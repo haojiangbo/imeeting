@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
+
 /**
 * @Title: HttpRequest
 * @Package com.haojiangbo.http

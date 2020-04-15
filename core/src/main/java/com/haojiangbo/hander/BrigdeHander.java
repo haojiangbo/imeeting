@@ -1,5 +1,6 @@
 package com.haojiangbo.hander;
 
+
 import com.haojiangbo.config.BrigdeChannelMapping;
 import com.haojiangbo.model.CustomProtocol;
 import io.netty.buffer.ByteBuf;
@@ -32,7 +33,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
     * @param message
     */
    private void channelMappingHander(ChannelHandlerContext ctx, CustomProtocol message) {
-     if(BrigdeChannelMapping .CHANNELID_CLINENTID_MAPPING.containsKey(ctx.channel().id().asLongText())){
+     if(BrigdeChannelMapping.CHANNELID_CLINENTID_MAPPING.containsKey(ctx.channel().id().asLongText())){
        BrigdeChannelMapping .CHANNELID_CLINENTID_MAPPING.put(ctx.channel().id().asLongText(),message.getClientId());
      }
      if(BrigdeChannelMapping .CLIENT_ID_MAPPING.containsKey(message.getClientId())){
