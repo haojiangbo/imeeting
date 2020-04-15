@@ -32,4 +32,9 @@ public class HttpRequest implements Serializable {
      */
     private String host;
 
+    /**
+     * 端口号
+     */
+    private int port;
+
 }

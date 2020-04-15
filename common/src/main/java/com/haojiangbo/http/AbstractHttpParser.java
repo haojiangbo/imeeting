@@ -24,15 +24,15 @@ public abstract class AbstractHttpParser {
         return HTTP1_1PARSER;
     }
 
-    public  void  decode(ByteBuf byteBuf){
+    public  HttpRequest  decode(ByteBuf byteBuf){
         if(null == byteBuf || byteBuf.writerIndex() == byteBuf.readerIndex()){
              decode("");
-             return;
+             return null;
         }
-        decode(byteBuf.toString(CharsetUtil.UTF_8));
+        return decode(byteBuf.toString(CharsetUtil.UTF_8));
     }
 
-    public abstract void  decode(String value);
+    public abstract HttpRequest  decode(String value);
 
     protected abstract HttpRequest parser(String s);
 

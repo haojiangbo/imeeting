@@ -1,14 +1,14 @@
 package com.haojiangbo.test;
 
+import com.haojiangbo.hander.ProxyClientHander;
 import com.haojiangbo.hander.ProxyHander;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.SneakyThrows;
@@ -17,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * 　　* @author 郝江波
  * 　　* @date 2020/4/15 11:59
- *
  */
 @Slf4j
 public class App {
@@ -26,6 +25,22 @@ public class App {
         // 配置NIO线程组
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup(4);
+
+
+        /**
+         * 客户端group
+         */
+        Bootstrap clientBootstrap = new Bootstrap();
+        clientBootstrap.group(workerGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new ProxyClientHander());
+                    }
+                });
+
+
         try {
             // 服务器辅助启动类配置
             ServerBootstrap b = new ServerBootstrap();
@@ -36,7 +51,7 @@ public class App {
                         @Override
                         protected void initChannel(SocketChannel ch) {
                             // 处理网络IO
-                            ch.pipeline().addLast(new ProxyHander());
+                            ch.pipeline().addLast(new ProxyHander(clientBootstrap));
                         }
                     })
                     // 设置tcp缓冲区 // (5)

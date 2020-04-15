@@ -15,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 public class HttpParser extends AbstractHttpParser {
 
     @Override
-    public void decode(String value) {
-        parser(value);
+    public HttpRequest decode(String value)  {
+      return   parser(value);
     }
 
     @Override
@@ -55,6 +55,11 @@ public class HttpParser extends AbstractHttpParser {
         String[] host = str.split(" ");
         assert host.length == 2;
         request.setHost(host[1].replace("\r", ""));
+        String [] port =  request.getHost().split(":");
+        if(port.length == 2){
+            request.setHost(port[0]);
+            request.setPort(Integer.valueOf(port[1]));
+        }
     }
 
 }
