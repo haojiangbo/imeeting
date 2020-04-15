@@ -3,6 +3,8 @@ package com.haojiangbo.hander;
 import com.haojiangbo.config.ClientConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
@@ -30,6 +32,7 @@ public class IdleCheckHandler extends IdleStateHandler {
         if (IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT == evt) {
             String messgae = "ping";
             CustomProtocol msg = new CustomProtocol(ConstantValue.PING,ClientConfig.INSTAND.getClientId(),messgae.getBytes().length,messgae.getBytes());
+            //ByteBuf out = getByteBuf(messgae, msg);
             ctx.channel().writeAndFlush(msg);
         } else if (IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT == evt) {
             ctx.channel().close();

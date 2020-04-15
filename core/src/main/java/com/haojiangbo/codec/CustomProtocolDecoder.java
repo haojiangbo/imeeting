@@ -29,7 +29,7 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
      * 表示数据的长度contentLength，int类型，占据4个字节.
      * </pre>
      */
-    public final int BASE_LENGTH = 4 + 4 + 4 + 4;
+    public final static int BASE_LENGTH = 4 + 4 + 4 + 4;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,

@@ -2,6 +2,7 @@ package com.haojiangbo.codec;
 
 import com.haojiangbo.model.CustomProtocol;
 
+import com.haojiangbo.model.CustomProtocolConverByteBuf;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -24,14 +25,6 @@ public class CustomProtocolEncoder extends MessageToByteEncoder<CustomProtocol> 
     @Override
     protected void encode(ChannelHandlerContext tcx, CustomProtocol msg,
                           ByteBuf out) throws Exception {
-        // 1.写入消息的开头的信息标志(int类型)
-        out.writeInt(msg.getHeadData());
-        // 2.写入消息类型
-        out.writeInt(msg.getMeesgeType());
-        out.writeInt(msg.getClientId());
-        // 3.写入消息的长度(int 类型)
-        out.writeInt(msg.getContentLength());
-        // 4.写入消息的内容(byte[]类型)
-        out.writeBytes(msg.getContent());
+        CustomProtocolConverByteBuf.getByteBuf(out,msg);
     }
 }
