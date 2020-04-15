@@ -12,6 +12,7 @@
         <module>common</module>
       <module>core</module>
       <module>proxy</module>
+        <module>client</module>
     </modules>
 
     <name>stinger</name>
