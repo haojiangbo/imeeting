@@ -23,9 +23,16 @@ public class BrigdeChannelMapping {
    /**
     * clientId 的 映射
     */
-   public static ConcurrentHashMap<Integer, Channel> CLIENT_ID_MAPPING = new ConcurrentHashMap<>();
+   public static ConcurrentHashMap<String, Channel> CLIENT_ID_MAPPING = new ConcurrentHashMap<>();
     /**
      * 管道ID 和  clientId 的映射
      */
-   public static ConcurrentHashMap<String, Integer> CHANNELID_CLINENTID_MAPPING = new ConcurrentHashMap<>();
+   public static ConcurrentHashMap<String, String> CHANNELID_CLINENTID_MAPPING = new ConcurrentHashMap<>();
+
+
+
+
+
+
+
 }

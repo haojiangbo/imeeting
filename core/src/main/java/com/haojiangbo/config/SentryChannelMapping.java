@@ -15,11 +15,17 @@ public class SentryChannelMapping {
     /**
      * 端口和管道的映射
      */
-    public static ConcurrentHashMap<Integer, Channel> PROT_CHANNEL_MAPPING = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, Channel> CLIENTID_CHANNEL_MAPPING = new ConcurrentHashMap<>();
     /**
      * 端口和clientId的映射
      */
-    public static ConcurrentHashMap<Integer, Integer> PROT_ClIENT_ID_MAPPING = new ConcurrentHashMap<>();
+    public static ConcurrentHashMap<String, String> PROT_ClIENT_ID_MAPPING = new ConcurrentHashMap<>();
+
+
+
+
+
+
     /**
      * 二级域名和CLIENTID的映射
      */

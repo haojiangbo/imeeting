@@ -1,7 +1,10 @@
 package com.haojiangbo.hander;
+import com.haojiangbo.config.BrigdeChannelMapping;
+import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.http.AbstractHttpParser;
 import com.haojiangbo.http.HttpRequest;
+import com.haojiangbo.model.CustomProtocol;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;

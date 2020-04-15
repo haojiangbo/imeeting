@@ -17,9 +17,9 @@ public class IdleCheckHandler extends IdleStateHandler {
 
     public static final int USER_CHANNEL_READ_IDLE_TIME = 1200;
 
-    public static final int READ_IDLE_TIME = 6;
+    public static final int READ_IDLE_TIME = 30;
 
-    public static final int WRITE_IDLE_TIME = 3;
+    public static final int WRITE_IDLE_TIME = 13;
 
     public IdleCheckHandler(int readerIdleTimeSeconds, int writerIdleTimeSeconds, int allIdleTimeSeconds) {
         super(readerIdleTimeSeconds, writerIdleTimeSeconds, allIdleTimeSeconds);
@@ -27,7 +27,6 @@ public class IdleCheckHandler extends IdleStateHandler {
 
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
-
         if (IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT == evt) {
             String messgae = "ping";
             CustomProtocol msg = new CustomProtocol(ConstantValue.PING,ClientConfig.INSTAND.getClientId(),messgae.getBytes().length,messgae.getBytes());

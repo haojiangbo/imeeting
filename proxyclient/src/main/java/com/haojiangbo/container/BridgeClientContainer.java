@@ -4,6 +4,7 @@ import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.ClientConfig;
 import com.haojiangbo.hander.ClientHander;
+import com.haojiangbo.hander.ClientProxyHander;
 import com.haojiangbo.hander.IdleCheckHandler;
 import com.haojiangbo.inteface.Container;
 import io.netty.bootstrap.Bootstrap;
@@ -31,7 +32,17 @@ public class BridgeClientContainer extends ChannelInboundHandlerAdapter implemen
     private Bootstrap bridgeBootstrap ;
 
     private void init(){
-        if(bridgeBootstrap != null){ return;}
+        if(null !=  bridgeBootstrap){return;}
+
+        clientBootstrap.group(workerGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new ClientProxyHander());
+                    }
+                });
+
 
         bridgeBootstrap = new Bootstrap();
         bridgeBootstrap.
@@ -45,8 +56,7 @@ public class BridgeClientContainer extends ChannelInboundHandlerAdapter implemen
                         ch.pipeline().addLast(new CustomProtocolDecoder());
                         //设置一个读取过期时间 和 写入过期时间  写入过期时间触发后 回向服务端写ping数据，如果规定时间内没有发生读事件，那么就是认为服务被停止
                         ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0));
-                        ch.pipeline().addLast(new ClientHander(clientBootstrap));
-                        ch.pipeline().addLast(BridgeClientContainer.this);
+                        ch.pipeline().addLast(new ClientHander(clientBootstrap,BridgeClientContainer.this));
                     }
                 });
     }
