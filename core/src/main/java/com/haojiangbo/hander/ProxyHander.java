@@ -23,10 +23,8 @@ public class ProxyHander extends ChannelInboundHandlerAdapter {
         bootstrap = bsp;
     }
 
-
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        log.info("激活便调用", ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
         super.channelActive(ctx);
     }
 
@@ -35,8 +33,18 @@ public class ProxyHander extends ChannelInboundHandlerAdapter {
         ByteBuf message = (ByteBuf) msg;
         Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
         if(target == null){
-            // 解析http协议  此处可能有bug  禁止服务端继续读取消息
+            /**
+             * 为什么此处要设置 ChannelOption.AUTO_READ 为 false
+             * 因为客户端连接是异步的，
+             * 很可能客户端还未连接成功，
+             * 已经有新的数据到来
+             * ，
+             * 所以先设置autoRead为false
+             * 等连接成功之后，
+             * 再接收其他数据
+             */
             ctx.channel().config().setOption(ChannelOption.AUTO_READ, false);
+            // 解析http协议  此处可能有bug
             HttpRequest request =  AbstractHttpParser.getDefaltHttpParser().decode(message);
             createConnect(ctx, message, request,80);
         }else{
@@ -48,7 +56,6 @@ public class ProxyHander extends ChannelInboundHandlerAdapter {
         bootstrap.connect(request.getHost(),port).addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()){
                 // 相互映射 双方互相可以得到对方
-                log.info("连接成功>>>>>>>", ">>>>>>>>>>>");
                 future.channel().attr(NettyProxyMappingConstant.MAPPING).set(ctx.channel());
                 ctx.channel().attr(NettyProxyMappingConstant.MAPPING).set(future.channel());
                 future.channel().writeAndFlush(message);
