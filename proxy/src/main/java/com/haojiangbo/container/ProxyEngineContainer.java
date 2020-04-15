@@ -1,5 +1,6 @@
 package com.haojiangbo.container;
 
+import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.ProxyClientHander;
 import com.haojiangbo.hander.ProxyHander;
 import com.haojiangbo.inteface.Container;
@@ -43,16 +44,13 @@ public class ProxyEngineContainer implements Container {
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true);
-        serverBootstrap.bind(port).addListener(new ChannelFutureListener() {
-            @Override
-            public void operationComplete(ChannelFuture future) throws Exception {
+            serverBootstrap.bind(ServerConfig.INSTAND.getProxyPort()).addListener((ChannelFutureListener) future -> {
                 if(future.isSuccess()){
-                    log.info("反向代理引擎启动成功...");
+                    log.info("反向代理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getProxyPort());
                 }else{
                     log.error("反向代理引擎启动失败...");
                 }
-            }
-        });
+            });
     }
 
     public void initClient(){
