@@ -46,6 +46,7 @@ public class ProxyHander extends ChannelInboundHandlerAdapter {
             ctx.channel().config().setOption(ChannelOption.AUTO_READ, false);
             // 解析http协议  此处可能有bug
             HttpRequest request =  AbstractHttpParser.getDefaltHttpParser().decode(message);
+            log.info("请求的域名>>>> {}", request.getHost());
             createConnect(ctx, message, request,80);
         }else{
             target.writeAndFlush(msg);

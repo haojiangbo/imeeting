@@ -1,6 +1,7 @@
 package com.haojiangbo.hander;
 
 import com.haojiangbo.constant.NettyProxyMappingConstant;
+import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -17,7 +18,7 @@ public class ProxyClientHander extends ChannelInboundHandlerAdapter {
 
      @Override
      public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-         log.info("客户端交换>>>>>>", "执行");
+         log.info("反向代理引擎交换数据>>>>>> byte length = {}", ((ByteBuf)msg).writerIndex());
          Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
          target.writeAndFlush(msg);
      }

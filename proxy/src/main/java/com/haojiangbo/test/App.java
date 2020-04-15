@@ -20,16 +20,16 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class App {
-    @SneakyThrows
+    /*@SneakyThrows
     public static void main(String[] argg) {
         // 配置NIO线程组
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup(4);
 
 
-        /**
+        *//**
          * 客户端group
-         */
+         *//*
         Bootstrap clientBootstrap = new Bootstrap();
         clientBootstrap.group(workerGroup)
                 .channel(NioSocketChannel.class)
@@ -67,5 +67,5 @@ public class App {
             workerGroup.shutdownGracefully();
             bossGroup.shutdownGracefully();
         }
-    }
+    }*/
 }
