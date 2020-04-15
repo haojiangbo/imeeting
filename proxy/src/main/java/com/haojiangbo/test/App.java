@@ -14,10 +14,15 @@ import io.netty.handler.logging.LoggingHandler;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * 　　* @author 郝江波
+ * 　　* @date 2020/4/15 11:59
+ *
+ */
 @Slf4j
 public class App {
     @SneakyThrows
-    public static void main(String [] argg){
+    public static void main(String[] argg) {
         // 配置NIO线程组
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup(4);
@@ -33,12 +38,13 @@ public class App {
                             // 处理网络IO
                             ch.pipeline().addLast(new ProxyHander());
                         }
-                    })//
-                    .option(ChannelOption.SO_BACKLOG, 1024) // 设置tcp缓冲区 // (5)
-                    .option(ChannelOption.SO_REUSEADDR,true)
-                    .childOption(ChannelOption.SO_KEEPALIVE, true); // (6)
+                    })
+                    // 设置tcp缓冲区 // (5)
+                    .option(ChannelOption.SO_BACKLOG, 1024)
+                    .option(ChannelOption.SO_REUSEADDR, true)
+                    .childOption(ChannelOption.SO_KEEPALIVE, true);
             // 绑定端口 同步等待绑定成功
-            ChannelFuture f = b.bind(999).sync(); // (7)
+            ChannelFuture f = b.bind(666).sync();
             // 等到服务端监听端口关闭
             f.channel().closeFuture().sync();
         } finally {
