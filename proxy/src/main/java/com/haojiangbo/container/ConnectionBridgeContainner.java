@@ -3,7 +3,8 @@ package com.haojiangbo.container;
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.ServerConfig;
-import com.haojiangbo.hander.ProxyHander;
+import com.haojiangbo.hander.BrigdeHander;
+import com.haojiangbo.hander.ProxyServerHander;
 import com.haojiangbo.inteface.Container;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
@@ -47,7 +48,7 @@ public class ConnectionBridgeContainner implements Container {
                         ch.pipeline().addLast(new CustomProtocolEncoder());
                         ch.pipeline().addLast(new CustomProtocolDecoder());
                         // 处理网络IO
-                        ch.pipeline().addLast(new ProxyHander(null));
+                        ch.pipeline().addLast(new BrigdeHander());
                     }
                 })
                 // 设置tcp缓冲区

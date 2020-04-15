@@ -13,15 +13,17 @@ import lombok.Data;
 @Data
 public class ServerConfig implements Container {
 
-   public static  ServerConfig INSTAND;
+   public static volatile   ServerConfig INSTAND;
 
    private int proxyPort;
    private int bridgePort;
 
 
+
    public ServerConfig(){
        this.proxyPort = ProxyServerConfig.INSTAND.getIntValue("proxyPort");
        this.bridgePort = ProxyServerConfig.INSTAND.getIntValue("bridgePort");
+       //volatile 关键字 防止指令重排序 顺便刷新本地内存到主存
        INSTAND = this;
    }
 

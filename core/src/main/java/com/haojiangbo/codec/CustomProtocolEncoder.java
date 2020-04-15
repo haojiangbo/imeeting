@@ -28,6 +28,7 @@ public class CustomProtocolEncoder extends MessageToByteEncoder<CustomProtocol> 
         out.writeInt(msg.getHeadData());
         // 2.写入消息类型
         out.writeInt(msg.getMeesgeType());
+        out.writeInt(msg.getClientId());
         // 3.写入消息的长度(int 类型)
         out.writeInt(msg.getContentLength());
         // 4.写入消息的内容(byte[]类型)

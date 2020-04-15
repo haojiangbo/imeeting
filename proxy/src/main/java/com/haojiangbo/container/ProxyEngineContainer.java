@@ -2,7 +2,7 @@ package com.haojiangbo.container;
 
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.ProxyClientHander;
-import com.haojiangbo.hander.ProxyHander;
+import com.haojiangbo.hander.ProxyServerHander;
 import com.haojiangbo.inteface.Container;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -37,7 +37,7 @@ public class ProxyEngineContainer implements Container {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         // 处理网络IO
-                        ch.pipeline().addLast(new ProxyHander(clientBootstrap));
+                        ch.pipeline().addLast(new ProxyServerHander(clientBootstrap));
                     }
                 })
                 // 设置tcp缓冲区

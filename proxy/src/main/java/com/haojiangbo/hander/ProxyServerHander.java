@@ -5,7 +5,6 @@ import com.haojiangbo.http.HttpRequest;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -15,11 +14,11 @@ import lombok.extern.slf4j.Slf4j;
  　　* @date 2020/4/15 14:12
  　　*/
 @Slf4j
-public class ProxyHander extends ChannelInboundHandlerAdapter {
+public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
     private static Bootstrap bootstrap = null;
 
-    public ProxyHander(Bootstrap bsp){
+    public ProxyServerHander(Bootstrap bsp){
         bootstrap = bsp;
     }
 
@@ -54,7 +53,7 @@ public class ProxyHander extends ChannelInboundHandlerAdapter {
     }
 
     private void createConnect(ChannelHandlerContext ctx, ByteBuf message, HttpRequest request,int port) {
-        bootstrap.connect(request.getHost(),port).addListener((ChannelFutureListener) future -> {
+        bootstrap.connect("hdyq.hbweiyinqing.cn",port).addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()){
                 // 相互映射 双方互相可以得到对方
                 future.channel().attr(NettyProxyMappingConstant.MAPPING).set(ctx.channel());
