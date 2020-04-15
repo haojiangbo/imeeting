@@ -34,6 +34,6 @@ public abstract class AbstractHttpParser {
 
     public abstract void  decode(String value);
 
-    protected abstract  void parser(String s);
+    protected abstract HttpRequest parser(String s);
 
 }
