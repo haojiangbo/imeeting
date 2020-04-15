@@ -51,6 +51,10 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
             log.info("请求的域名>>>> {}", request.getHost());
             createConnect(ctx, message, request,80);
         }else{
+            if(!target.isActive()){
+                ctx.close();
+                return;
+            }
             target.writeAndFlush(msg);
         }
     }
