@@ -1,9 +1,11 @@
 package com.haojiangbo.container;
 
 import com.haojiangbo.codec.CustomProtocolDecoder;
+import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.SentryClientHander;
 import com.haojiangbo.hander.SentryServerHander;
 import com.haojiangbo.inteface.Container;
+import com.haojiangbo.model.ConfigModel;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
@@ -17,6 +19,8 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
 
 /**
   *
@@ -72,10 +76,11 @@ public class SentryEngineContainer implements Container {
 
     @Override
     public void start() {
-        start(777,"123","hdyq.hbweiyinqing.cn:80");
-        start(888,"456","relixunjian.hbweiyinqing.cn:80");
+        List<ConfigModel> configModelList =  ServerConfig.INSTAND.getConfigList();
+        for(ConfigModel item : configModelList){
+            start(item.getPort(),String.valueOf(item.getClientId()),item.getClientUrl());
+        }
     }
-
     @Override
     public void stop() {
 

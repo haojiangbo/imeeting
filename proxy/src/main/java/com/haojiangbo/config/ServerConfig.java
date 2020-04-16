@@ -1,7 +1,15 @@
 package com.haojiangbo.config;
 
+import com.haojiangbo.config.imp.NioLocalFileConfigReadImp;
 import com.haojiangbo.inteface.Container;
+import com.haojiangbo.model.ConfigModel;
+import com.haojiangbo.utils.PathUtils;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
+
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -11,6 +19,7 @@ import lombok.Data;
   * @date 2020/4/15 16:26
   */
 @Data
+@Slf4j
 public class ServerConfig implements Container {
 
    public static volatile   ServerConfig INSTAND;
@@ -18,18 +27,26 @@ public class ServerConfig implements Container {
    private String bridgeHost;
    private int proxyPort;
    private int bridgePort;
-
+   private List<ConfigModel> configList;
 
 
    public ServerConfig(){
        this.bridgeHost = ProxyServerConfig.INSTAND.getStringValue("bridgeHost");
        this.proxyPort = ProxyServerConfig.INSTAND.getIntValue("proxyPort");
        this.bridgePort = ProxyServerConfig.INSTAND.getIntValue("bridgePort");
+       this.configList = initConfigList();
+       if(configList.size() == 0)
+           throw  new RuntimeException("配置不能为空");
+
        //volatile 关键字 防止指令重排序 顺便刷新本地内存到主存
        INSTAND = this;
    }
 
 
+    private List<ConfigModel> initConfigList(){
+        ConfigRead configRead =   new NioLocalFileConfigReadImp();
+        return   configRead.readLine(PathUtils.getPath(ServerConfig.class));
+   }
 
 
    @Override
