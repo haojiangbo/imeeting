@@ -4,16 +4,10 @@ import com.haojiangbo.config.ClientConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.utils.SessionUtils;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-import sun.plugin.util.UIUtil;
-
-import java.util.UUID;
-
 /**
  * check idle chanel.
  *

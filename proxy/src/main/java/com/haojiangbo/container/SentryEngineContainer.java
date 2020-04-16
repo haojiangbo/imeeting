@@ -1,11 +1,8 @@
 package com.haojiangbo.container;
 
 import com.haojiangbo.codec.CustomProtocolDecoder;
-import com.haojiangbo.codec.CustomProtocolEncoder;
-import com.haojiangbo.config.ServerConfig;
-import com.haojiangbo.hander.BrigdeHander;
 import com.haojiangbo.hander.SentryClientHander;
-import com.haojiangbo.hander.SentryHander;
+import com.haojiangbo.hander.SentryServerHander;
 import com.haojiangbo.inteface.Container;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -20,9 +17,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
-
-import java.util.HashMap;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
   *
@@ -60,7 +54,7 @@ public class SentryEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new SentryHander(clientId,clientBootstrap,url));
+                        ch.pipeline().addLast(new SentryServerHander(clientId,clientBootstrap,url));
                     }
                 })
                 // 设置tcp缓冲区

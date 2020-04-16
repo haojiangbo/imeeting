@@ -22,11 +22,11 @@ import lombok.extern.slf4j.Slf4j;
  　　* @date 2020/4/16 13:42
  　　*/
  @Slf4j
-public class SentryHander extends ChannelInboundHandlerAdapter {
+public class SentryServerHander extends ChannelInboundHandlerAdapter {
     private String clientId = null;
     private Bootstrap clientBootstrap = null;
     private String clientUrl = null;
-    public SentryHander(String clientId,Bootstrap bootstrap,String clientUrl){
+    public SentryServerHander(String clientId, Bootstrap bootstrap, String clientUrl){
         this.clientBootstrap =bootstrap;
         this.clientId = clientId;
         this.clientUrl = clientUrl;
@@ -60,7 +60,7 @@ public class SentryHander extends ChannelInboundHandlerAdapter {
     private void createConnect(ChannelHandlerContext ctx,ByteBuf byteBuf,SessionUtils.SessionModel model) {
         ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         clientBootstrap
-                .connect("127.0.0.1", 10009)
+                .connect(ServerConfig.INSTAND.getBridgeHost(), ServerConfig.INSTAND.getBridgePort())
                 .addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
                         AtoBUtils.addMapping(ctx.channel(),future.channel());

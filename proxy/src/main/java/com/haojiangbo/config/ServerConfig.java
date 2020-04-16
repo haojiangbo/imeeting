@@ -15,12 +15,14 @@ public class ServerConfig implements Container {
 
    public static volatile   ServerConfig INSTAND;
 
+   private String bridgeHost;
    private int proxyPort;
    private int bridgePort;
 
 
 
    public ServerConfig(){
+       this.bridgeHost = ProxyServerConfig.INSTAND.getStringValue("bridgeHost");
        this.proxyPort = ProxyServerConfig.INSTAND.getIntValue("proxyPort");
        this.bridgePort = ProxyServerConfig.INSTAND.getIntValue("bridgePort");
        //volatile 关键字 防止指令重排序 顺便刷新本地内存到主存
