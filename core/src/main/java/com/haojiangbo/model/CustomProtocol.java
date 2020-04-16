@@ -2,10 +2,12 @@ package com.haojiangbo.model;
 
 import com.haojiangbo.constant.ConstantValue;
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 import java.util.Arrays;
 
 @Data
+@Accessors(chain = true)
 public class CustomProtocol {
     /**
      * 消息的开头的信息标志

@@ -29,25 +29,49 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
      @Override
      public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-        // 处理管道和消息的映射
-        channelMappingHander(ctx, message);
         // byte array 转  byteBuf
         // ByteBuf byteBuf =  Unpooled.wrappedBuffer(message.getContent());
          switch (message.getMeesgeType()){
              case ConstantValue.PING:
+                 // 处理管道和消息的映射
+                 channelMappingHander(ctx, message);
                  pingHander(ctx,message);
                  break;
              case ConstantValue.DATA:
+                 // 处理管道和消息的映射
+                 channelMappingHander(ctx, message);
                  dataHander(ctx,message);
-                 ReferenceCountUtil.release(msg);
+                 break;
+             case ConstantValue.FORWARD:
+                 //处理本地哨兵数据的转发
+                 forWardHander(ctx,message);
                  break;
          }
      }
 
-     private void dataHander(ChannelHandlerContext ctx,CustomProtocol message){
-         log.info("收到客户端的转发消息 {}", message);
+
+    private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
+        log.info("收到哨兵端的消息 {}", message.getSessionId());
+        Channel target =  BrigdeChannelMapping .CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId()));
+        if(null == target || !target.isActive()){
+            ctx.close();
+            return;
+        }
+        //向客户端发送消息
+        target.writeAndFlush(message.setMeesgeType(ConstantValue.DATA));
+        SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), ctx.channel());
+
+    }
+
+    private void dataHander(ChannelHandlerContext ctx,CustomProtocol message){
+        log.info("收到客户端的消息 {}", message.getSessionId());
          Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
-         target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
+         if(null ==  target || !target.isActive()){
+             SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());
+         }else{
+             //target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
+             target.writeAndFlush(message);
+         }
      }
 
      private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){

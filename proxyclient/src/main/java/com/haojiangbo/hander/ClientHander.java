@@ -40,7 +40,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     }
 
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        log.info("收到服务器端的数据消息.......{}", message);
+        log.info("收到服务器端的数据消息.......{}", message.getSessionId());
         String sessionId =  message.getSessionId();
         Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(sessionId);
         if(target == null){

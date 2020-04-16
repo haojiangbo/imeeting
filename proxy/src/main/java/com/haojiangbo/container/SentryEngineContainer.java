@@ -4,8 +4,10 @@ import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.BrigdeHander;
+import com.haojiangbo.hander.SentryClientHander;
 import com.haojiangbo.hander.SentryHander;
 import com.haojiangbo.inteface.Container;
+import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -14,6 +16,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
@@ -33,9 +36,23 @@ public class SentryEngineContainer implements Container {
     private  static  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private  static  EventLoopGroup workerGroup = new NioEventLoopGroup();
     ServerBootstrap serverBootstrap = null;
-
+    Bootstrap  clientBootstrap = null;
 
     public void start(int port,String clientId){
+
+
+        clientBootstrap = new Bootstrap();
+        clientBootstrap.group(workerGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new ChannelInitializer<SocketChannel>() {
+                    @Override
+                    protected void initChannel(SocketChannel ch) throws Exception {
+                        ch.pipeline().addLast(new CustomProtocolDecoder());
+                        ch.pipeline().addLast(new SentryClientHander());
+                    }
+                });
+
+
         serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -43,7 +60,7 @@ public class SentryEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new SentryHander(clientId));
+                        ch.pipeline().addLast(new SentryHander(clientId,clientBootstrap));
                     }
                 })
                 // 设置tcp缓冲区

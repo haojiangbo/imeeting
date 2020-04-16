@@ -18,9 +18,9 @@ public class StartProxyServerApp {
     public static void main(String [] args){
         Container[]  containers = new Container[]{
                 new ServerConfig(),
-                new ProxyEngineContainer(),
                 new ConnectionBridgeContainner(),
-                new SentryEngineContainer()
+                new SentryEngineContainer(),
+                new ProxyEngineContainer(),
         };
         for(Container item : containers){
             item.start();
