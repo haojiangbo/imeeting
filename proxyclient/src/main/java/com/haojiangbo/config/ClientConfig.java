@@ -12,18 +12,12 @@ import lombok.Data;
   */
 @Data
 public class ClientConfig implements Container {
-
    public static volatile ClientConfig INSTAND;
-
-   private String localHost;
-   private int localPort;
    private int clientId;
    private String remoteHost;
    private int remotePort;
 
    public ClientConfig(){
-       this.localHost = ProxyServerConfig.INSTAND.getStringValue("localHost");
-       this.localPort = ProxyServerConfig.INSTAND.getIntValue("localPort");
        this.clientId =  ProxyServerConfig.INSTAND.getIntValue("clientId");
        this.remoteHost = ProxyServerConfig.INSTAND.getStringValue("remoteHost");
        this.remotePort = ProxyServerConfig.INSTAND.getIntValue("remotePort");
