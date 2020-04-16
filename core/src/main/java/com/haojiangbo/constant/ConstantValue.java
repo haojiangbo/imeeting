@@ -15,4 +15,6 @@ public class ConstantValue {
     public static final  int PING = 0X77;
     //数据消息
     public static final  int DATA = 0X78;
+    //转发消息
+    public static final  int FORWARD = 0X79;
 }

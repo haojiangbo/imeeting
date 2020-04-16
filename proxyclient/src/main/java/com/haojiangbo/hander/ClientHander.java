@@ -27,8 +27,6 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
 
-        // byte array 转  byteBuf
-        // ByteBuf byteBuf =  ;
         switch (message.getMeesgeType()){
             case ConstantValue.PING:
                 pingHander(ctx,message);

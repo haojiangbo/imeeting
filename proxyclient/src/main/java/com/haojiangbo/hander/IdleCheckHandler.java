@@ -51,7 +51,6 @@ public class IdleCheckHandler extends IdleStateHandler {
                 sessionId.getBytes().length,
                 sessionId,
                 messgae.getBytes().length,messgae.getBytes());
-        //ByteBuf out = getByteBuf(messgae, msg);
         channel.writeAndFlush(msg);
     }
 }

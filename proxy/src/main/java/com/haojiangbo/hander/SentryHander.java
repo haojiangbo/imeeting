@@ -12,7 +12,11 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
-
+ /**
+  * 哨兵数据处理器
+ 　　* @author 郝江波
+ 　　* @date 2020/4/16 13:42
+ 　　*/
 public class SentryHander extends ChannelInboundHandlerAdapter {
     private String clientId = null;
     public SentryHander(String clientId){
