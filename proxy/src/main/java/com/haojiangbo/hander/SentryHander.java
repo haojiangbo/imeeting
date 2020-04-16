@@ -25,15 +25,17 @@ import lombok.extern.slf4j.Slf4j;
 public class SentryHander extends ChannelInboundHandlerAdapter {
     private String clientId = null;
     private Bootstrap clientBootstrap = null;
-    public SentryHander(String clientId,Bootstrap bootstrap){
+    private String clientUrl = null;
+    public SentryHander(String clientId,Bootstrap bootstrap,String clientUrl){
         this.clientBootstrap =bootstrap;
         this.clientId = clientId;
+        this.clientUrl = clientUrl;
     }
 
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        String sessionId = SessionUtils.genSessionId(this.clientId, "127.0.0.1:80");
+        String sessionId = SessionUtils.genSessionId(this.clientId, this.clientUrl);
         //绑定sessionId
         ctx.channel().attr(NettyProxyMappingConstant.SESSION)
                 .set(sessionId);

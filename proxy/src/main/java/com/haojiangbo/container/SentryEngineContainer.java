@@ -38,7 +38,7 @@ public class SentryEngineContainer implements Container {
     ServerBootstrap serverBootstrap = null;
     Bootstrap  clientBootstrap = null;
 
-    public void start(int port,String clientId){
+    public void start(int port,String clientId,String url){
 
 
         clientBootstrap = new Bootstrap();
@@ -60,7 +60,7 @@ public class SentryEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        ch.pipeline().addLast(new SentryHander(clientId,clientBootstrap));
+                        ch.pipeline().addLast(new SentryHander(clientId,clientBootstrap,url));
                     }
                 })
                 // 设置tcp缓冲区
@@ -78,8 +78,8 @@ public class SentryEngineContainer implements Container {
 
     @Override
     public void start() {
-        start(777,"123");
-        start(888,"456");
+        start(777,"123","hdyq.hbweiyinqing.cn:80");
+        start(888,"456","relixunjian.hbweiyinqing.cn:80");
     }
 
     @Override
