@@ -12,11 +12,14 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
- /**
+import lombok.extern.slf4j.Slf4j;
+
+/**
   * 哨兵数据处理器
  　　* @author 郝江波
  　　* @date 2020/4/16 13:42
  　　*/
+ @Slf4j
 public class SentryHander extends ChannelInboundHandlerAdapter {
     private String clientId = null;
     public SentryHander(String clientId){
@@ -67,6 +70,7 @@ public class SentryHander extends ChannelInboundHandlerAdapter {
             ));
             ReferenceCountUtil.release(btf);
         }else{
+            log.info("没有发现活跃通道,已关闭链接");
             ctx.close();
         }
     }

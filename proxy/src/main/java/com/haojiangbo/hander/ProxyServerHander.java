@@ -35,16 +35,6 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
         ByteBuf message = (ByteBuf) msg;
         Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
         if(target == null){
-            /**
-             * 为什么此处要设置 ChannelOption.AUTO_READ 为 false
-             * 因为客户端连接是异步的，
-             * 很可能客户端还未连接成功，
-             * 已经有新的数据到来
-             * ，
-             * 所以先设置autoRead为false
-             * 等连接成功之后，
-             * 再接收其他数据
-             */
             ctx.channel().config().setOption(ChannelOption.AUTO_READ, false);
             // 解析http协议  此处可能有bug
             HttpRequest request =  AbstractHttpParser.getDefaltHttpParser().decode(message);

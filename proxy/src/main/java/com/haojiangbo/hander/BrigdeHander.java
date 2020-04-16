@@ -51,7 +51,9 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
      }
 
      private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-         log.info("收到客户端的心跳消息  clientId = {}",message.getClientId());
+         if(log.isDebugEnabled()){
+             log.debug("收到客户端的心跳消息  clientId = {}",message.getClientId());
+         }
          ctx.writeAndFlush(message);
      }
 

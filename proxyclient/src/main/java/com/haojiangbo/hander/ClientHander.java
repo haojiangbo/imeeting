@@ -68,7 +68,9 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
 
 
     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-        log.info("收到服务器的心跳消息  clientId = {}",message.getClientId());
+        if(log.isDebugEnabled()){
+            log.info("收到服务器的心跳消息  clientId = {}",message.getClientId());
+        }
     }
 
     @Override

@@ -9,7 +9,7 @@ import java.io.Serializable;
 * @Title: HttpRequest
 * @Package com.haojiangbo.http
 * @Description: http请求类
-* @author Administrator
+* @author 郝江波
 * @date 2020/4/14
 * @version V1.0
 */

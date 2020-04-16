@@ -30,8 +30,8 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class SentryEngineContainer implements Container {
 
-    EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    private  static  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    private  static  EventLoopGroup workerGroup = new NioEventLoopGroup();
     ServerBootstrap serverBootstrap = null;
 
 
@@ -62,6 +62,7 @@ public class SentryEngineContainer implements Container {
     @Override
     public void start() {
         start(777,"123");
+        start(888,"456");
     }
 
     @Override

@@ -4,7 +4,7 @@ package com.haojiangbo.constant;
 * @Title: ConstantValue
 * @Package com.haojiangbo.constant
 * @Description: 协议常量
-* @author Administrator
+* @author 郝江波
 * @date 2020/4/15
 * @version V1.0
 */
