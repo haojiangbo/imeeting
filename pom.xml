@@ -11,8 +11,6 @@
     <modules>
       <module>core</module>
       <module>proxy</module>
-      <module>client</module>
-      <module>client</module>
         <module>proxyclient</module>
     </modules>
 
@@ -59,6 +57,13 @@
       <version>1.18.12</version>
       <scope>provided</scope>
     </dependency>
+
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.6</version>
+    </dependency>
+
   </dependencies>
 
   <build>

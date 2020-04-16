@@ -1,6 +1,7 @@
 package com.haojiangbo.hander;
 
 import com.haojiangbo.config.ClientConfig;
+import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.container.BridgeClientContainer;
@@ -41,13 +42,16 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     }
 
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+        log.info("收到服务器端的数据消息.......{}", message);
+        String sessionId =  message.getSessionId();
+        Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(sessionId);
         if(target == null){
             ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
-            mapingHander(ctx, message);
+            mapingHander(ctx,message);
         }else{
             target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
         }
+        ReferenceCountUtil.release(message);
     }
 
     private void mapingHander(ChannelHandlerContext ctx, CustomProtocol message) {
@@ -55,17 +59,18 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
         bootstrap.connect(ClientConfig.INSTAND.getLocalHost(),ClientConfig.INSTAND.getLocalPort())
                 .addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
+                        future.channel().attr(NettyProxyMappingConstant.SESSION).set(message.getSessionId());
+                        SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), future.channel());
                         future.channel().attr(NettyProxyMappingConstant.MAPPING).set(ctx.channel());
-                        ctx.channel().attr(NettyProxyMappingConstant.MAPPING).set(future.channel());
-                        future.channel().writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
                     }
+                    future.channel().writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
                     ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                 });
     }
 
 
     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-        log.info("收到服务器的回复消息  clientId = {}",message.getClientId());
+        log.info("收到服务器的心跳消息  clientId = {}",message.getClientId());
     }
 
     @Override

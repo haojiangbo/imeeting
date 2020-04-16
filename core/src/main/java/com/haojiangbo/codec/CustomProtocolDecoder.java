@@ -66,10 +66,23 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                     return;
                 }
             }
-            //消息key
+            // 消息类型
             int messageType = buffer.readInt();
-            //消息key
+            // 消息客户端ID
             int clientId = buffer.readInt();
+
+            // 会话长度
+            int sesstionIdLength = buffer.readInt();
+            if (buffer.readableBytes() < sesstionIdLength) {
+                // 还原读指针
+                buffer.readerIndex(beginReader);
+                return;
+            }
+            // 会话ID
+            byte[] sessionId = new byte[sesstionIdLength];
+            buffer.readBytes(sessionId);
+
+
             // 消息的长度
             int length = buffer.readInt();
             // 判断请求数据包数据是否到齐
@@ -78,11 +91,20 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                 buffer.readerIndex(beginReader);
                 return;
             }
-
             // 读取data数据
             byte[] data = new byte[length];
             buffer.readBytes(data);
-            CustomProtocol protocol = new CustomProtocol(messageType,clientId,data.length, data);
+
+
+            // 组装消息
+            CustomProtocol protocol = new CustomProtocol(
+                    messageType,
+                    clientId,
+                    sesstionIdLength,
+                    new String(sessionId),
+                    data.length,
+                    data);
+
             out.add(protocol);
         }
     }

@@ -18,14 +18,17 @@ public class CustomProtocolConverByteBuf {
         return getByteBuf(out,msg);
     }
     public static ByteBuf getByteBuf(ByteBuf out,CustomProtocol msg) {
-        // 1.写入消息的开头的信息标志(int类型)
+        // 消息头
         out.writeInt(msg.getHeadData());
-        // 2.写入消息类型
         out.writeInt(msg.getMeesgeType());
         out.writeInt(msg.getClientId());
-        // 3.写入消息的长度(int 类型)
+
+        // 会话
+        out.writeInt(msg.getSesstionIdLength());
+        out.writeBytes(msg.getSessionId().getBytes());
+
+        // 负载
         out.writeInt(msg.getContentLength());
-        // 4.写入消息的内容(byte[]类型)
         out.writeBytes(msg.getContent());
         return out;
     }

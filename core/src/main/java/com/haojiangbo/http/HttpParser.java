@@ -21,7 +21,6 @@ public class HttpParser extends AbstractHttpParser {
 
     @Override
     protected HttpRequest parser(String s) {
-        //log.info("http context = \r\n {} ", s);
         String[] httpContext = s.split("\n");
         HttpRequest request = new HttpRequest();
         for (String item : httpContext) {

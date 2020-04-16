@@ -3,6 +3,7 @@ package com.haojiangbo.hander;
 
 import com.haojiangbo.config.BrigdeChannelMapping;
 import com.haojiangbo.config.SentryChannelMapping;
+import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
 import io.netty.buffer.ByteBuf;
@@ -37,14 +38,17 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
                  pingHander(ctx,message);
                  break;
              case ConstantValue.DATA:
-                 Channel target =  SentryChannelMapping.CLIENTID_CHANNEL_MAPPING.get(String.valueOf(message.getClientId()));
-                 target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
+                 dataHander(ctx,message);
                  ReferenceCountUtil.release(msg);
                  break;
          }
-
      }
 
+     private void dataHander(ChannelHandlerContext ctx,CustomProtocol message){
+         log.info("收到客户端的转发消息 {}", message);
+         Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
+         target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
+     }
 
      private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
          log.info("收到客户端的心跳消息  clientId = {}",message.getClientId());

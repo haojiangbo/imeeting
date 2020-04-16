@@ -23,17 +23,4 @@ public class SentryChannelMapping {
 
 
 
-
-
-
-    /**
-     * 二级域名和CLIENTID的映射
-     */
-    public static ConcurrentHashMap<String, Integer> HOST_ClIENT_ID_MAPPING = new ConcurrentHashMap<>();
-    /**
-     * 二级域名和Channel的映射
-     */
-    public static ConcurrentHashMap<String, Channel> HOST_CHANNEL_MAPPING = new ConcurrentHashMap<>();
-
-
 }
