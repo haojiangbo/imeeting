@@ -31,8 +31,6 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
         switch (message.getMeesgeType()){
             case ConstantValue.PING:
                 pingHander(ctx,message);
-                //释放消息，防止内存泄漏
-                ReferenceCountUtil.release(message);
                 break;
             case ConstantValue.DATA:
                 dataHander(ctx, message);
@@ -48,7 +46,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
             ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
             createConnect(ctx,message);
         }else{
-            target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
+            target.writeAndFlush(message.getContent());
         }
         ReferenceCountUtil.release(message);
     }
@@ -67,7 +65,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
                         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), future.channel());
                     }
                     //向服务发送数据
-                    future.channel().writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
+                    future.channel().writeAndFlush(message.getContent());
                     ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                 });
     }
@@ -77,6 +75,8 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
         if(log.isDebugEnabled()){
             log.debug("收到服务器的心跳消息  clientId = {}",message.getClientId());
         }
+        //释放消息，防止内存泄漏
+        ReferenceCountUtil.release(message);
     }
 
     @Override

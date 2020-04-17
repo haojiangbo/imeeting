@@ -13,7 +13,11 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-
+ /**
+  * 客户端代理类
+ 　　* @author 郝江波
+ 　　* @date 2020/4/17 10:32
+ 　　*/
 @Slf4j
 public class ClientProxyHander extends ChannelInboundHandlerAdapter {
 
@@ -21,22 +25,16 @@ public class ClientProxyHander extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
         Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-        ByteBuf result = byteBuf.duplicate();
         String sessionId = ctx.channel().attr(NettyProxyMappingConstant.SESSION).get();
         log.info("交换数据 === byte length {}", byteBuf.readableBytes());
-
         target.writeAndFlush(new CustomProtocol(
                 ConstantValue.DATA,
                 ClientConfig.INSTAND.getClientId(),
                 sessionId.getBytes().length,
                 sessionId,
-                result.readableBytes(),
-                result
+                byteBuf.readableBytes(),
+                byteBuf
         ));
-
-        // 释放引用
-        //ReferenceCountUtil.release(byteBuf);
-
     }
 
 

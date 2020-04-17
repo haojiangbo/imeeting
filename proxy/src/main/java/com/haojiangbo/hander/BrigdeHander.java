@@ -2,21 +2,14 @@ package com.haojiangbo.hander;
 
 
 import com.haojiangbo.config.BrigdeChannelMapping;
-
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
-import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.Charset;
 
 /**
  *
@@ -72,7 +65,6 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
          if(null ==  target || !target.isActive()){
              SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());
          }else{
-             //target.writeAndFlush(Unpooled.wrappedBuffer(message.getContent()));
              target.writeAndFlush(message);
          }
      }

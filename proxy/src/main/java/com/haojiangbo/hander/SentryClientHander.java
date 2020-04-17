@@ -2,7 +2,6 @@ package com.haojiangbo.hander;
 
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.model.CustomProtocol;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -23,7 +22,7 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
         CustomProtocol customProtocol = (CustomProtocol) msg;
         Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
         if(null != target && target.isActive()){
-            target.writeAndFlush(Unpooled.wrappedBuffer(customProtocol.getContent()));
+            target.writeAndFlush(customProtocol.getContent());
         }else{
             ctx.close();
         }
