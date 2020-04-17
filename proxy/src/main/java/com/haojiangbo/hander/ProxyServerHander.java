@@ -1,11 +1,9 @@
 package com.haojiangbo.hander;
-import com.haojiangbo.config.BrigdeChannelMapping;
 import com.haojiangbo.config.ServerConfig;
-import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.http.AbstractHttpParser;
 import com.haojiangbo.http.HttpRequest;
-import com.haojiangbo.model.CustomProtocol;
+import com.haojiangbo.utils.AtoBUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
@@ -24,6 +22,12 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
     private static Bootstrap bootstrap = null;
 
+    /**
+     * 此处使用常量代理
+     * 因为反向代理 肯定会和哨兵服务器部署在同一个服务器上
+     * 所以直接写成本机地址
+     */
+    private static final String HOST = "127.0.0.1";
 
     public ProxyServerHander(Bootstrap bsp){
         bootstrap = bsp;
@@ -57,11 +61,10 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
         log.info("host = {}  domain = {}",request.getHost(),domain);
         try {
             Map<String,Integer> domainProtMapping = ServerConfig.INSTAND.getDomainProtMapping();
-            bootstrap.connect("127.0.0.1", domainProtMapping.get(domain)).addListener((ChannelFutureListener) future -> {
+            bootstrap.connect(HOST, domainProtMapping.get(domain)).addListener((ChannelFutureListener) future -> {
                 if(future.isSuccess()){
                     // 相互映射 双方互相可以得到对方
-                    future.channel().attr(NettyProxyMappingConstant.MAPPING).set(ctx.channel());
-                    ctx.channel().attr(NettyProxyMappingConstant.MAPPING).set(future.channel());
+                    AtoBUtils.addMapping(ctx.channel(),future.channel());
                     future.channel().writeAndFlush(message);
                 }else{
                     ctx.close();
@@ -78,11 +81,7 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-        if(null != target){
-            target.attr(NettyProxyMappingConstant.MAPPING).set(null);
-        }
-        ctx.channel().attr(NettyProxyMappingConstant.MAPPING).set(null);
+        AtoBUtils.removeMapping(ctx.channel());
         super.channelInactive(ctx);
     }
 
