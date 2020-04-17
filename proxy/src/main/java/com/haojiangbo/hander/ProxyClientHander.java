@@ -18,8 +18,12 @@ public class ProxyClientHander extends ChannelInboundHandlerAdapter {
 
      @Override
      public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-         log.info("反向代理引擎交换数据>>>>>> byte length = {}", ((ByteBuf)msg).writerIndex());
+         log.info("反向代理引擎交换数据 {} byte", ((ByteBuf)msg).readableBytes());
          Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-         target.writeAndFlush(msg);
+         if(null == target || !target.isActive()){
+             ctx.close();
+         }else{
+             target.writeAndFlush(msg);
+         }
      }
  }

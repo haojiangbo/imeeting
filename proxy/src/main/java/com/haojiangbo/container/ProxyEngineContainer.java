@@ -29,7 +29,7 @@ public class ProxyEngineContainer implements Container {
     Bootstrap clientBootstrap = new Bootstrap();
     ServerBootstrap serverBootstrap = new ServerBootstrap();
 
-    public void initServer(int port){
+    public void initServer(){
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .handler(new LoggingHandler(LogLevel.INFO))
@@ -71,7 +71,7 @@ public class ProxyEngineContainer implements Container {
     @Override
     public void start() {
         initClient();
-        initServer(666);
+        initServer();
     }
 
     @Override
