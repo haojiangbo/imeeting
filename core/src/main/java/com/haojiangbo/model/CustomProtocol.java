@@ -1,6 +1,7 @@
 package com.haojiangbo.model;
 
 import com.haojiangbo.constant.ConstantValue;
+import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -36,7 +37,7 @@ public class CustomProtocol {
     /**
      * 消息的内容
      */
-    private byte[] content;
+    private ByteBuf content;
     /**
      * 初始化协议
      * @param meesgeType 消息类型
@@ -48,7 +49,8 @@ public class CustomProtocol {
                           int clientId,
                           int sessionIdLengtn,
                           String sessionId,
-                          int contentLength, byte[] content) {
+                          int contentLength,
+                          ByteBuf content) {
         this.contentLength = contentLength;
         this.content = content;
         this.meesgeType = meesgeType;

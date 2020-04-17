@@ -3,6 +3,8 @@ package com.haojiangbo.model;
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
+
 /**
 * @Title: CustomProtocolConverByteBuf
 * @Package com.haojiangbo.model
@@ -14,7 +16,7 @@ import io.netty.buffer.Unpooled;
 public class CustomProtocolConverByteBuf {
 
     public static ByteBuf getByteBuf(CustomProtocol msg) {
-        ByteBuf out = Unpooled.directBuffer(CustomProtocolDecoder.BASE_LENGTH+msg.getContent().length);
+        ByteBuf out = Unpooled.directBuffer(CustomProtocolDecoder.BASE_LENGTH+msg.getContent().readableBytes());
         return getByteBuf(out,msg);
     }
     public static ByteBuf getByteBuf(ByteBuf out,CustomProtocol msg) {
@@ -30,6 +32,7 @@ public class CustomProtocolConverByteBuf {
         // 负载
         out.writeInt(msg.getContentLength());
         out.writeBytes(msg.getContent());
+        ReferenceCountUtil.release(msg.getContent());
         return out;
     }
 }

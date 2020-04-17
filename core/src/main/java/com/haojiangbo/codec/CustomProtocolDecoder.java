@@ -3,6 +3,7 @@ package com.haojiangbo.codec;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
@@ -91,9 +92,9 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                 buffer.readerIndex(beginReader);
                 return;
             }
-            // 读取data数据
-            byte[] data = new byte[length];
-            buffer.readBytes(data);
+            // 读取data数据 使用堆外内存
+            ByteBuf byteBuf = Unpooled.directBuffer(length);
+            buffer.readBytes(byteBuf);
 
 
             // 组装消息
@@ -102,8 +103,8 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                     clientId,
                     sesstionIdLength,
                     new String(sessionId),
-                    data.length,
-                    data);
+                    byteBuf.capacity(),
+                    byteBuf);
 
             out.add(protocol);
         }

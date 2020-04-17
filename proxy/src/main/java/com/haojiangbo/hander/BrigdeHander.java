@@ -2,7 +2,7 @@ package com.haojiangbo.hander;
 
 
 import com.haojiangbo.config.BrigdeChannelMapping;
-import com.haojiangbo.config.SentryChannelMapping;
+
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
@@ -12,8 +12,11 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
+
+import java.nio.charset.Charset;
 
 /**
  *
@@ -52,7 +55,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
         log.info("收到哨兵端的消息 {}", message.getSessionId());
-        Channel target =  BrigdeChannelMapping .CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId()));
+        Channel target =  BrigdeChannelMapping.CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId()));
         if(null == target || !target.isActive()){
             ctx.close();
             return;
@@ -76,7 +79,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
      private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
          if(log.isDebugEnabled()){
-             log.debug("收到客户端的心跳消息  clientId = {}",message.getClientId());
+             log.debug("收到客户端的心跳消息  clientId = {}",message.getContent().toString(CharsetUtil.UTF_8));
          }
          ctx.writeAndFlush(message);
      }

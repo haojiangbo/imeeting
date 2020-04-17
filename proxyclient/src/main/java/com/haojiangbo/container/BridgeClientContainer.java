@@ -55,7 +55,7 @@ public class BridgeClientContainer implements Container {
                         ch.pipeline().addLast(new CustomProtocolEncoder());
                         ch.pipeline().addLast(new CustomProtocolDecoder());
                         //设置一个读取过期时间 和 写入过期时间  写入过期时间触发后 回向服务端写ping数据，如果规定时间内没有发生读事件，那么就是认为服务被停止
-                        ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0));
+                        //ch.pipeline().addLast(new IdleCheckHandler(IdleCheckHandler.READ_IDLE_TIME, IdleCheckHandler.WRITE_IDLE_TIME, 0));
                         ch.pipeline().addLast(new ClientHander(clientBootstrap,BridgeClientContainer.this));
                     }
                 });
