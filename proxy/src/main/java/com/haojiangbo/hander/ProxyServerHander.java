@@ -49,13 +49,14 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
         if(ServerConfig.INSTAND.isProxyModel()){
             String m = message.toString(CharsetUtil.UTF_8);
-            log.info("接受数据 ..... {}",m);
+            log.info("接受数据 ..... {} byte ",message.readableBytes());
             if(m.startsWith(CONNECT)){
+                log.info("CONNECT ..... ");
                 ctx.channel().config().setOption(ChannelOption.AUTO_READ, false);
                 // 解析http协议  此处可能有bug
                 HttpRequest request =  AbstractHttpParser.getDefaltHttpParser().decode(message);
+                log.info("CONNECT ..... url = {} port = {}",request.getHost(),request.getPort());
                 createConnect(ctx, message, request,false);
-                ctx.writeAndFlush(Unpooled.wrappedBuffer("HTTP/1.1 200 Connection Established\r\n\r\n".getBytes()));
                 ReferenceCountUtil.release(msg);
                 return;
             }
@@ -92,6 +93,9 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
                     AtoBUtils.addMapping(ctx.channel(),future.channel());
                     if(isSendMessgae){
                         future.channel().writeAndFlush(message);
+                    }else{
+                        log.info("CONNECT OK ..... url = {} port = {}",request.getHost(),request.getPort());
+                        ctx.writeAndFlush(Unpooled.wrappedBuffer("HTTP/1.1 200 Connection Established\r\n\r\n".getBytes()));
                     }
                 }else{
                     ctx.close();
