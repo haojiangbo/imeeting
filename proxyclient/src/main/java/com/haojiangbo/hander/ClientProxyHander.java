@@ -25,8 +25,13 @@ public class ClientProxyHander extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
         Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+        if(target  == null || !target.isActive()){
+            ctx.close();
+            ReferenceCountUtil.release(byteBuf);
+            return;
+        }
         String sessionId = ctx.channel().attr(NettyProxyMappingConstant.SESSION).get();
-        log.info("交换数据 === byte length {}", byteBuf.readableBytes());
+        log.info("交换数据 {} byte ", byteBuf.readableBytes());
         target.writeAndFlush(new CustomProtocol(
                 ConstantValue.DATA,
                 ClientConfig.INSTAND.getClientId(),

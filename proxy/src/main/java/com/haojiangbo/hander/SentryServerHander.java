@@ -10,6 +10,7 @@ import com.haojiangbo.utils.SessionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.*;
+import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -61,6 +62,7 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                         sendForwardMessage(model, future.channel(), byteBuf);
                     }else{
                         ctx.close();
+                        ReferenceCountUtil.release(byteBuf);
                     }
                     ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                 });

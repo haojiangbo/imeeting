@@ -9,6 +9,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
+import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -46,10 +47,11 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        log.info("收到哨兵端的消息 {}", message.getSessionId());
+        log.info("收到哨兵端的消息 {} byte", message.getContent().readableBytes());
         Channel target =  BrigdeChannelMapping.CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId()));
         if(null == target || !target.isActive()){
             ctx.close();
+            ReferenceCountUtil.release(message);
             return;
         }
         //向客户端发送消息
@@ -59,10 +61,12 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
     }
 
     private void dataHander(ChannelHandlerContext ctx,CustomProtocol message){
-        log.info("收到客户端的消息 {}", message.getSessionId());
+        log.info("收到客户端的消息 {} byte", message.getContent().readableBytes());
          Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
          if(null ==  target || !target.isActive()){
              SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());
+             ctx.close();
+             ReferenceCountUtil.release(message);
          }else{
              target.writeAndFlush(message);
          }
