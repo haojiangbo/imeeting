@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 * @version V1.0
 */
 @Slf4j
-public class BridgeClientContainer extends ChannelInboundHandlerAdapter implements Container {
+public class BridgeClientContainer implements Container {
 
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
     private Bootstrap clientBootstrap = new Bootstrap();
@@ -91,9 +91,4 @@ public class BridgeClientContainer extends ChannelInboundHandlerAdapter implemen
     }
 
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        super.channelInactive(ctx);
-        restart();
-    }
 }

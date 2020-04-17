@@ -27,13 +27,10 @@ import lombok.extern.slf4j.Slf4j;
  　　* @date 2020/4/15 16:03
  　　*/
 @Slf4j
-public class ConnectionBridgeContainner implements Container {
+public class BridgeEngineContainner implements Container {
     EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     ServerBootstrap serverBootstrap = new ServerBootstrap();
-    public void  init(){
-
-    }
 
 
     @Override
@@ -66,6 +63,8 @@ public class ConnectionBridgeContainner implements Container {
 
     @Override
     public void stop() {
-
+        // 优雅关闭
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 }

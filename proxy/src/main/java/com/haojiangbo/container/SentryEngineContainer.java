@@ -83,6 +83,8 @@ public class SentryEngineContainer implements Container {
     }
     @Override
     public void stop() {
-
+        // 优雅关闭
+        bossGroup.shutdownGracefully();
+        workerGroup.shutdownGracefully();
     }
 }

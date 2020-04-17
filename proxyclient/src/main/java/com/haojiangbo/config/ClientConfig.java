@@ -21,7 +21,7 @@ public class ClientConfig implements Container {
        this.clientId =  ProxyServerConfig.INSTAND.getIntValue("clientId");
        this.remoteHost = ProxyServerConfig.INSTAND.getStringValue("remoteHost");
        this.remotePort = ProxyServerConfig.INSTAND.getIntValue("remotePort");
-       //volatile 关键字 防止指令重排序 顺便刷新本地内存到主存
+       // 禁止指令重排序
        INSTAND = this;
    }
 
