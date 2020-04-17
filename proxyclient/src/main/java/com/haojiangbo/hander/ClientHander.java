@@ -67,6 +67,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
                     }
                     //向服务发送数据
                     future.channel().writeAndFlush(message.getContent());
+                    ReferenceCountUtil.release(message);
                     ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                 });
     }

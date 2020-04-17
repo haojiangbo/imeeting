@@ -6,6 +6,7 @@ import com.haojiangbo.utils.PathUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.File;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import java.util.List;
@@ -21,8 +22,11 @@ public class NioLocalFileConfigReadImp implements ConfigRead {
     @SneakyThrows
     @Override
     public List<ConfigModel> readLine(String path) {
+        log.info("准备从 {} 下加载 配置文件", path);
         List<ConfigModel> result = new LinkedList<>();
-        RandomAccessFile randomAccessFile = new RandomAccessFile(path+ConfigRead.CONFIG_FILE_NAME,"r");
+        String configPath = path+File.separator+ConfigRead.CONFIG_FILE_NAME;
+        RandomAccessFile randomAccessFile = new RandomAccessFile(configPath,"r");
+        log.info("配置文件加载成功 {} ", configPath);
         String line;
         for(line = randomAccessFile.readLine(); line != null; line = randomAccessFile.readLine()){
             if(line.startsWith("#"))
