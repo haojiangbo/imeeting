@@ -8,6 +8,7 @@ import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
  /**
@@ -74,8 +75,13 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
 
 
     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-        if(log.isDebugEnabled()){
-            log.debug("收到服务器的心跳消息  clientId = {}",message.getClientId());
+        log.info("收到服务器的心跳消息  clientId = {}",message.getClientId());
+        String meesgae = message.getContent().toString(CharsetUtil.UTF_8);
+        if(meesgae.equals(ConstantValue.CLIENTID_ERROR)
+                || meesgae.equals(ConstantValue.REPEATED_ERROR)){
+            log.error("服务器返回错误消息 {} ",meesgae);
+            bridgeClientContainer.stop();
+            return;
         }
         //释放消息，防止内存泄漏
         ReferenceCountUtil.release(message);

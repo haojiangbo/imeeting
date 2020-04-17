@@ -17,4 +17,9 @@ public class ConstantValue {
     public static final  int DATA = 0X78;
     //转发消息
     public static final  int FORWARD = 0X79;
+    //clientId错误  为什么用英文，因为这样会减少一些不必要的转码错误
+    public static final  String CLIENTID_ERROR = "clientId is not exist";
+    //重复连接的错误
+    public static final  String REPEATED_ERROR = "Repeated connection error  please close other connection";
+
 }

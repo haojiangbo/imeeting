@@ -1,5 +1,6 @@
 package com.haojiangbo.config.imp;
 
+import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.ConfigRead;
 import com.haojiangbo.model.ConfigModel;
 import com.haojiangbo.utils.PathUtils;
@@ -46,6 +47,7 @@ public class NioLocalFileConfigReadImp implements ConfigRead {
        configModel.setDomain(temp[0]);
        configModel.setPort(Integer.valueOf(temp[1]));
        configModel.setClientId(Integer.valueOf(temp[2]));
+       ClientCheckConfig.CLIENT_CHECK_MAP.put(temp[2],ClientCheckConfig.OK);
        configModel.setClientUrl(temp[3]);
        String [] hp = configModel.getClientUrl().split(":");
        if(hp.length != 2){

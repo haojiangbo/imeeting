@@ -2,12 +2,13 @@ package com.haojiangbo.hander;
 
 
 import com.haojiangbo.config.BrigdeChannelMapping;
+import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
 
+
      @Override
      public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
          CustomProtocol message = (CustomProtocol) msg;
@@ -31,11 +33,10 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
              case ConstantValue.PING:
                  // 处理管道和消息的映射
                  channelMappingHander(ctx, message);
-                 pingHander(ctx,message);
                  break;
              case ConstantValue.DATA:
                  // 处理管道和消息的映射
-                 channelMappingHander(ctx, message);
+                 //channelMappingHander(ctx, message);
                  dataHander(ctx,message);
                  break;
              case ConstantValue.FORWARD:
@@ -72,11 +73,13 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
          }
      }
 
-     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-         if(log.isDebugEnabled()){
-             log.debug("收到客户端的心跳消息  clientId = {}",message.getContent().toString(CharsetUtil.UTF_8));
-         }
-         ctx.writeAndFlush(message);
+     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message,boolean isclose){
+         log.info("收到客户端的心跳消息  clientId = {}",message.getContent().toString(CharsetUtil.UTF_8));
+         ctx.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
+             if(isclose){
+                 ctx.close();
+             }
+         });
      }
 
 
@@ -87,16 +90,34 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
        * @param message
        */
       private void channelMappingHander(ChannelHandlerContext ctx, CustomProtocol message) {
+        if(!ClientCheckConfig.CLIENT_CHECK_MAP.containsKey(String.valueOf(message.getClientId()))){
+            log.error("clientid = {}  不合法",message.getClientId());
+            createError(ctx, message,ConstantValue.CLIENTID_ERROR);
+            return;
+        }
+        if(!BrigdeChannelMapping .CLIENT_ID_MAPPING.containsKey(String.valueOf(message.getClientId()))){
+            BrigdeChannelMapping .CLIENT_ID_MAPPING.put(String.valueOf(message.getClientId()),ctx.channel());
+            // 返回心跳响应
+        }else{
+            boolean b =  BrigdeChannelMapping .CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId())).equals(ctx.channel());
+            if(!b){ createError(ctx, message,ConstantValue.REPEATED_ERROR); return;}
+        }
         if(!BrigdeChannelMapping.CHANNELID_CLINENTID_MAPPING.containsKey(ctx.channel().id().asLongText())){
           BrigdeChannelMapping .CHANNELID_CLINENTID_MAPPING.put(ctx.channel().id().asLongText(),String.valueOf(message.getClientId()));
         }
-        if(!BrigdeChannelMapping .CLIENT_ID_MAPPING.containsKey(message.getClientId())){
-          BrigdeChannelMapping .CLIENT_ID_MAPPING.put(String.valueOf(message.getClientId()),ctx.channel());
-        }
+        pingHander(ctx,message,false);
       }
 
+    // 发送错误消息
+    private void createError(ChannelHandlerContext ctx, CustomProtocol message,String errortype) {
+        ByteBuf error = Unpooled.wrappedBuffer(errortype.getBytes());
+        pingHander(ctx, message
+                .setContentLength(error.readableBytes())
+                .setContent(error), true);
+    }
 
-      @Override
+
+    @Override
      public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         removeChannelMapping(ctx);
         super.channelInactive(ctx);
