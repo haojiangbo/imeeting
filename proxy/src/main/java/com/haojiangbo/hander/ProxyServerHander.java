@@ -32,6 +32,7 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
      * 所以直接写成本机地址
      */
     private static final String HOST = "127.0.0.1";
+    private static final String CONNECT = "CONNECT";
 
     public ProxyServerHander(Bootstrap bsp){
         bootstrap = bsp;
@@ -47,16 +48,14 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
         ByteBuf message = (ByteBuf) msg;
 
         if(ServerConfig.INSTAND.isProxyModel()){
-            ByteBuf read = message.copy();
-            String m = read.toString(CharsetUtil.UTF_8);
+            String m = message.toString(CharsetUtil.UTF_8);
             log.info("接受数据 ..... {}",m);
-            if(m.startsWith("CONNECT")){
+            if(m.startsWith(CONNECT)){
                 ctx.channel().config().setOption(ChannelOption.AUTO_READ, false);
                 // 解析http协议  此处可能有bug
                 HttpRequest request =  AbstractHttpParser.getDefaltHttpParser().decode(message);
                 createConnect(ctx, message, request,false);
                 ctx.writeAndFlush(Unpooled.wrappedBuffer("HTTP/1.1 200 Connection Established\r\n\r\n".getBytes()));
-                ReferenceCountUtil.release(read);
                 ReferenceCountUtil.release(msg);
                 return;
             }
@@ -88,7 +87,6 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
                 request.setPort(domainProtMapping.get(domain));
             }
             bootstrap.connect(request.getHost(), request.getPort()).addListener((ChannelFutureListener) future -> {
-            //bootstrap.connect(HOST, domainProtMapping.get(domain)).addListener((ChannelFutureListener) future -> {
                 if(future.isSuccess()){
                     // 相互映射 双方互相可以得到对方
                     AtoBUtils.addMapping(ctx.channel(),future.channel());
