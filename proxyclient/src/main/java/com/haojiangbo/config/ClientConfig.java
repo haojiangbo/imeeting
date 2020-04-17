@@ -18,9 +18,9 @@ public class ClientConfig implements Container {
    private int remotePort;
 
    public ClientConfig(){
-       this.clientId =  ProxyServerConfig.INSTAND.getIntValue("clientId");
-       this.remoteHost = ProxyServerConfig.INSTAND.getStringValue("remoteHost");
-       this.remotePort = ProxyServerConfig.INSTAND.getIntValue("remotePort");
+       this.clientId =  PrppertiesReadUtils.INSTAND.getIntValue("clientId");
+       this.remoteHost = PrppertiesReadUtils.INSTAND.getStringValue("remoteHost");
+       this.remotePort = PrppertiesReadUtils.INSTAND.getIntValue("remotePort");
        // 禁止指令重排序
        INSTAND = this;
    }

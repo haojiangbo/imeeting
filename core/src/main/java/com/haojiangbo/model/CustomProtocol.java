@@ -4,9 +4,12 @@ import com.haojiangbo.constant.ConstantValue;
 import io.netty.buffer.ByteBuf;
 import lombok.Data;
 import lombok.experimental.Accessors;
-
-import java.util.Arrays;
-
+ /**
+  *
+  * 自定义协议
+ 　　* @author 郝江波
+ 　　* @date 2020/4/17 10:38
+ 　　*/
 @Data
 @Accessors(chain = true)
 public class CustomProtocol {
@@ -40,10 +43,6 @@ public class CustomProtocol {
     private ByteBuf content;
     /**
      * 初始化协议
-     * @param meesgeType 消息类型
-     * @param clientId 客户端ID
-     * @param contentLength 消息长度
-     * @param content 消息内容
      */
     public CustomProtocol(int meesgeType,
                           int clientId,

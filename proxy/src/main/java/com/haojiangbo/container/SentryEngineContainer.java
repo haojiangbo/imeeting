@@ -64,14 +64,14 @@ public class SentryEngineContainer implements Container {
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
-        serverBootstrap.bind(port).addListener((ChannelFutureListener) future -> {
-            if(future.isSuccess()){
-                log.info("哨兵服务引擎启动成功... 监听端口...{}",port);
-            }else{
-                log.error("哨兵服务引擎启动失败...");
-            }
-        });
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .bind(port).addListener((ChannelFutureListener) future -> {
+                    if(future.isSuccess()){
+                        log.info("哨兵服务引擎启动成功... 监听端口...{}",port);
+                    }else{
+                        log.error("哨兵服务引擎启动失败...");
+                    }
+                });
     }
 
     @Override

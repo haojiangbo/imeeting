@@ -10,15 +10,13 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-/**
- * check idle chanel.
- *
- * @author fengfei
- *
- */
+ /**
+  * 心跳包
+ 　　* @author 郝江波
+ 　　* @date 2020/4/17 10:47
+ 　　*/
 public class IdleCheckHandler extends IdleStateHandler {
 
-    public static final int USER_CHANNEL_READ_IDLE_TIME = 1200;
 
     public static final int READ_IDLE_TIME = 30;
 
@@ -42,13 +40,11 @@ public class IdleCheckHandler extends IdleStateHandler {
         String messgae = "ping";
         String sessionId = SessionUtils.genSessionId(String.valueOf(ClientConfig.INSTAND.getClientId()));
         ByteBuf byteBuf =  Unpooled.wrappedBuffer(messgae.getBytes());
-        //byteBuf.writeBytes(messgae.getBytes());
-        CustomProtocol msg = new CustomProtocol(
+        channel.writeAndFlush(new CustomProtocol(
                 ConstantValue.PING,
                 ClientConfig.INSTAND.getClientId(),
                 sessionId.getBytes().length,
                 sessionId,
-                byteBuf.readableBytes(),byteBuf);
-        channel.writeAndFlush(msg);
+                byteBuf.readableBytes(),byteBuf));
     }
 }

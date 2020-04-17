@@ -37,10 +37,6 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                           List<Object> out) throws Exception {
         // 可读长度必须大于基本长度
         if (buffer.readableBytes() >= BASE_LENGTH) {
-            // 防止socket字节流攻击
-            // 防止，客户端传来的数据过大
-            // 因为，太大的数据，是不合理的
-
 
             // 记录包头开始的index
             int beginReader;
@@ -98,15 +94,13 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
 
 
             // 组装消息
-            CustomProtocol protocol = new CustomProtocol(
+            out.add(new CustomProtocol(
                     messageType,
                     clientId,
                     sesstionIdLength,
                     new String(sessionId),
                     byteBuf.capacity(),
-                    byteBuf);
-
-            out.add(protocol);
+                    byteBuf));
         }
     }
 

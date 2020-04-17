@@ -9,7 +9,7 @@ import io.netty.util.ReferenceCountUtil;
 * @Title: CustomProtocolConverByteBuf
 * @Package com.haojiangbo.model
 * @Description: 自定义协议转换为byteBuf
-* @author Administrator
+* @author 郝江波
 * @date 2020/4/15
 * @version V1.0
 */
@@ -32,6 +32,8 @@ public class CustomProtocolConverByteBuf {
         // 负载
         out.writeInt(msg.getContentLength());
         out.writeBytes(msg.getContent());
+
+        //释放消息
         ReferenceCountUtil.release(msg.getContent());
         return out;
     }

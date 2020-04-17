@@ -9,6 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.RandomAccessFile;
 import java.util.LinkedList;
 import java.util.List;
+ /**
+  *
+  * 本地配置文件读取
+ 　　* @author 郝江波
+ 　　* @date 2020/4/17 10:41
+ 　　*/
 @Slf4j
 public class NioLocalFileConfigReadImp implements ConfigRead {
 

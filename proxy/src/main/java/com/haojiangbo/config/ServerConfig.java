@@ -7,8 +7,6 @@ import com.haojiangbo.utils.PathUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -31,9 +29,9 @@ public class ServerConfig implements Container {
 
 
    public ServerConfig(){
-       this.proxyPort = ProxyServerConfig.INSTAND.getIntValue("proxyPort");
-       this.bridgeHost = ProxyServerConfig.INSTAND.getStringValue("bridgeHost");
-       this.bridgePort = ProxyServerConfig.INSTAND.getIntValue("bridgePort");
+       this.proxyPort = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
+       this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
+       this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
        this.configList = initConfigList();
        if (configList.size() == 0) {
            throw  new RuntimeException("配置不能为空");

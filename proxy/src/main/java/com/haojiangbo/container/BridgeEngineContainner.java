@@ -51,14 +51,14 @@ public class BridgeEngineContainner implements Container {
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap.bind(ServerConfig.INSTAND.getBridgePort()).addListener((ChannelFutureListener) future -> {
-                if(future.isSuccess()){
-                    log.info("桥梁服务引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getBridgePort());
-                }else{
-                    log.error("桥梁服务引擎启动失败...");
-                }
-            });
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .bind(ServerConfig.INSTAND.getBridgePort()).addListener((ChannelFutureListener) future -> {
+                    if(future.isSuccess()){
+                        log.info("桥梁服务引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getBridgePort());
+                    }else{
+                        log.error("桥梁服务引擎启动失败...");
+                    }
+                });
     }
 
     @Override

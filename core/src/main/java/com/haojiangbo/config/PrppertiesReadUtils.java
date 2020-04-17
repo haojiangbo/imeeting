@@ -11,17 +11,17 @@ import java.util.Properties;
 　* @author 郝江波
 　* @date 2020/4/15 16:09
 　*/
-public class ProxyServerConfig {
+public class PrppertiesReadUtils {
     private static final String DEFAULT_CONF = "config.properties";
-    public  static final ProxyServerConfig INSTAND = new ProxyServerConfig();
+    public  static final PrppertiesReadUtils INSTAND = new PrppertiesReadUtils();
     private Properties configuration = new Properties();
 
-    private ProxyServerConfig() {
+    private PrppertiesReadUtils() {
         initConfig(DEFAULT_CONF);
     }
 
     private void initConfig(String defaultConf) {
-        InputStream is = ProxyServerConfig.class.getClassLoader().getResourceAsStream(defaultConf);
+        InputStream is = PrppertiesReadUtils.class.getClassLoader().getResourceAsStream(defaultConf);
         try {
             configuration.load(is);
             is.close();

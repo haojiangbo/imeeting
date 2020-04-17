@@ -1,6 +1,5 @@
 package com.haojiangbo.hander;
 
-import com.haojiangbo.config.ClientConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
@@ -8,11 +7,13 @@ import com.haojiangbo.container.BridgeClientContainer;
 import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-
+ /**
+ 　　* @author 郝江波
+ 　　* @date 2020/4/17 10:47
+ 　　*/
 @Slf4j
 public class ClientHander extends ChannelInboundHandlerAdapter {
 

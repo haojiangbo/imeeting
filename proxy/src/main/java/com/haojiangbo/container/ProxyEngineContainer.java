@@ -43,14 +43,14 @@ public class ProxyEngineContainer implements Container {
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true);
-            serverBootstrap.bind(ServerConfig.INSTAND.getProxyPort()).addListener((ChannelFutureListener) future -> {
-                if(future.isSuccess()){
-                    log.info("反向代理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getProxyPort());
-                }else{
-                    log.error("反向代理引擎启动失败...");
-                }
-            });
+                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                .bind(ServerConfig.INSTAND.getProxyPort()).addListener((ChannelFutureListener) future -> {
+                    if(future.isSuccess()){
+                        log.info("反向代理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getProxyPort());
+                    }else{
+                        log.error("反向代理引擎启动失败...");
+                    }
+                });
     }
 
     public void initClient(){

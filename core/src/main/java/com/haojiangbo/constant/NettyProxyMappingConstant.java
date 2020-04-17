@@ -5,17 +5,17 @@ import io.netty.util.AttributeKey;
 
 /**
   *
-  * 反向代理key
+  *  常量配置
  　　* @author 郝江波
  　　* @date 2020/4/15 14:23
  　　*/
 public class NettyProxyMappingConstant {
      /**
-      * 服务器端 反向代理的  key
+      *  映射
       */
     public static final AttributeKey<Channel> MAPPING = AttributeKey.newInstance("PROXY_MAPPING");
     /**
-     * 服务器端 会话
+     *  会话
      */
     public static final AttributeKey<String> SESSION = AttributeKey.newInstance("SESSION");
 
