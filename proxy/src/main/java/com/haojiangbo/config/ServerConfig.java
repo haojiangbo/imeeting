@@ -27,6 +27,7 @@ public class ServerConfig implements Container {
    private String bridgeHost;
    private int proxyPort;
    private int bridgePort;
+   private boolean isProxyModel;
    private List<ConfigModel> configList;
    private Map<String,Integer> domainProtMapping = new HashMap<>();
 
@@ -35,6 +36,7 @@ public class ServerConfig implements Container {
        this.proxyPort = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
        this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
        this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
+       this.isProxyModel = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
        this.configList = initConfigList();
        if (configList.size() == 0) {
            throw  new RuntimeException("配置不能为空");

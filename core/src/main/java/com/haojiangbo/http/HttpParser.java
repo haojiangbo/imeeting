@@ -58,6 +58,9 @@ public class HttpParser extends AbstractHttpParser {
         if(port.length == 2){
             request.setHost(port[0]);
             request.setPort(Integer.valueOf(port[1]));
+        }else {
+            request.setHost(port[0]);
+            request.setPort(80);
         }
     }
 

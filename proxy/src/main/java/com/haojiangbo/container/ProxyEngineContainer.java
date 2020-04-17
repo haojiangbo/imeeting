@@ -4,18 +4,29 @@ import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.ProxyClientHander;
 import com.haojiangbo.hander.ProxyServerHander;
 import com.haojiangbo.inteface.Container;
+import com.haojiangbo.ssl.HttpSslContextFactory;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.*;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
+ *
+ * https://blog.csdn.net/huanongdetian/article/details/80175899?depth_1-utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1&utm_source=distribute.pc_relevant.none-task-blog-BlogCommendFromBaidu-1
+ * jdk 生成 密钥
+ * keytool -genkey -alias netty -keypass 123456 -keyalg RSA -keysize 1024 -validity 365 -keystore D:/netty.keystore -storepass 123456
+ *
+ *
   *     反向代理启动类
  　　* @author 郝江波
  　　* @date 2020/4/15 15:46
@@ -36,6 +47,13 @@ public class ProxyEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
+
+
+                        // =====================以下为SSL处理代码=================================
+                        //ch.pipeline().addLast("ssl", new SslHandler(HttpSslContextFactory.createSSLEngine()));
+                        // =====================以上为SSL处理代码=================================
+
+
                         // 处理网络IO
                         ch.pipeline().addLast(new ProxyServerHander(clientBootstrap));
                     }
