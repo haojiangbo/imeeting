@@ -31,8 +31,8 @@ import java.util.List;
 @Slf4j
 public class SentryEngineContainer implements Container {
 
-    private  static  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    private  static  EventLoopGroup workerGroup = new NioEventLoopGroup();
+    private  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    private  EventLoopGroup workerGroup = new NioEventLoopGroup();
     ServerBootstrap serverBootstrap = null;
     Bootstrap  clientBootstrap = null;
 
@@ -54,7 +54,7 @@ public class SentryEngineContainer implements Container {
         serverBootstrap = new ServerBootstrap();
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler(LogLevel.INFO))
+                // .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {

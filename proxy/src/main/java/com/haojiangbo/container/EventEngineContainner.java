@@ -4,6 +4,7 @@ import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.BrigdeHander;
+import com.haojiangbo.hander.EventServerHander;
 import com.haojiangbo.inteface.Container;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
@@ -18,22 +19,19 @@ import io.netty.handler.logging.LoggingHandler;
 import lombok.extern.slf4j.Slf4j;
 
 /**
-  * 这是一个连接桥梁的server
-  * 客户端主动与该server连接
-  * 通过客户端携带的key值
-  * 实现数据交
+  *
+  * 服务端事件处理器
  　　* @author 郝江波
- 　　* @date 2020/4/15 16:03
+ 　　* @date 2020/4/18 10:53
  　　*/
-@Slf4j
-public class BridgeEngineContainner implements Container {
+ @Slf4j
+public class EventEngineContainner implements Container {
+
     EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    EventLoopGroup workerGroup = new NioEventLoopGroup(1);
     ServerBootstrap serverBootstrap = new ServerBootstrap();
 
-
-    @Override
-    public void start() {
+    public void  init(){
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 // .handler(new LoggingHandler(LogLevel.INFO))
@@ -44,25 +42,30 @@ public class BridgeEngineContainner implements Container {
                         ch.pipeline().addLast(new CustomProtocolEncoder());
                         ch.pipeline().addLast(new CustomProtocolDecoder());
                         // 处理网络IO
-                        ch.pipeline().addLast(new BrigdeHander());
+                        ch.pipeline().addLast(new EventServerHander());
                     }
                 })
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .bind(ServerConfig.INSTAND.getBridgePort()).addListener((ChannelFutureListener) future -> {
-                    if(future.isSuccess()){
-                        log.info("桥梁服务引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getBridgePort());
-                    }else{
-                        log.error("桥梁服务引擎启动失败...");
-                    }
-                });
+                .bind(ServerConfig.INSTAND.getEventPort()).addListener((ChannelFutureListener) future -> {
+            if(future.isSuccess()){
+                log.info("事件处理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getEventPort());
+            }else{
+                log.error("事件处理引擎启动失败...");
+            }
+        });
+    }
+
+
+    @Override
+    public void start() {
+        init();
     }
 
     @Override
     public void stop() {
-        // 优雅关闭
         bossGroup.shutdownGracefully();
         workerGroup.shutdownGracefully();
     }

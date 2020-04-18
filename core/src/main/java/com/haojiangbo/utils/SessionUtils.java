@@ -50,6 +50,11 @@ public class SessionUtils {
         return  sessionModel;
     }
 
+
+
+    public static void clearCatch(){
+        CATCH.clear();
+    }
     @Data
     public static class SessionModel{
         private String sessionId;

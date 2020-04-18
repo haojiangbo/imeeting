@@ -43,7 +43,7 @@ public class ProxyEngineContainer implements Container {
     public void initServer(){
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
-                .handler(new LoggingHandler(LogLevel.INFO))
+                // .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
