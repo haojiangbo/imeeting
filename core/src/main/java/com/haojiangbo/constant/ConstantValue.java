@@ -21,5 +21,6 @@ public class ConstantValue {
     public static final  String CLIENTID_ERROR = "clientId is not exist";
     //重复连接的错误
     public static final  String REPEATED_ERROR = "Repeated connection error  please close other connection";
-
+    //指令
+    public static final  String  CLI = "cli";
 }

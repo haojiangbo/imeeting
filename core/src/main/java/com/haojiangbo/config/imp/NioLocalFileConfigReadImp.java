@@ -3,7 +3,6 @@ package com.haojiangbo.config.imp;
 import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.ConfigRead;
 import com.haojiangbo.model.ConfigModel;
-import com.haojiangbo.utils.PathUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 

@@ -8,33 +8,20 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.util.List;
-
-/**
- * 解码器
- * <pre>
- * 自己定义的协议
- *  数据包格式
- * +——----——+——-----——+——----——+
- * |协议开始标志|  长度             |   数据       |
- * +——----——+——-----——+——----——+
- * 1.协议开始标志head_data，为int类型的数据，16进制表示为0X76
- * 2.传输数据的长度contentLength，int类型
- * 3.要传输的数据,长度不应该超过2048，防止socket流的攻击
- * </pre>
- */
+ /**
+  *
+  * 自定义解码器
+ 　　* @author 郝江波
+ 　　* @date 2020/4/18 9:20
+ 　　*/
 public class CustomProtocolDecoder extends ByteToMessageDecoder {
 
-    /**
-     * <pre>
-     * 协议开始的标准head_data，int类型，占据4个字节.
-     * 表示数据的长度contentLength，int类型，占据4个字节.
-     * </pre>
-     */
+
     public final static int BASE_LENGTH = 4 + 4 + 4;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
-                          List<Object> out) throws Exception {
+                          List<Object> out) {
         // 可读长度必须大于基本长度
         if (buffer.readableBytes() >= BASE_LENGTH) {
 
@@ -66,18 +53,21 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
             // 消息类型
             int messageType = buffer.readInt();
 
-
-            // 会话长度
+            // session长度
             int sesstionIdLength = buffer.readInt();
-            if (buffer.readableBytes() < sesstionIdLength) {
+
+            // 关于此处为什么要 + 4 因为读取完sesion的字节数组之后
+            // 紧接着 会读数据的长度 如果当前数据包只包含了 sesion数据
+            // 没有数据的长度  83 行代码读取的时候 就会报错
+            if (buffer.readableBytes() < (sesstionIdLength) + 4) {
                 // 还原读指针
                 buffer.readerIndex(beginReader);
                 return;
             }
+
             // 会话ID
             byte[] sessionId = new byte[sesstionIdLength];
             buffer.readBytes(sessionId);
-
 
             // 消息的长度
             int length = buffer.readInt();
@@ -87,10 +77,10 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                 buffer.readerIndex(beginReader);
                 return;
             }
+
             // 读取data数据 使用堆外内存
             ByteBuf byteBuf = Unpooled.directBuffer(length);
             buffer.readBytes(byteBuf);
-
 
             // 组装消息
             out.add(new CustomProtocol(

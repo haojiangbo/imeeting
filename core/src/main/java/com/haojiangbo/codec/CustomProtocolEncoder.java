@@ -24,7 +24,7 @@ public class CustomProtocolEncoder extends MessageToByteEncoder<CustomProtocol> 
 
     @Override
     protected void encode(ChannelHandlerContext tcx, CustomProtocol msg,
-                          ByteBuf out) throws Exception {
+                          ByteBuf out) {
         CustomProtocolConverByteBuf.getByteBuf(out,msg);
     }
 }

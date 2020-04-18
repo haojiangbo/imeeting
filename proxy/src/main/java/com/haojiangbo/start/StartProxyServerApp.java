@@ -15,6 +15,12 @@ import lombok.extern.slf4j.Slf4j;
 public class StartProxyServerApp {
 
     public static void main(String [] args){
+        if(args.length == 0){
+            startContainers();
+        }
+    }
+
+    private static void startContainers() {
         Container[]  containers = new Container[]{
                 new ServerConfig(),
                 new BridgeEngineContainner(),
