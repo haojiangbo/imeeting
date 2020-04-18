@@ -2,6 +2,8 @@ package com.haojiangbo.container;
 
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
+import com.haojiangbo.config.BrigdeChannelMapping;
+import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.hander.BrigdeHander;
 import com.haojiangbo.inteface.Container;
@@ -27,13 +29,17 @@ import lombok.extern.slf4j.Slf4j;
  　　*/
 @Slf4j
 public class BridgeEngineContainner implements Container {
-    EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+    EventLoopGroup bossGroup = new NioEventLoopGroup();
     EventLoopGroup workerGroup = new NioEventLoopGroup();
     ServerBootstrap serverBootstrap = new ServerBootstrap();
 
 
     @Override
     public void start() {
+
+        BrigdeChannelMapping.CLIENT_ID_MAPPING.clear();
+        BrigdeChannelMapping.CHANNELID_CLINENTID_MAPPING.clear();
+
         serverBootstrap.group(bossGroup, workerGroup)
                 .channel(NioServerSocketChannel.class)
                 // .handler(new LoggingHandler(LogLevel.INFO))

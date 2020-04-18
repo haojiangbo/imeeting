@@ -38,6 +38,6 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
              target.close();
          }
          log.error("无法访问对端连接  强制关闭当前连接");
-         super.channelInactive(ctx);
+         ctx.close();
      }
  }

@@ -44,7 +44,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
         log.info("收到服务端的消息 {} byte", message.getContent().readableBytes());
         String sessionId =  message.getSessionId();
         Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(sessionId);
-        if(target == null){
+        if(target == null || !target.isActive()){
             ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
             createConnect(ctx,message);
         }else{
