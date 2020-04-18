@@ -37,7 +37,6 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
                  break;
              case ConstantValue.DATA:
                  // 处理管道和消息的映射
-                 //channelMappingHander(ctx, message);
                  dataHander(ctx,message);
                  break;
              case ConstantValue.FORWARD:
