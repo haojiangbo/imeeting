@@ -30,6 +30,8 @@ public class BridgeClientContainer implements Container {
     private EventLoopGroup workerGroup = new NioEventLoopGroup();
     private Bootstrap clientBootstrap = new Bootstrap();
     private Bootstrap bridgeBootstrap ;
+    public static volatile boolean IS_RESTART = true;
+
 
     private void init(){
         if(null !=  bridgeBootstrap){return;}
@@ -81,6 +83,10 @@ public class BridgeClientContainer implements Container {
     public void restart() {
         log.info("准备尝试重新连接...");
         Thread.sleep(3000);
+        if(!BridgeClientContainer.IS_RESTART){
+            log.error("事件循环组已关闭，无法重新启动");
+            return;
+        }
         start();
     }
 

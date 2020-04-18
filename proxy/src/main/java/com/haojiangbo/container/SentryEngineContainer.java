@@ -78,7 +78,7 @@ public class SentryEngineContainer implements Container {
     public void start() {
         List<ConfigModel> configModelList =  ServerConfig.INSTAND.getConfigList();
         for(ConfigModel item : configModelList){
-            start(item.getPort(),String.valueOf(item.getClientId()),item.getClientUrl());
+            start(item.getPort(),item.getClientId(),item.getClientUrl());
         }
     }
     @Override

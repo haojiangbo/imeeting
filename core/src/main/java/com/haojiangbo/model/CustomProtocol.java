@@ -22,10 +22,6 @@ public class CustomProtocol {
      */
     private int meesgeType;
     /**
-     * 客户端ID
-     */
-    private int clientId;
-    /**
      * 会话ID的长度
      */
     private int sesstionIdLength;
@@ -45,7 +41,6 @@ public class CustomProtocol {
      * 初始化协议
      */
     public CustomProtocol(int meesgeType,
-                          int clientId,
                           int sessionIdLengtn,
                           String sessionId,
                           int contentLength,
@@ -53,7 +48,6 @@ public class CustomProtocol {
         this.contentLength = contentLength;
         this.content = content;
         this.meesgeType = meesgeType;
-        this.clientId = clientId;
         this.sesstionIdLength = sessionIdLengtn;
         this.sessionId = sessionId;
     }

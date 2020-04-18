@@ -34,7 +34,6 @@ public class ClientProxyHander extends ChannelInboundHandlerAdapter {
         log.info("交换数据 {} byte ", byteBuf.readableBytes());
         target.writeAndFlush(new CustomProtocol(
                 ConstantValue.DATA,
-                ClientConfig.INSTAND.getClientId(),
                 sessionId.getBytes().length,
                 sessionId,
                 byteBuf.readableBytes(),

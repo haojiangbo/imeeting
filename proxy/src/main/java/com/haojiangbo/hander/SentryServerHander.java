@@ -77,7 +77,6 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
     private void sendForwardMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf) {
         channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(
                 ConstantValue.FORWARD,
-                Integer.valueOf(model.getClientId()),
                 model.getSessionId().getBytes().length,
                 model.getSessionId(),
                 byteBuf.readableBytes(),

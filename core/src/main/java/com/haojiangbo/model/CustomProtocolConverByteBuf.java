@@ -23,7 +23,6 @@ public class CustomProtocolConverByteBuf {
         // 消息头
         out.writeInt(msg.getHeadData());
         out.writeInt(msg.getMeesgeType());
-        out.writeInt(msg.getClientId());
 
         // 会话
         out.writeInt(msg.getSesstionIdLength());

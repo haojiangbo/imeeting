@@ -75,11 +75,12 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
 
 
     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-        log.info("收到服务器的心跳消息  clientId = {}",message.getClientId());
+        log.info("收到服务器的心跳消息  clientId = {}",SessionUtils.parserSessionId(message.getSessionId()).getClientId());
         String meesgae = message.getContent().toString(CharsetUtil.UTF_8);
         if(meesgae.equals(ConstantValue.CLIENTID_ERROR)
                 || meesgae.equals(ConstantValue.REPEATED_ERROR)){
             log.error("服务器返回错误消息 {} ",meesgae);
+            BridgeClientContainer.IS_RESTART = false;
             bridgeClientContainer.stop();
             return;
         }

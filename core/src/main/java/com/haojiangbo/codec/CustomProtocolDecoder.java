@@ -30,7 +30,7 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
      * 表示数据的长度contentLength，int类型，占据4个字节.
      * </pre>
      */
-    public final static int BASE_LENGTH = 4 + 4 + 4 + 4;
+    public final static int BASE_LENGTH = 4 + 4 + 4;
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
@@ -65,8 +65,7 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
             }
             // 消息类型
             int messageType = buffer.readInt();
-            // 消息客户端ID
-            int clientId = buffer.readInt();
+
 
             // 会话长度
             int sesstionIdLength = buffer.readInt();
@@ -96,7 +95,6 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
             // 组装消息
             out.add(new CustomProtocol(
                     messageType,
-                    clientId,
                     sesstionIdLength,
                     new String(sessionId),
                     byteBuf.capacity(),

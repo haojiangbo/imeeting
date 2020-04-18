@@ -32,7 +32,6 @@ public class IdleCheckHandler extends IdleStateHandler {
     @Override
     protected void channelIdle(ChannelHandlerContext ctx, IdleStateEvent evt) throws Exception {
         if (IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT == evt) {
-            log.info("准备发送心跳消息");
             sendPingMessage(ctx.channel());
         } else if (IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT == evt) {
             ctx.channel().close();
@@ -42,11 +41,10 @@ public class IdleCheckHandler extends IdleStateHandler {
 
     public static void sendPingMessage(Channel channel) {
         String messgae = "ping";
-        String sessionId = SessionUtils.genSessionId(String.valueOf(ClientConfig.INSTAND.getClientId()));
+        String sessionId = SessionUtils.genSessionId(ClientConfig.INSTAND.getClientId());
         ByteBuf byteBuf =  Unpooled.wrappedBuffer(messgae.getBytes());
         channel.writeAndFlush(new CustomProtocol(
                 ConstantValue.PING,
-                ClientConfig.INSTAND.getClientId(),
                 sessionId.getBytes().length,
                 sessionId,
                 byteBuf.readableBytes(),byteBuf));

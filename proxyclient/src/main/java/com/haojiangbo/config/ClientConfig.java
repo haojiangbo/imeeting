@@ -13,12 +13,12 @@ import lombok.Data;
 @Data
 public class ClientConfig implements Container {
    public static volatile ClientConfig INSTAND;
-   private int clientId;
+   private String clientId;
    private String remoteHost;
    private int remotePort;
 
    public ClientConfig(){
-       this.clientId =  PrppertiesReadUtils.INSTAND.getIntValue("clientId");
+       this.clientId =  PrppertiesReadUtils.INSTAND.getStringValue("clientId");
        this.remoteHost = PrppertiesReadUtils.INSTAND.getStringValue("remoteHost");
        this.remotePort = PrppertiesReadUtils.INSTAND.getIntValue("remotePort");
        // 禁止指令重排序

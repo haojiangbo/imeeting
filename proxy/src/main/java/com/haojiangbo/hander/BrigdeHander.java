@@ -6,6 +6,7 @@ import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
+import com.haojiangbo.utils.SessionUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -49,7 +50,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
         log.info("收到哨兵端的消息 {} byte", message.getContent().readableBytes());
-        Channel target =  BrigdeChannelMapping.CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId()));
+        Channel target =  BrigdeChannelMapping.CLIENT_ID_MAPPING.get(SessionUtils.parserSessionId(message.getSessionId()).getClientId());
         if(null == target || !target.isActive()){
             ctx.close();
             ReferenceCountUtil.release(message);
@@ -74,7 +75,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
      }
 
      private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message,boolean isclose){
-         log.info("收到客户端的心跳消息  clientId = {}",message.getContent().toString(CharsetUtil.UTF_8));
+         log.info("收到客户端的心跳消息  clientId = {}",SessionUtils.parserSessionId(message.getSessionId()).getClientId());
          ctx.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
              if(isclose){
                  ctx.close();
@@ -90,20 +91,20 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
        * @param message
        */
       private void channelMappingHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        if(!ClientCheckConfig.CLIENT_CHECK_MAP.containsKey(String.valueOf(message.getClientId()))){
-            log.error("clientid = {}  不合法",message.getClientId());
+        if(!ClientCheckConfig.CLIENT_CHECK_MAP.containsKey(SessionUtils.parserSessionId(message.getSessionId()).getClientId())){
+            log.error("clientid = {}  不合法",SessionUtils.parserSessionId(message.getSessionId()).getClientId());
             createError(ctx, message,ConstantValue.CLIENTID_ERROR);
             return;
         }
-        if(!BrigdeChannelMapping .CLIENT_ID_MAPPING.containsKey(String.valueOf(message.getClientId()))){
-            BrigdeChannelMapping .CLIENT_ID_MAPPING.put(String.valueOf(message.getClientId()),ctx.channel());
+        if(!BrigdeChannelMapping .CLIENT_ID_MAPPING.containsKey(SessionUtils.parserSessionId(message.getSessionId()).getClientId())){
+            BrigdeChannelMapping .CLIENT_ID_MAPPING.put(SessionUtils.parserSessionId(message.getSessionId()).getClientId(),ctx.channel());
             // 返回心跳响应
         }else{
-            boolean b =  BrigdeChannelMapping .CLIENT_ID_MAPPING.get(String.valueOf(message.getClientId())).equals(ctx.channel());
+            boolean b =  BrigdeChannelMapping .CLIENT_ID_MAPPING.get(SessionUtils.parserSessionId(message.getSessionId()).getClientId()).equals(ctx.channel());
             if(!b){ createError(ctx, message,ConstantValue.REPEATED_ERROR); return;}
         }
         if(!BrigdeChannelMapping.CHANNELID_CLINENTID_MAPPING.containsKey(ctx.channel().id().asLongText())){
-          BrigdeChannelMapping .CHANNELID_CLINENTID_MAPPING.put(ctx.channel().id().asLongText(),String.valueOf(message.getClientId()));
+          BrigdeChannelMapping .CHANNELID_CLINENTID_MAPPING.put(ctx.channel().id().asLongText(),SessionUtils.parserSessionId(message.getSessionId()).getClientId());
         }
         pingHander(ctx,message,false);
       }

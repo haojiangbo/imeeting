@@ -6,6 +6,6 @@ import lombok.Data;
 public class ConfigModel {
     private String domain;
     private int port;
-    private int clientId;
+    private String clientId;
     private String clientUrl;
 }
