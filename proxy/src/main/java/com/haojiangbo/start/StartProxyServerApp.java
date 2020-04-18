@@ -1,13 +1,12 @@
 package com.haojiangbo.start;
 
 import com.haojiangbo.config.ServerConfig;
-import com.haojiangbo.container.BridgeEngineContainner;
-import com.haojiangbo.container.EventEngineContainner;
-import com.haojiangbo.container.ProxyEngineContainer;
-import com.haojiangbo.container.SentryEngineContainer;
-import com.haojiangbo.event.AbstractEventAccepter;
+import com.haojiangbo.constant.ConstantValue;
+import com.haojiangbo.container.*;
+import com.haojiangbo.event.EventListener;
 import com.haojiangbo.inteface.Container;
 import com.haojiangbo.model.EventMessage;
+import com.haojiangbo.shell.CmdShellHander;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -15,28 +14,37 @@ import lombok.extern.slf4j.Slf4j;
  　　* @date 2020/4/15 15:53
  　　*/
 @Slf4j
-public class StartProxyServerApp extends AbstractEventAccepter {
-    private  static  Container[]  containers = new Container[]{
-            new ServerConfig(),
-            new BridgeEngineContainner(),
-            new SentryEngineContainer(),
-            new ProxyEngineContainer(),
-            new EventEngineContainner()
-    };
+public class StartProxyServerApp implements EventListener {
+
+
+    private static StartProxyServerApp instand;
+
+
+    public StartProxyServerApp(){
+        ACCEPTER.add(this);
+    }
+
+
+    private  static  Container[]  containers = getContainers();
 
     public static void main(String [] args){
+        instand = new StartProxyServerApp();
         if(args.length == 0){
-           try {
+            try {
                startContainers();
-           }catch (Exception e){
+            }catch (Exception e){
                e.printStackTrace();
                stopContainers();
-           }
+            }
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                log.error("关闭服务端...");
+                stopContainers();
+            }));
         }
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            log.error("关闭服务端...");
-            stopContainers();
-        }));
+        // 支持控制台交互
+        else if(args[0].equals(ConstantValue.CLI)){
+            CmdShellHander.start(new ServerConfig(),new EventClientEngineContainner());
+        }
     }
 
     private static void startContainers() {
@@ -52,16 +60,13 @@ public class StartProxyServerApp extends AbstractEventAccepter {
         }
     }
 
+
+
     @Override
-    public void notify(EventMessage eventMessage) {
+    public void notifyEvent(EventMessage eventMessage) {
         if(eventMessage.getType() == EventMessage.RELOAD_EVENT){
             stopContainers();
-            containers = new Container[]{
-                    new ServerConfig(),
-                    new BridgeEngineContainner(),
-                    new SentryEngineContainer(),
-                    new ProxyEngineContainer(),
-            };
+            containers = getContainers();
             startContainers();
         }else if(eventMessage.getType() == EventMessage.CLOSE_EVENT){
             stopContainers();
@@ -69,8 +74,14 @@ public class StartProxyServerApp extends AbstractEventAccepter {
         }
     }
 
-    @Override
-    protected AbstractEventAccepter registInstand() {
-        return new StartProxyServerApp();
+    private static Container[] getContainers() {
+        return new Container[]{
+                new ServerConfig(),
+                new BridgeEngineContainner(),
+                new SentryEngineContainer(),
+                new ProxyEngineContainer(),
+                new EventEngineContainner()
+        };
     }
+
 }

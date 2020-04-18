@@ -10,6 +10,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
  　　* @date 2020/4/18 10:36
  　　*/
 public interface EventListener {
-    void regist();
-    void notify(EventMessage eventMessage);
+    /**
+     * 监听者容器
+     */
+    CopyOnWriteArrayList<EventListener> ACCEPTER = new CopyOnWriteArrayList<>();
+    void notifyEvent(EventMessage eventMessage);
 }

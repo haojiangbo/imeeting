@@ -1,6 +1,7 @@
 package com.haojiangbo.model;
 
 import lombok.Data;
+import lombok.experimental.Accessors;
 
 /**
   *
@@ -9,6 +10,7 @@ import lombok.Data;
  　　* @date 2020/4/18 10:34
  　　*/
  @Data
+ @Accessors(chain = true)
 public class EventMessage {
     //重新加载事件
     public static final int RELOAD_EVENT = 0XFF;
