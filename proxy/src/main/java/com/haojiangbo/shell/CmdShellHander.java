@@ -20,6 +20,11 @@ public class CmdShellHander {
 
     private static ShellHanderAbstract shellHander = new DefaultShellHanderImp();
 
+    //测试类
+    public static void main(String[] a) {
+        start(new ServerConfig(),new EventClientEngineContainner());
+    }
+
     @SneakyThrows
     public static void start(Container... container) {
         for(Container item : container){

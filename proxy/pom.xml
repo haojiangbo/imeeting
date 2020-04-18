@@ -19,6 +19,7 @@
     </dependencies>
 
     <build>
+        <finalName>proxyServer</finalName>
         <plugins>
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>

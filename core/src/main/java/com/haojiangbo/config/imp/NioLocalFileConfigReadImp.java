@@ -32,7 +32,7 @@ public class NioLocalFileConfigReadImp implements ConfigRead {
             if(line.startsWith("#"))
                 continue;
             else
-                result.add(parserLine(line));
+                result.add(parserLine(line.trim()));
         }
         return result;
     }

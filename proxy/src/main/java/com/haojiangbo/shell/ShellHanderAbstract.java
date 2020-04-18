@@ -9,17 +9,32 @@ public abstract class ShellHanderAbstract {
     public static final String HELP     = "help";
     public static final String FLUSH    = "flush";
     public static final String EXIT     = "exit";
+    public static final String GET      = "get";
+    public static final String GETLIST  = "getlist";
+    public static final String SET      = "set";
+
+
+
 
     public String distributor(String line){
-        if(line.equals(HELP)){
-            return helpCmd();
-        }else if(line.equals(FLUSH)){
-            return flush();
-        }else if(line.equals(EXIT)){
-            return exit();
-        }else{
-            return "不能识别的命令 请输入 help";
+        String prefix = line.split(" ")[0];
+        switch (prefix){
+            case HELP:
+                return helpCmd();
+            case FLUSH:
+                return flush();
+            case EXIT:
+                return exit();
+            case GET:
+                return get(line.split(" "));
+            case GETLIST:
+                return getlist();
+            case SET:
+                return set(line.split(" "));
+            default:
+                return "不能识别的命令 请输入 help";
         }
+
     }
 
 
@@ -30,5 +45,13 @@ public abstract class ShellHanderAbstract {
 
     protected abstract String flush();
 
-     protected abstract String exit();
+    protected abstract String exit();
+
+    protected abstract String get(String... str);
+
+    protected abstract String getlist();
+
+
+    protected abstract String set(String... str);
+
 }
