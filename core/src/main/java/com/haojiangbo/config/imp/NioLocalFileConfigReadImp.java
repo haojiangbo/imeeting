@@ -5,6 +5,7 @@ import com.haojiangbo.config.ConfigRead;
 import com.haojiangbo.model.ConfigModel;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -29,10 +30,13 @@ public class NioLocalFileConfigReadImp implements ConfigRead {
         log.info("配置文件加载成功 {} ", configPath);
         String line;
         for(line = randomAccessFile.readLine(); line != null; line = randomAccessFile.readLine()){
-            if(line.startsWith("#"))
-                continue;
-            else
-                result.add(parserLine(line.trim()));
+            line = line.trim();
+            if(!StringUtils.isEmpty(line)){
+                if(line.startsWith("#"))
+                    continue;
+                else
+                    result.add(parserLine(line));
+            }
         }
         return result;
     }

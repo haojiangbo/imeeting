@@ -78,6 +78,26 @@ public class ServerConfig implements Container {
        INSTAND = this;
    }
 
+
+
+    public void restart() {
+        this.eventPort           = PrppertiesReadUtils.INSTAND.getIntValue("eventPort");
+        this.proxyPort           = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
+        this.bridgeHost          = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
+        this.bridgePort          = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
+        this.isProxyModel        = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
+        this.configList          = initConfigList();
+
+        if (configList.size() == 0) {
+            throw  new RuntimeException("配置不能为空");
+        }
+        for(ConfigModel item : configList){
+            domainProtMapping.put(item.getDomain(), item.getPort());
+        }
+        // 禁止指令重排序
+        INSTAND = this;
+    }
+
    @Override
    public void stop() {
        SessionUtils.clearCatch();

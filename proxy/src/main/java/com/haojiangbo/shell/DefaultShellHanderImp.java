@@ -116,6 +116,7 @@ public class DefaultShellHanderImp extends  ShellHanderAbstract{
                 //e.printStackTrace();
                 return e.getMessage();
             }
+            ServerConfig.INSTAND.restart();
             return "OK";
         });
     }
