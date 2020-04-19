@@ -10,7 +10,7 @@ public abstract class ShellHanderAbstract {
     public static final String FLUSH    = "flush";
     public static final String EXIT     = "exit";
     public static final String GET      = "get";
-    public static final String GETLIST  = "getlist";
+    public static final String LIST     = "list";
     public static final String SET      = "set";
 
 
@@ -27,7 +27,7 @@ public abstract class ShellHanderAbstract {
                 return exit();
             case GET:
                 return get(line.split(" "));
-            case GETLIST:
+            case LIST:
                 return getlist();
             case SET:
                 return set(line.split(" "));
