@@ -25,7 +25,6 @@ import java.util.stream.Collectors;
  * 默认的shell事件处理器
  * 　　* @author 郝江波
  * 　　* @date 2020/4/18 11:18
- *
  */
 public class DefaultShellHanderImp extends ShellHanderAbstract {
     String sessionId = "134";
@@ -85,6 +84,91 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
         return setHander(cli.get(1), cli.get(2), cli.get(3));
     }
 
+    @Override
+    protected String add(String... str) {
+        return addHander(str);
+    }
+
+    private String addHander(String... str) {
+
+        if (str.length < 4) {
+            return "错误的命令 请参考文档";
+        }
+
+        String isRepeat = checkIsRepeat(str);
+        if (!isRepeat.equals("no")) {
+            return isRepeat;
+        }
+
+        StringBuilder value = getAddWriteValue(str);
+        try {
+            RandomAccessFile file = getRandomAccessFile();
+            file.seek(file.length());
+            file.writeBytes(value.toString());
+            file.close();
+            ServerConfig.INSTAND.restart();
+        } catch (Exception e) {
+            return e.getMessage();
+        }
+        return getOk();
+    }
+
+    private StringBuilder getAddWriteValue(String[] str) {
+        StringBuilder value = new StringBuilder();
+        for (int i = 1; i < str.length; i++) {
+            value.append(str[i]);
+            if (i < str.length - 1) {
+                value.append(",");
+            } else {
+                value.append("\n");
+            }
+        }
+        return value;
+    }
+
+    private String checkIsRepeat(String[] str) {
+        List<ConfigModel> result = ServerConfig.INSTAND.getConfigList();
+        String isRepeat = "no";
+        for (ConfigModel configModel : result) {
+            if (configModel.getPort() == Integer.valueOf(str[2])) {
+                isRepeat = "哨兵端口号重复";
+            } else if (configModel.getDomain().equals(str[1])) {
+                isRepeat = "二级域名重复";
+            } else if (configModel.getClientId().equals(str[3])) {
+                isRepeat = "clientId重复";
+            }
+        }
+        return isRepeat;
+    }
+
+    @Override
+    protected String del(String... str) {
+        return delhander(str);
+    }
+
+    private String delhander(String... str) {
+        if (!(str.length == 2)) {
+            return "参数错误";
+        }
+        return readLine((line, randomAccessFile, strings) -> {
+            String temp = strings
+                    .stream()
+                    .filter(item -> item.contains(str[1]))
+                    .findFirst().orElse(null);
+            if (temp == null) {
+                return "不存在的 clientId";
+            }
+            temp = line.replace(temp, "");
+            try {
+                writeValue(randomAccessFile, temp);
+            } catch (IOException e) {
+                return e.getMessage();
+            }
+            ServerConfig.INSTAND.restart();
+            return getOk();
+        });
+    }
+
 
     private String setHander(String clientId, String feild, String value) {
         return readLine((line, randomAccessFile, strings) -> {
@@ -103,7 +187,7 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
 
             //覆盖值
             String[] v = valueParser(temp);
-            temp = line.replace(temp, temp.replace(v[index],index == v.length - 1 ? value+"\n":value));
+            temp = line.replace(temp, temp.replace(v[index], index == v.length - 1 ? value + "\n" : value));
 
             try {
                 writeValue(randomAccessFile, temp);
@@ -111,8 +195,12 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
                 return e.getMessage();
             }
             ServerConfig.INSTAND.restart();
-            return "OK";
+            return getOk();
         });
+    }
+
+    private String getOk() {
+        return "OK";
     }
 
     private void writeValue(RandomAccessFile randomAccessFile, String temp) throws IOException {
@@ -123,7 +211,6 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
         }
         randomAccessFile.seek(0);
         randomAccessFile.writeBytes(temp);
-
         randomAccessFile.close();
     }
 
@@ -155,28 +242,6 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
         return value.split(",");
     }
 
-    /*private String setCilentId(String clientId,String newClientId){
-        return readLine((line, randomAccessFile,strings) -> {
-            String temp =  line.replace(clientId, newClientId);
-            try {
-                randomAccessFile.seek(0);
-                randomAccessFile.writeBytes(temp);
-
-                //旧数据填充0
-                for(int i = temp.getBytes().length; i < randomAccessFile.length(); i++){
-                    randomAccessFile.writeByte(0);
-                }
-
-                randomAccessFile.close();
-            } catch (IOException e) {
-                //e.printStackTrace();
-                return e.getMessage();
-            }
-            ServerConfig.INSTAND.restart();
-            return "OK";
-        });
-    }*/
-
 
     private int getSeekValue(String clientId, String newClientId) {
         return Math.abs(clientId.getBytes().length - newClientId.getBytes().length) - 3;
@@ -199,9 +264,7 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
 
     @SneakyThrows
     private String readLine(Call call) {
-        String path = PathUtils.getPath(ServerConfig.class);
-        String configPath = path + File.separator + ConfigRead.CONFIG_FILE_NAME;
-        RandomAccessFile randomAccessFile = new RandomAccessFile(configPath, "rw");
+        RandomAccessFile randomAccessFile = getRandomAccessFile();
         String line;
         int index = 0;
         StringBuilder stringBuilder = new StringBuilder();
@@ -212,6 +275,12 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
             strings.add(item);
         }
         return call.call(stringBuilder.toString(), randomAccessFile, strings);
+    }
+
+    private RandomAccessFile getRandomAccessFile() throws FileNotFoundException {
+        String path = PathUtils.getPath(ServerConfig.class);
+        String configPath = path + File.separator + ConfigRead.CONFIG_FILE_NAME;
+        return new RandomAccessFile(configPath, "rw");
     }
 }
 
