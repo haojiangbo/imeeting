@@ -1,5 +1,8 @@
 package com.haojiangbo.shell;
- /**
+
+import com.sun.org.apache.regexp.internal.RE;
+
+/**
   * shell处理器
  　　* @author 郝江波
  　　* @date 2020/4/18 11:17
@@ -10,14 +13,17 @@ public abstract class ShellHanderAbstract {
     public static final String FLUSH    = "flush";
     public static final String EXIT     = "exit";
     public static final String GET      = "get";
-    public static final String GETLIST  = "getlist";
+    public static final String LIST     = "list";
     public static final String SET      = "set";
+    public static final String DEL      = "del";
+    public static final String ADD      = "add";
 
 
 
 
     public String distributor(String line){
-        String prefix = line.split(" ")[0];
+        String [] tokens = line.split(" ");
+        String prefix = tokens[0];
         switch (prefix){
             case HELP:
                 return helpCmd();
@@ -26,11 +32,15 @@ public abstract class ShellHanderAbstract {
             case EXIT:
                 return exit();
             case GET:
-                return get(line.split(" "));
-            case GETLIST:
+                return get(tokens);
+            case LIST:
                 return getlist();
             case SET:
-                return set(line.split(" "));
+                return set(tokens);
+            case ADD:
+                return add(tokens);
+            case DEL:
+                return del(tokens);
             default:
                 return "不能识别的命令 请输入 help";
         }
@@ -51,7 +61,10 @@ public abstract class ShellHanderAbstract {
 
     protected abstract String getlist();
 
-
     protected abstract String set(String... str);
+
+    protected abstract String add(String... str);
+
+    protected abstract String del(String... str);
 
 }

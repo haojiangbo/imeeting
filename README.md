@@ -22,5 +22,5 @@ www 是要配置的二级域名
 我已经在看云上写好了文档，
 请点击下方连接查看文档，
 详细配置会在此文档同步
-https://www.kancloud.cn/book/haojiangbo/stinger/f5734dcae82ebc896d71bdaef6251418a52ddac7/preview/%E5%A6%82%E4%BD%95%E5%90%AF%E5%8A%A8.md
+https://www.kancloud.cn/haojiangbo/stinger
  
