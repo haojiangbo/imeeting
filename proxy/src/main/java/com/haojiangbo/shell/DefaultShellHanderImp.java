@@ -95,7 +95,7 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
             return "错误的命令 请参考文档";
         }
 
-        String x = checkClientUrl(str[3]);
+        String x = checkClientUrl(str[4]);
         if (!x.equals("OK")) return x;
 
         String isRepeat = checkIsRepeat(str);
@@ -156,7 +156,13 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
         return readLine((line, randomAccessFile, strings) -> {
             String temp = strings
                     .stream()
-                    .filter(item -> item.contains(str[1]))
+                    .filter(item -> {
+                        String[] tokens =  item.split(",");
+                        if(tokens.length < 4){
+                            return false;
+                        }
+                        return  tokens[2].equals(str[1]);
+                    })
                     .findFirst().orElse(null);
             if (temp == null) {
                 return "不存在的 clientId";
