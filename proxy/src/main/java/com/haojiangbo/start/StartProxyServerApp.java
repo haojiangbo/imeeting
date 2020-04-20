@@ -36,15 +36,19 @@ public class StartProxyServerApp implements EventListener {
                e.printStackTrace();
                stopContainers();
             }
-            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-                log.error("关闭服务端...");
-                stopContainers();
-            }));
+            shutDownHook();
         }
         // 支持控制台交互
         else if(args[0].equals(ConstantValue.CLI)){
             CmdShellHander.start(new ServerConfig(),new EventClientEngineContainner());
         }
+    }
+
+    private static void shutDownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.error("关闭服务端...");
+            stopContainers();
+        }));
     }
 
     private static void startContainers() {

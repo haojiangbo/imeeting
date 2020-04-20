@@ -12,6 +12,10 @@ public class ClientAppStart {
 
     public static void main(String [] ages){
         startContainers();
+        shutdownHook();
+    }
+
+    private static void shutdownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             log.error("关闭客户端...");
             BridgeClientContainer.IS_RESTART = false;
@@ -20,7 +24,6 @@ public class ClientAppStart {
     }
 
     private static void startContainers() {
-
         for(Container container : containers){
             container.start();
         }

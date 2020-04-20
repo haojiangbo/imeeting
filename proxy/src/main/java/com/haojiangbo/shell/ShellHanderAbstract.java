@@ -1,7 +1,5 @@
 package com.haojiangbo.shell;
 
-import com.sun.org.apache.regexp.internal.RE;
-
 /**
   * shell处理器
  　　* @author 郝江波
