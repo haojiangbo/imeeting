@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * 　　* @date 2020/4/18 11:18
  */
 public class DefaultShellHanderImp extends ShellHanderAbstract {
-    String sessionId = "134";
+    String sessionId = "666";
 
     @Override
     protected String flush() {
@@ -161,10 +161,10 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
             temp = line.replace(temp, "");
             try {
                 writeValue(randomAccessFile, temp);
+                ServerConfig.INSTAND.restart();
             } catch (IOException e) {
                 return e.getMessage();
             }
-            ServerConfig.INSTAND.restart();
             return getOk();
         });
     }
@@ -188,15 +188,18 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
             //覆盖值
             String[] v = valueParser(temp);
             temp = line.replace(temp, temp.replace(v[index], index == v.length - 1 ? value + "\n" : value));
-
             try {
-                writeValue(randomAccessFile, temp);
+                writeAndReload(randomAccessFile, temp);
             } catch (IOException e) {
                 return e.getMessage();
             }
-            ServerConfig.INSTAND.restart();
             return getOk();
         });
+    }
+
+    private void writeAndReload(RandomAccessFile randomAccessFile, String temp) throws IOException {
+        writeValue(randomAccessFile, temp);
+        ServerConfig.INSTAND.restart();
     }
 
     private String getOk() {
