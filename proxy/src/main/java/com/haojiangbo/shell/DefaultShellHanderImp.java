@@ -157,11 +157,11 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
             String temp = strings
                     .stream()
                     .filter(item -> {
-                        String[] tokens =  item.split(",");
-                        if(tokens.length < 4){
+                        String[] tokens = item.split(",");
+                        if (tokens.length < 4) {
                             return false;
                         }
-                        return  tokens[2].equals(str[1]);
+                        return tokens[2].equals(str[1]);
                     })
                     .findFirst().orElse(null);
             if (temp == null) {
@@ -197,7 +197,7 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
             //覆盖值
             String[] v = valueParser(temp);
 
-            if(index == v.length - 1){
+            if (index == v.length - 1) {
                 String x = checkClientUrl(value);
                 if (!x.equals("OK")) return x;
             }
@@ -213,16 +213,16 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
     }
 
     private String checkClientUrl(String value) {
-        String [] hp = value.split(":");
-        if(hp.length != 2){
+        String[] hp = value.split(":");
+        if (hp.length != 2) {
             return "请输入正确的 host:port格式";
         }
         try {
-           int port = Integer.valueOf(hp[1]);
-           if(port < 1 || port >= 65535)
-               throw new RuntimeException("超出范围");
-        }catch (Exception e){
-           return "请输入正确的端口号 1 - 65535";
+            int port = Integer.valueOf(hp[1]);
+            if (port < 1 || port >= 65535)
+                throw new RuntimeException("超出范围");
+        } catch (Exception e) {
+            return "请输入正确的端口号 1 - 65535";
         }
         return "OK";
     }
