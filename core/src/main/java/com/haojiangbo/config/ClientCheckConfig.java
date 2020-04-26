@@ -1,5 +1,7 @@
 package com.haojiangbo.config;
 
+import com.haojiangbo.model.ConfigModel;
+
 import java.util.HashMap;
 import java.util.Map;
 /**
@@ -12,5 +14,5 @@ import java.util.Map;
 */
 public class ClientCheckConfig {
     public static final String OK = "OK";
-    public static Map<String,String> CLIENT_CHECK_MAP = new HashMap<>();
+    public static Map<String, ConfigModel> CLIENT_CHECK_MAP = new HashMap<>();
 }

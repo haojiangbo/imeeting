@@ -61,41 +61,30 @@ public class ServerConfig implements Container {
 
    @Override
    public void start() {
-       this.eventPort           = PrppertiesReadUtils.INSTAND.getIntValue("eventPort");
-       this.proxyPort           = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
-       this.bridgeHost          = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
-       this.bridgePort          = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
-       this.isProxyModel        = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
-       this.configList          = initConfigList();
-
-       if (configList.size() == 0) {
-           throw  new RuntimeException("配置不能为空");
-       }
-       for(ConfigModel item : configList){
-           domainProtMapping.put(item.getDomain(), item.getPort());
-       }
-       // 禁止指令重排序
-       INSTAND = this;
+       setValue();
    }
 
-
-
-    public void restart() {
-        this.eventPort           = PrppertiesReadUtils.INSTAND.getIntValue("eventPort");
-        this.proxyPort           = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
-        this.bridgeHost          = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
-        this.bridgePort          = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
-        this.isProxyModel        = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
-        this.configList          = initConfigList();
+    private void setValue() {
+        this.eventPort = PrppertiesReadUtils.INSTAND.getIntValue("eventPort");
+        this.proxyPort = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
+        this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
+        this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
+        this.isProxyModel = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
+        this.configList = initConfigList();
 
         if (configList.size() == 0) {
-            throw  new RuntimeException("配置不能为空");
+            throw new RuntimeException("配置不能为空");
         }
-        for(ConfigModel item : configList){
+        for (ConfigModel item : configList) {
             domainProtMapping.put(item.getDomain(), item.getPort());
         }
         // 禁止指令重排序
         INSTAND = this;
+    }
+
+
+    public void restart() {
+        setValue();
     }
 
    @Override

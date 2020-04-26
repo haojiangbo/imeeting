@@ -50,12 +50,12 @@ public class NioLocalFileConfigReadImp implements ConfigRead {
        configModel.setDomain(temp[0]);
        configModel.setPort(Integer.valueOf(temp[1]));
        configModel.setClientId(temp[2]);
-       ClientCheckConfig.CLIENT_CHECK_MAP.put(temp[2],ClientCheckConfig.OK);
        configModel.setClientUrl(temp[3]);
        String [] hp = configModel.getClientUrl().split(":");
        if(hp.length != 2){
            throw  new RuntimeException("配置参数错误,错误的主机地址，请参照注释");
        }
+       ClientCheckConfig.CLIENT_CHECK_MAP.put(temp[2],configModel);
        return configModel;
     }
 

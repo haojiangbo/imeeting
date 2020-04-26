@@ -59,12 +59,19 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                 .addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
                         AtoBUtils.addMapping(ctx.channel(),future.channel());
-                        sendForwardMessage(model, future.channel(), byteBuf);
+                        sendForwardMessage(model, future.channel(), byteBuf)
+                                .addListener((ChannelFutureListener) future1 -> {
+                                    if(future1.isSuccess()){
+                                        ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
+                                    }else{
+                                        ctx.close();
+                                    }
+                                });
                     }else{
                         ctx.close();
                         ReferenceCountUtil.release(byteBuf);
                     }
-                    ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
+
                 });
     }
 
@@ -74,8 +81,8 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
      * @param channel
      * @param byteBuf
      */
-    private void sendForwardMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf) {
-        channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(
+    private ChannelFuture sendForwardMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf) {
+      return   channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(
                 ConstantValue.FORWARD,
                 model.getSessionId().getBytes().length,
                 model.getSessionId(),
