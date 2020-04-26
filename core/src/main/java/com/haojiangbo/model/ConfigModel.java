@@ -8,4 +8,13 @@ public class ConfigModel {
     private int port;
     private String clientId;
     private String clientUrl;
+
+    @Override
+    public String toString() {
+        return "[" +
+                "访问域名:'" +  domain+".1900th.com"  + '\'' +
+                ", 访问端口:" + port +
+                ", 代理地址='" + clientUrl + '\'' +
+                ']';
+    }
 }

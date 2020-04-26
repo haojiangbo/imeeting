@@ -5,6 +5,7 @@ import com.haojiangbo.config.BrigdeChannelMapping;
 import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
+import com.haojiangbo.model.ConfigModel;
 import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.buffer.ByteBuf;
@@ -48,7 +49,8 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        log.info("收到哨兵端的消息 {} byte", message.getContent().readableBytes());
+        log.info("收到哨兵端的消息 {} byte address  = {}", message.getContent().readableBytes(),message.hashCode());
+        ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         Channel target =  BrigdeChannelMapping.CLIENT_ID_MAPPING.get(SessionUtils.parserSessionId(message.getSessionId()).getClientId());
         if(null == target || !target.isActive()){
             ctx.close();
@@ -56,7 +58,12 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
             return;
         }
         //向客户端发送消息
-        target.writeAndFlush(message.setMeesgeType(ConstantValue.DATA));
+        target.writeAndFlush(message.setMeesgeType(ConstantValue.DATA)).addListener(new ChannelFutureListener() {
+            @Override
+            public void operationComplete(ChannelFuture future) throws Exception {
+                ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
+            }
+        });
         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), ctx.channel());
 
     }
@@ -74,7 +81,12 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
      }
 
      private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message,boolean isclose){
-         log.info("收到客户端的心跳消息  clientId = {}",SessionUtils.parserSessionId(message.getSessionId()).getClientId());
+         String clientId = SessionUtils.parserSessionId(message.getSessionId()).getClientId();
+         log.info("收到客户端的心跳消息  clientId = {}",clientId);
+         ConfigModel configMode =  ClientCheckConfig.CLIENT_CHECK_MAP.get(clientId);
+         ByteBuf byteBuf = Unpooled.wrappedBuffer(configMode.toString().getBytes());
+         message.setContentLength(byteBuf.readableBytes());
+         message.setContent(byteBuf);
          ctx.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
              if(isclose){
                  ctx.close();
