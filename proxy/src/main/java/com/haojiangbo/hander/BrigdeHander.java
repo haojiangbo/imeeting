@@ -50,7 +50,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
         log.info("收到哨兵端的消息 {} byte address  = {}", message.getContent().readableBytes(),message.hashCode());
-        ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
+        //ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         Channel target =  BrigdeChannelMapping.CLIENT_ID_MAPPING.get(SessionUtils.parserSessionId(message.getSessionId()).getClientId());
         if(null == target || !target.isActive()){
             ctx.close();
@@ -61,7 +61,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter  {
         target.writeAndFlush(message.setMeesgeType(ConstantValue.DATA)).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
-                ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
+                //ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
             }
         });
         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), ctx.channel());
