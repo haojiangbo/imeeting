@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  *
  *
  * 桥梁中继hander
-  * @author 郝江波
+  * @author haojiangbo
   * @date 2020/4/15 16:36
   */
 @Slf4j

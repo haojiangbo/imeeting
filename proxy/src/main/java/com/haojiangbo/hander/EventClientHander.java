@@ -9,7 +9,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
  /**
- 　　* @author 郝江波
+ 　　* @author 江波
  　　* @date 2020/4/18 13:54
  　　*/
 public class EventClientHander extends ChannelInboundHandlerAdapter {

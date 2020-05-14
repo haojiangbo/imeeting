@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
   * 事件处理器
- 　　* @author 郝江波
+ 　　* @author jb
  　　* @date 2020/4/18 10:54
  　　*/
  @Slf4j
