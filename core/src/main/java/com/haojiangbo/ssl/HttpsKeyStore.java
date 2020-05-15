@@ -16,7 +16,7 @@ public class HttpsKeyStore {
     public static InputStream getKeyStoreStream() {
         InputStream inStream = null;
         try {
-            inStream = new FileInputStream(SSLConstant.keystorePath);
+            inStream = new FileInputStream(SSLConstant.KEYSTORE_PATH);
         } catch (FileNotFoundException e) {
             log.error("读取密钥文件失败", e);
         }
@@ -30,7 +30,7 @@ public class HttpsKeyStore {
      * @return char[]
      */
     public static char[] getCertificatePassword() {
-        return SSLConstant.certificatePassword.toCharArray();
+        return SSLConstant.CERTIFICATE_PASSWORD.toCharArray();
     }
 
     /**
@@ -40,7 +40,7 @@ public class HttpsKeyStore {
      * @return char[]
      */
     public static char[] getKeyStorePassword() {
-        return SSLConstant.keystorePassword.toCharArray();
+        return SSLConstant.KEYSTORE_PASSWORD.toCharArray();
     }
 
 }

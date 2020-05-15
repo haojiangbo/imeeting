@@ -3,10 +3,9 @@ import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.http.AbstractHttpParser;
 import com.haojiangbo.http.HttpRequest;
-import com.haojiangbo.utils.AtoBUtils;
+import com.haojiangbo.utils.A2BUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
@@ -90,7 +89,7 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
             bootstrap.connect(request.getHost(), request.getPort()).addListener((ChannelFutureListener) future -> {
                 if(future.isSuccess()){
                     // 相互映射 双方互相可以得到对方
-                    AtoBUtils.addMapping(ctx.channel(),future.channel());
+                    A2BUtils.addMapping(ctx.channel(),future.channel());
                     if(isSendMessgae){
                         future.channel().writeAndFlush(message);
                     }else{
@@ -112,7 +111,7 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        AtoBUtils.removeMapping(ctx.channel());
+        A2BUtils.removeMapping(ctx.channel());
         super.channelInactive(ctx);
     }
 

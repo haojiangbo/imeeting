@@ -7,27 +7,28 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 
 /**
  * 　　* @author 郝江波
  * 　　* @date 2020/4/18 11:05
- *
  */
 public class CmdShellHander {
 
-    private static ShellHanderAbstract shellHander = new DefaultShellHanderImp();
+    private static AbstractShellHander shellHander = new DefaultShellHanderImp();
 
-    //测试类
+    /**
+     * 测试类
+     *
+     * @param a
+     */
     public static void main(String[] a) {
-        start(new ServerConfig(),new EventClientEngineContainner());
+        start(new ServerConfig(), new EventClientEngineContainner());
     }
 
     @SneakyThrows
     public static void start(Container... container) {
-        for(Container item : container){
+        for (Container item : container) {
             item.start();
         }
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -35,13 +36,13 @@ public class CmdShellHander {
         println("输入 help 查看帮助");
         print(">");
         while ((line = br.readLine()) != null) {
-            if (!StringUtils.isEmpty(line)){
+            if (!StringUtils.isEmpty(line)) {
                 String result = shellHander.distributor(line);
-                if(!result.equals(ShellHanderAbstract.EXIT)){
+                if (!result.equals(AbstractShellHander.EXIT)) {
                     System.out.println(result);
-                }else{
+                } else {
                     br.close();
-                    for(Container item : container){
+                    for (Container item : container) {
                         item.stop();
                     }
                     return;

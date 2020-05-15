@@ -11,7 +11,7 @@ import io.netty.channel.Channel;
  * 　　* @date 2020/4/16 17:04
  *
  */
-public class AtoBUtils {
+public class A2BUtils {
 
 
     /**

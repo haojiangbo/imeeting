@@ -26,27 +26,27 @@ import java.util.stream.Collectors;
  * 　　* @author 郝江波
  * 　　* @date 2020/4/18 11:18
  */
-public class DefaultShellHanderImp extends ShellHanderAbstract {
+public class DefaultShellHanderImp extends AbstractShellHander {
     String sessionId = "666";
 
     @Override
     protected String flush() {
         if (EventClientHander.channel != null && EventClientHander.channel.isActive()) {
-            ByteBuf send = Unpooled.wrappedBuffer(ShellHanderAbstract.FLUSH.getBytes());
+            ByteBuf send = Unpooled.wrappedBuffer(AbstractShellHander.FLUSH.getBytes());
             EventClientHander.channel.writeAndFlush(new CustomProtocol(
                     ConstantValue.DATA,
                     sessionId.getBytes().length,
                     sessionId, send.readableBytes(),
                     send));
-            return ShellHanderAbstract.FLUSH + " 发送成功";
+            return AbstractShellHander.FLUSH + " 发送成功";
         } else {
-            return ShellHanderAbstract.FLUSH + " 发送失败";
+            return AbstractShellHander.FLUSH + " 发送失败";
         }
     }
 
     @Override
     protected String exit() {
-        return ShellHanderAbstract.EXIT;
+        return AbstractShellHander.EXIT;
     }
 
     @Override
@@ -96,10 +96,12 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
         }
 
         String x = checkClientUrl(str[4]);
-        if (!x.equals("OK")) return x;
+        if (!"OK".equals(x)) {
+            return x;
+        }
 
         String isRepeat = checkIsRepeat(str);
-        if (!isRepeat.equals("no")) {
+        if (!"no".equals(isRepeat)) {
             return isRepeat;
         }
 
@@ -150,7 +152,7 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
     }
 
     private String delhander(String... str) {
-        if (!(str.length == 2)) {
+        if ((str.length != 2)) {
             return "参数错误";
         }
         return readLine((line, randomAccessFile, strings) -> {
@@ -199,7 +201,9 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
 
             if (index == v.length - 1) {
                 String x = checkClientUrl(value);
-                if (!x.equals("OK")) return x;
+                if (!"OK".equals(x)) {
+                    return x;
+                }
             }
 
             temp = line.replace(temp, temp.replace(v[index], index == v.length - 1 ? value + "\n" : value));
@@ -219,8 +223,9 @@ public class DefaultShellHanderImp extends ShellHanderAbstract {
         }
         try {
             int port = Integer.valueOf(hp[1]);
-            if (port < 1 || port >= 65535)
+            if (port < 1 || port >= 65535) {
                 throw new RuntimeException("超出范围");
+            }
         } catch (Exception e) {
             return "请输入正确的端口号 1 - 65535";
         }

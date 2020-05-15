@@ -5,7 +5,7 @@ import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.model.CustomProtocolConverByteBuf;
-import com.haojiangbo.utils.AtoBUtils;
+import com.haojiangbo.utils.A2BUtils;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
@@ -58,7 +58,7 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                 .connect(ServerConfig.INSTAND.getBridgeHost(), ServerConfig.INSTAND.getBridgePort())
                 .addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
-                        AtoBUtils.addMapping(ctx.channel(),future.channel());
+                        A2BUtils.addMapping(ctx.channel(),future.channel());
                         sendForwardMessage(model, future.channel(), byteBuf)
                                 .addListener((ChannelFutureListener) future1 -> {
                                     if(future1.isSuccess()){
@@ -93,7 +93,7 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        AtoBUtils.removeMapping(ctx.channel());
+        A2BUtils.removeMapping(ctx.channel());
         super.channelInactive(ctx);
     }
 

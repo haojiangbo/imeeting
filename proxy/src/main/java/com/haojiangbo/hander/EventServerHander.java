@@ -3,7 +3,7 @@ package com.haojiangbo.hander;
 import com.haojiangbo.event.EventListener;
 import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.model.EventMessage;
-import com.haojiangbo.shell.ShellHanderAbstract;
+import com.haojiangbo.shell.AbstractShellHander;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.CharsetUtil;
@@ -25,7 +25,7 @@ public class EventServerHander  extends ChannelInboundHandlerAdapter {
             EventMessage eventMessage = new EventMessage();
             eventMessage.setType(EventMessage.RELOAD_EVENT);
             eventMessage.setMessage(event);
-            if(event.equals(ShellHanderAbstract.FLUSH)){
+            if(event.equals(AbstractShellHander.FLUSH)){
                for(EventListener listener :  EventListener.ACCEPTER){
                    listener.notifyEvent(eventMessage);
                }
