@@ -15,8 +15,6 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.ssl.SslHandler;
 import lombok.extern.slf4j.Slf4j;
 
@@ -38,7 +36,7 @@ import java.security.KeyStore;
  　　* @date 2020/4/15 15:46
  　　*/
 @Slf4j
-public class ProxyEngineContainer implements Container {
+public class ProxySSLEngineContainer implements Container {
 
 
     EventLoopGroup bossGroup = new NioEventLoopGroup(1);
@@ -53,6 +51,22 @@ public class ProxyEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
+
+
+                        // =====================以下为SSL处理代码=================================
+
+                        // 暂时只支持阿里云的免费 单域名  pfx 证书
+
+                        ch.pipeline().addFirst("ssl",
+                                new SslHandler(HttpSslContextFactory
+                                        .createSslEngine(
+                                                ServerConfig.INSTAND.getKeyStoryPath(),
+                                                ServerConfig.INSTAND.getKeyStoryPassword()
+                                        )
+                                ));
+
+                        // =====================以上为SSL处理代码=================================
+
                         // 处理网络IO
                         ch.pipeline().addLast(new ProxyServerHander(clientBootstrap));
                     }
@@ -61,9 +75,9 @@ public class ProxyEngineContainer implements Container {
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
-                .bind(ServerConfig.INSTAND.getProxyPort()).addListener((ChannelFutureListener) future -> {
+                .bind(ServerConfig.INSTAND.getProxySSLPort()).addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
-                        log.info("反向代理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getProxyPort());
+                        log.info("反向代理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getProxySSLPort());
                     }else{
                         log.error("反向代理引擎启动失败...");
                     }

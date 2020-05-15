@@ -34,6 +34,19 @@ public class ServerConfig implements Container {
      */
    private int proxyPort;
     /**
+     * 代理端口 https
+     */
+   private int proxySSLPort;
+    /**
+     * key的路径
+     */
+   private String keyStoryPath;
+    /**
+     * key的密码
+     */
+   private String keyStoryPassword;
+   
+    /**
      * 桥接服务器和端口号
      */
    private String bridgeHost;
@@ -67,6 +80,9 @@ public class ServerConfig implements Container {
     private void setValue() {
         this.eventPort = PrppertiesReadUtils.INSTAND.getIntValue("eventPort");
         this.proxyPort = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
+        this.proxySSLPort = PrppertiesReadUtils.INSTAND.getIntValue("proxySSLPort");
+        this.keyStoryPath = PrppertiesReadUtils.INSTAND.getStringValue("keyStoryPath");
+        this.keyStoryPassword = PrppertiesReadUtils.INSTAND.getStringValue("keyStoryPassword");
         this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
         this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
         this.isProxyModel = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");

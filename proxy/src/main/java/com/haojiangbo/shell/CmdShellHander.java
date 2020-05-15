@@ -22,7 +22,7 @@ public class CmdShellHander {
      *
      * @param a
      */
-    public static void main(String[] a) {
+    public  void main(String[] a) {
         start(new ServerConfig(), new EventClientEngineContainner());
     }
 

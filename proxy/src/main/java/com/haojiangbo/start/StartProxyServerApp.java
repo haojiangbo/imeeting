@@ -84,6 +84,7 @@ public class StartProxyServerApp implements EventListener {
                 new BridgeEngineContainner(),
                 new SentryEngineContainer(),
                 new ProxyEngineContainer(),
+                new ProxySSLEngineContainer(),
                 new EventEngineContainner()
         };
     }
