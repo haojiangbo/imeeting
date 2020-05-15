@@ -58,7 +58,7 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
 
             // 关于此处为什么要 + 4 因为读取完sesion的字节数组之后
             // 紧接着 会读数据的长度 如果当前数据包只包含了 sesion数据
-            // 没有数据的长度  83 行代码读取的时候 就会报错
+            // 没有数据的长度  73 行代码读取的时候 就会报错
             if (buffer.readableBytes() < (sesstionIdLength) + 4) {
                 // 还原读指针
                 buffer.readerIndex(beginReader);
