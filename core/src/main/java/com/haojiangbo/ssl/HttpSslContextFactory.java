@@ -12,9 +12,15 @@ import java.security.Security;
 public class HttpSslContextFactory {
 
     //    private static final String PROTOCOL = "SSLv2";
-    private static final String PROTOCOL = "SSLv3";//客户端可以指明为SSLv3或者TLSv1.2
-    /**针对于服务器端配置*/
+    /**
+     * 客户端可以指明为SSLv3或者TLSv1.2
+     */
+    private static final String PROTOCOL = "SSLv3";
+    /**
+     * 针对于服务器端配置
+     */
     private static SSLContext sslContext = null;
+
     static {
         String algorithm = Security
                 .getProperty("ssl.KeyManagerFactory.algorithm");
@@ -35,11 +41,12 @@ public class HttpSslContextFactory {
         }
         sslContext = serverContext;
     }
-    public static SSLEngine createSSLEngine() {
+
+    public static SSLEngine createSslEngine() {
         SSLEngine sslEngine = sslContext.createSSLEngine();
         sslEngine.setUseClientMode(false);
         sslEngine.setNeedClientAuth(false);
-        return sslEngine ;
+        return sslEngine;
     }
 }
 

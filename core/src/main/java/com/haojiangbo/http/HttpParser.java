@@ -47,7 +47,7 @@ public class HttpParser extends AbstractHttpParser {
         assert requestUri.length == 3;
         request.setMethod(requestUri[0]);
         request.setProtocol(requestUri[2].replace("\r", ""));
-        request.setRequestURI(requestUri[1]);
+        request.setRequestUri(requestUri[1]);
     }
 
     private void requestHostParser(String str, HttpRequest request) {

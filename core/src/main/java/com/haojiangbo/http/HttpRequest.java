@@ -27,7 +27,7 @@ public class HttpRequest implements Serializable {
     /**
      * 请求地址
      */
-    private String requestURI;
+    private String requestUri;
     /**
      * 请求主机
      */

@@ -32,10 +32,11 @@ public class NioLocalFileConfigReadImp implements ConfigRead {
         for(line = randomAccessFile.readLine(); line != null; line = randomAccessFile.readLine()){
             line = line.trim();
             if(!StringUtils.isEmpty(line)){
-                if(line.startsWith("#"))
+                if(line.startsWith("#")) {
                     continue;
-                else
+                } else {
                     result.add(parserLine(line));
+                }
             }
         }
         return result;

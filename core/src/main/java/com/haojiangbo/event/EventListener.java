@@ -14,5 +14,10 @@ public interface EventListener {
      * 监听者容器
      */
     CopyOnWriteArrayList<EventListener> ACCEPTER = new CopyOnWriteArrayList<>();
+
+    /**
+     * notifyEvent
+     * @param eventMessage
+     */
     void notifyEvent(EventMessage eventMessage);
 }
