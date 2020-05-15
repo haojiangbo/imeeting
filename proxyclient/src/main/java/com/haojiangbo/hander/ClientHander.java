@@ -37,6 +37,8 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
             case ConstantValue.DATA:
                 dataHander(ctx, message);
                 break;
+            default:
+                break;
         }
     }
 

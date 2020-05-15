@@ -41,6 +41,8 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
                 //处理本地哨兵数据的转发
                 forWardHander(ctx, message);
                 break;
+            default:
+                break;
         }
     }
 
