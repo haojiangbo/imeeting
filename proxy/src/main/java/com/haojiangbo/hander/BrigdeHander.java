@@ -27,9 +27,6 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-        byte [] b = new byte[message.getContent().readableBytes()];
-        message.getContent().copy().readBytes(b);
-        log.info(">>>>>>>>>> {}",new String(b));
         switch (message.getMeesgeType()) {
             case ConstantValue.PING:
                 // 处理管道和消息的映射
