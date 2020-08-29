@@ -33,7 +33,7 @@ import java.util.List;
 public class SentryEngineContainer implements Container {
 
     private  EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    private  EventLoopGroup workerGroup = new NioEventLoopGroup();
+    private  EventLoopGroup workerGroup = new NioEventLoopGroup(ConstantValue.WORK_THREAD_NUM);
     ServerBootstrap serverBootstrap = null;
     Bootstrap  clientBootstrap = null;
 

@@ -22,7 +22,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
-    <netty.version>4.1.6.Final</netty.version>
+    <netty.version>4.1.51.Final</netty.version>
     <logback.version>1.2.3</logback.version>
     <slf4j.version>1.7.5</slf4j.version>
   </properties>
@@ -69,9 +69,11 @@
     <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
-      <version>1.2.31</version>
+      <version>1.2.73</version>
     </dependency>
   </dependencies>
+
+
 
   <build>
 

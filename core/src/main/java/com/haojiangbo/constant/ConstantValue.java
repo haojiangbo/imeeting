@@ -1,5 +1,8 @@
 package com.haojiangbo.constant;
 
+import io.netty.util.NettyRuntime;
+import io.netty.util.internal.SystemPropertyUtil;
+
 /**
  * @author 郝江波
  * @version V1.0
@@ -48,5 +51,11 @@ public class ConstantValue {
 
 
     public static final int SO_BACKLOG_VALUE = 2048;
+
+
+    /**
+     * 工作线程数量
+     */
+    public static final int WORK_THREAD_NUM = (Math.max(1, SystemPropertyUtil.getInt("io.netty.eventLoopThreads", NettyRuntime.availableProcessors() * 2))) << 1;
 
 }

@@ -43,7 +43,7 @@ public class ProxyEngineContainer implements Container {
 
 
     EventLoopGroup bossGroup = new NioEventLoopGroup(1);
-    EventLoopGroup workerGroup = new NioEventLoopGroup(4);
+    EventLoopGroup workerGroup = new NioEventLoopGroup(ConstantValue.WORK_THREAD_NUM);
     Bootstrap clientBootstrap = new Bootstrap();
     ServerBootstrap serverBootstrap = new ServerBootstrap();
 
