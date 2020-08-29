@@ -18,7 +18,13 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ClientProxyHander extends ChannelInboundHandlerAdapter {
 
-    @Override
+
+     @Override
+     public void channelActive(ChannelHandlerContext ctx) throws Exception {
+         super.channelActive(ctx);
+     }
+
+     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = (ByteBuf) msg;
         Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();

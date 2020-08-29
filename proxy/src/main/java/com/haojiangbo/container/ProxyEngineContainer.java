@@ -1,6 +1,7 @@
 package com.haojiangbo.container;
 
 import com.haojiangbo.config.ServerConfig;
+import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.hander.ProxyClientHander;
 import com.haojiangbo.hander.ProxyServerHander;
 import com.haojiangbo.inteface.Container;
@@ -58,7 +59,7 @@ public class ProxyEngineContainer implements Container {
                     }
                 })
                 // 设置tcp缓冲区
-                .option(ChannelOption.SO_BACKLOG, 1024)
+                .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(ServerConfig.INSTAND.getProxyPort()).addListener((ChannelFutureListener) future -> {

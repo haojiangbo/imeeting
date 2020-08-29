@@ -25,6 +25,13 @@ public class ConstantValue {
      * 转发消息
      */
     public static final int FORWARD = 0X79;
+
+    /**
+     * 连接消息
+     */
+    public static final int CONCAT = 0X80;
+
+
     /**
      * clientId错误  为什么用英文，因为这样会减少一些不必要的转码错误
      */
@@ -37,4 +44,9 @@ public class ConstantValue {
      * 指令
      */
     public static final String CLI = "cli";
+
+
+
+    public static final int SO_BACKLOG_VALUE = 2048;
+
 }

@@ -9,16 +9,17 @@ import com.haojiangbo.utils.A2BUtils;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
-  * 哨兵数据处理器
+ * 哨兵数据处理器
  　　* @author 郝江波
  　　* @date 2020/4/16 13:42
  　　*/
- @Slf4j
+@Slf4j
 public class SentryServerHander extends ChannelInboundHandlerAdapter {
     private String clientId = null;
     private Bootstrap clientBootstrap = null;
@@ -36,6 +37,9 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
         //绑定sessionId
         ctx.channel().attr(NettyProxyMappingConstant.SESSION)
                 .set(sessionId);
+        SessionUtils.SessionModel model =  SessionUtils
+                .parserSessionId(ctx.channel().attr(NettyProxyMappingConstant.SESSION).get());
+        createConnect(ctx,Unpooled.wrappedBuffer("CONCAT".getBytes()),model,ConstantValue.CONCAT);
         super.channelActive(ctx);
     }
 
@@ -46,20 +50,20 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
         SessionUtils.SessionModel model =  SessionUtils
                 .parserSessionId(ctx.channel().attr(NettyProxyMappingConstant.SESSION).get());
         if(target == null || !target.isActive()){
-            createConnect(ctx,btf,model);
+            createConnect(ctx,btf,model,ConstantValue.FORWARD);
         }else{
-            sendForwardMessage(model,target,btf);
+            sendMessage(model,target,btf,ConstantValue.FORWARD);
         }
     }
 
-    private void createConnect(ChannelHandlerContext ctx,ByteBuf byteBuf,SessionUtils.SessionModel model) {
+    private void createConnect(ChannelHandlerContext ctx,ByteBuf byteBuf,SessionUtils.SessionModel model,int type) {
         ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         clientBootstrap
                 .connect(ServerConfig.INSTAND.getBridgeHost(), ServerConfig.INSTAND.getBridgePort())
                 .addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
                         A2BUtils.addMapping(ctx.channel(),future.channel());
-                        sendForwardMessage(model, future.channel(), byteBuf)
+                        sendMessage(model, future.channel(), byteBuf,type)
                                 .addListener((ChannelFutureListener) future1 -> {
                                     if(future1.isSuccess()){
                                         ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
@@ -71,9 +75,12 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                         ctx.close();
                         ReferenceCountUtil.release(byteBuf);
                     }
-
                 });
     }
+
+
+
+
 
     /**
      * 发送FORWARD数据
@@ -81,9 +88,9 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
      * @param channel
      * @param byteBuf
      */
-    private ChannelFuture sendForwardMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf) {
-      return   channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(
-                ConstantValue.FORWARD,
+    private ChannelFuture sendMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf,int type) {
+        return   channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(
+                type,
                 model.getSessionId().getBytes().length,
                 model.getSessionId(),
                 byteBuf.readableBytes(),

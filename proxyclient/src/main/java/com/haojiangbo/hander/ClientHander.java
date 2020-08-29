@@ -11,7 +11,10 @@ import io.netty.channel.*;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
- /**
+
+import java.awt.image.ConvolveOp;
+
+/**
  　　* @author 郝江波
  　　* @date 2020/4/17 10:47
  　　*/
@@ -29,13 +32,18 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-
+        byte [] b = new byte[message.getContent().readableBytes()];
+        message.getContent().copy().readBytes(b);
+        //log.info("{}",new String(b));
         switch (message.getMeesgeType()){
             case ConstantValue.PING:
                 pingHander(ctx,message);
                 break;
             case ConstantValue.DATA:
                 dataHander(ctx, message);
+                break;
+            case ConstantValue.CONCAT:
+                createConnect(ctx, message);
                 break;
             default:
                 break;
@@ -47,7 +55,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
         String sessionId =  message.getSessionId();
         Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(sessionId);
         if(target == null || !target.isActive()){
-            ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
+            // ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
             createConnect(ctx,message);
         }else{
             target.writeAndFlush(message.getContent());
@@ -57,6 +65,8 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
 
     private void createConnect(ChannelHandlerContext ctx, CustomProtocol message) {
         // 连接服务端
+        // 2020/08/29日改
+        ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         SessionUtils.SessionModel model =  SessionUtils.parserSessionId(message.getSessionId());
         bootstrap.connect(model.getHost(),model.getPort())
                 .addListener((ChannelFutureListener) future -> {
@@ -68,8 +78,11 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
                         //下次服务端再有数据的时候，不需要重新连接
                         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), future.channel());
                     }
-                    //向服务发送数据
-                    future.channel().writeAndFlush(message.getContent());
+                    // log.info(">>>>>",message.getContent());
+                    if(message.getMeesgeType() != ConstantValue.CONCAT){
+                       //向服务发送数据
+                       future.channel().writeAndFlush(message.getContent());
+                    }
                     ReferenceCountUtil.release(message);
                     ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                 });

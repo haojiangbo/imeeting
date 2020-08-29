@@ -1,10 +1,12 @@
 package com.haojiangbo.hander;
 
+import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.model.CustomProtocol;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.ChannelOption;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +24,10 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
      public void channelRead(ChannelHandlerContext ctx, Object msg) {
         CustomProtocol customProtocol = (CustomProtocol) msg;
         Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+        if(customProtocol.getMeesgeType() == ConstantValue.CONCAT){
+            target.config().setOption(ChannelOption.AUTO_READ,true);
+            return;
+        }
         if(null != target && target.isActive()){
             target.writeAndFlush(customProtocol.getContent());
         }else{

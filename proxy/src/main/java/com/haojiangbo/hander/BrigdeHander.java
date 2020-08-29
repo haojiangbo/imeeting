@@ -27,7 +27,9 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-
+        byte [] b = new byte[message.getContent().readableBytes()];
+        message.getContent().copy().readBytes(b);
+        log.info(">>>>>>>>>> {}",new String(b));
         switch (message.getMeesgeType()) {
             case ConstantValue.PING:
                 // 处理管道和消息的映射
@@ -39,7 +41,11 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
                 break;
             case ConstantValue.FORWARD:
                 //处理本地哨兵数据的转发
-                forWardHander(ctx, message);
+                forWardHander(ctx, message,ConstantValue.DATA);
+                break;
+            case ConstantValue.CONCAT:
+                //处理本地哨兵数据的转发
+                forWardHander(ctx, message,ConstantValue.CONCAT);
                 break;
             default:
                 break;
@@ -47,7 +53,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
     }
 
 
-    private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message) {
+    private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message,int type) {
         log.info("收到哨兵端的消息 {} byte address  = {}", message.getContent().readableBytes(), message.hashCode());
         //ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         Channel target = BrigdeChannelMapping.CLIENT_ID_MAPPING.get(SessionUtils.parserSessionId(message.getSessionId()).getClientId());
@@ -57,7 +63,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
             return;
         }
         //向客户端发送消息
-        target.writeAndFlush(message.setMeesgeType(ConstantValue.DATA)).addListener(new ChannelFutureListener() {
+        target.writeAndFlush(message.setMeesgeType(type)).addListener(new ChannelFutureListener() {
             @Override
             public void operationComplete(ChannelFuture future) throws Exception {
                 //ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
@@ -75,6 +81,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
             ctx.close();
             ReferenceCountUtil.release(message);
         } else {
+            // 此处直接拿到 客户端和SentryServer的连接 返回数据，节省一步
             target.writeAndFlush(message);
         }
     }

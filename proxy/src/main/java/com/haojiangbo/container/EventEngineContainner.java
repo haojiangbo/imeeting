@@ -3,6 +3,7 @@ package com.haojiangbo.container;
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.ServerConfig;
+import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.hander.BrigdeHander;
 import com.haojiangbo.hander.EventServerHander;
 import com.haojiangbo.inteface.Container;
@@ -46,7 +47,7 @@ public class EventEngineContainner implements Container {
                     }
                 })
                 // 设置tcp缓冲区
-                .option(ChannelOption.SO_BACKLOG, 1024)
+                .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
                 .option(ChannelOption.SO_REUSEADDR, true)
                 .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(ServerConfig.INSTAND.getEventPort()).addListener((ChannelFutureListener) future -> {
