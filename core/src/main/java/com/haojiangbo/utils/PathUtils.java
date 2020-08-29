@@ -23,4 +23,5 @@ public class PathUtils {
         }
         return path.replace("target/classes/", "");
     }
+
 }

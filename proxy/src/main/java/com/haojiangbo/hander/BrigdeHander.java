@@ -87,9 +87,11 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         String clientId = SessionUtils.parserSessionId(message.getSessionId()).getClientId();
         log.info("收到客户端的心跳消息  clientId = {}", clientId);
         ConfigModel configMode = ClientCheckConfig.CLIENT_CHECK_MAP.get(clientId);
-        ByteBuf byteBuf = Unpooled.wrappedBuffer(configMode.toString().getBytes());
-        message.setContentLength(byteBuf.readableBytes());
-        message.setContent(byteBuf);
+        if(null != configMode){
+            ByteBuf byteBuf = Unpooled.wrappedBuffer(configMode.toString().getBytes());
+            message.setContentLength(byteBuf.readableBytes());
+            message.setContent(byteBuf);
+        }
         ctx.writeAndFlush(message).addListener((ChannelFutureListener) future -> {
             if (isclose) {
                 ctx.close();
@@ -137,7 +139,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         ByteBuf error = Unpooled.wrappedBuffer(errortype.getBytes());
         pingHander(ctx, message
                 .setContentLength(error.readableBytes())
-                .setContent(error), true);
+                .setContent(error), false);
     }
 
 

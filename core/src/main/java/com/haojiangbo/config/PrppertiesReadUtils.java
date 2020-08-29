@@ -1,9 +1,9 @@
 package com.haojiangbo.config;
 
 import com.haojiangbo.utils.LangUtil;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Properties;
 
 /**
@@ -11,23 +11,35 @@ import java.util.Properties;
 　* @author 郝江波
 　* @date 2020/4/15 16:09
 　*/
+@Slf4j
 public class PrppertiesReadUtils {
-    private static final String DEFAULT_CONF = "config.properties";
+    public static final String DEFAULT_CONF = "config.properties";
     public  static final PrppertiesReadUtils INSTAND = new PrppertiesReadUtils();
     private Properties configuration = new Properties();
 
-    private PrppertiesReadUtils() {
-        initConfig(DEFAULT_CONF);
+    public PrppertiesReadUtils() {
+        initConfig(DEFAULT_CONF,true);
     }
 
-    private void initConfig(String defaultConf) {
-        InputStream is = PrppertiesReadUtils.class.getClassLoader().getResourceAsStream(defaultConf);
+    public PrppertiesReadUtils initConfig(String defaultConf,boolean isResource) {
+        log.info("config file path = {}",defaultConf);
+        InputStream is = null;
+        if(isResource){
+            is =   PrppertiesReadUtils.class.getClassLoader().getResourceAsStream(defaultConf);
+        }else{
+            try {
+                is =   new FileInputStream(new File(defaultConf));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             configuration.load(is);
             is.close();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+        return this;
     }
 
 

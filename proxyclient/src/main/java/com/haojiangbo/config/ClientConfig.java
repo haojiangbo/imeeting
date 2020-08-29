@@ -1,6 +1,7 @@
 package com.haojiangbo.config;
 
 import com.haojiangbo.inteface.Container;
+import com.haojiangbo.utils.PathUtils;
 import lombok.Data;
 
 /**
@@ -18,9 +19,11 @@ public class ClientConfig implements Container {
    private int remotePort;
 
    public ClientConfig(){
-       this.clientId =  PrppertiesReadUtils.INSTAND.getStringValue("clientId");
-       this.remoteHost = PrppertiesReadUtils.INSTAND.getStringValue("remoteHost");
-       this.remotePort = PrppertiesReadUtils.INSTAND.getIntValue("remotePort");
+       PrppertiesReadUtils prppertiesReadUtils =   new PrppertiesReadUtils()
+               .initConfig(PathUtils.getPath(ClientConfig.class)+PrppertiesReadUtils.DEFAULT_CONF,false);
+       this.clientId =  prppertiesReadUtils.getStringValue("clientId");
+       this.remoteHost = prppertiesReadUtils.getStringValue("remoteHost");
+       this.remotePort = prppertiesReadUtils.getIntValue("remotePort");
        // 禁止指令重排序
        INSTAND = this;
    }
