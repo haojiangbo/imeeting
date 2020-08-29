@@ -4,6 +4,8 @@ import com.haojiangbo.inteface.Container;
 import com.haojiangbo.utils.PathUtils;
 import lombok.Data;
 
+import java.io.File;
+
 /**
  *
  * 初始化配置类
@@ -20,7 +22,7 @@ public class ClientConfig implements Container {
 
    public ClientConfig(){
        PrppertiesReadUtils prppertiesReadUtils =   new PrppertiesReadUtils()
-               .initConfig(PathUtils.getPath(ClientConfig.class)+PrppertiesReadUtils.DEFAULT_CONF,false);
+               .initConfig(PathUtils.getPath(ClientConfig.class)+ File.separator+PrppertiesReadUtils.DEFAULT_CONF,false);
        this.clientId =  prppertiesReadUtils.getStringValue("clientId");
        this.remoteHost = prppertiesReadUtils.getStringValue("remoteHost");
        this.remotePort = prppertiesReadUtils.getIntValue("remotePort");
