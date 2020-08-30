@@ -3,6 +3,8 @@ package com.haojiangbo.codec;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.CustomProtocol;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -16,7 +18,7 @@ import java.util.List;
  　　*/
 public class CustomProtocolDecoder extends ByteToMessageDecoder {
 
-
+    private static final ByteBufAllocator allocator = PooledByteBufAllocator.DEFAULT;
     public final static int BASE_LENGTH = 4 + 4 + 4;
 
     @Override
@@ -77,9 +79,8 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                 buffer.readerIndex(beginReader);
                 return;
             }
-
-            // 读取data数据 使用堆外内存
-            ByteBuf byteBuf = Unpooled.directBuffer(length);
+            ByteBuf byteBuf = allocator.directBuffer(length);
+            //ByteBuf byteBuf = Unpooled.directBuffer(length);
             buffer.readBytes(byteBuf);
 
             // 组装消息
