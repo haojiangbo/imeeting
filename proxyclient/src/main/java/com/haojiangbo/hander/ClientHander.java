@@ -112,14 +112,14 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
-        log.info("ClientHander 客户端关闭了一个连接  channel = {}",ctx.channel());
-        for(String key : SessionChannelMapping.SESSION_CHANNEL_MAPPING.keySet()){
+        /* log.info("ClientHander 客户端关闭了一个连接  channel = {}",ctx.channel());
+         for(String key : SessionChannelMapping.SESSION_CHANNEL_MAPPING.keySet()){
            Channel channel =   SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(key);
            if(null != channel){
                channel.close();
                SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(key);
            }
-        }
+        }*/
         bridgeClientContainer.restart();
     }
 }

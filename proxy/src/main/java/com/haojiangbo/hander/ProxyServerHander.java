@@ -111,11 +111,14 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        A2BUtils.removeMapping(ctx.channel());
         Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-        if(null == target || !target.isActive()){
+        /*if(null == target || !target.isActive()){
             ctx.close();
+        }*/
+        if(null != target){
+           target.close();
         }
+        A2BUtils.removeMapping(ctx.channel());
         super.channelInactive(ctx);
     }
 
