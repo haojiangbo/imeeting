@@ -50,6 +50,7 @@ public class ClientProxyHander extends ChannelInboundHandlerAdapter {
         String sessionId = ctx.channel().attr(NettyProxyMappingConstant.SESSION).get();
         SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(sessionId);
         ctx.channel().attr(NettyProxyMappingConstant.MAPPING).set(null);
+        log.info("ClientProxyHander 客户端关闭了一个连接  channel = {}",ctx.channel());
         super.channelInactive(ctx);
     }
 }

@@ -24,11 +24,13 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
      public void channelRead(ChannelHandlerContext ctx, Object msg) {
         CustomProtocol customProtocol = (CustomProtocol) msg;
         Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-        if(customProtocol.getMeesgeType() == ConstantValue.CONCAT){
+       /* if(customProtocol.getMeesgeType() == ConstantValue.CONCAT){
             target.config().setOption(ChannelOption.AUTO_READ,true);
             return;
-        }
-        if(null != target && target.isActive()){
+        }*/
+        boolean b = (null != target && target.isActive());
+        log.info("RRR3 哨兵 clentHander 向用户发送数据 {} byte 结果 {}",customProtocol.getContent().readableBytes(),b);
+        if(b){
             target.writeAndFlush(customProtocol.getContent());
         }else{
             ctx.close();
@@ -43,7 +45,14 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
          if(null != target){
              target.close();
          }
-         log.error("无法访问对端连接  强制关闭当前连接");
+         log.error("哨兵客户端-桥接-连接已关闭");
          ctx.close();
      }
- }
+
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+         super.exceptionCaught(ctx, cause);
+    }
+}

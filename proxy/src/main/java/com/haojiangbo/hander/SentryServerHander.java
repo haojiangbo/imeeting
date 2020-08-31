@@ -62,10 +62,10 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                 .connect(ServerConfig.INSTAND.getBridgeHost(), ServerConfig.INSTAND.getBridgePort())
                 .addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
-                        A2BUtils.addMapping(ctx.channel(),future.channel());
                         sendMessage(model, future.channel(), byteBuf,type)
                                 .addListener((ChannelFutureListener) future1 -> {
                                     if(future1.isSuccess()){
+                                        A2BUtils.addMapping(ctx.channel(),future.channel());
                                         ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                                     }else{
                                         ctx.close();
@@ -100,8 +100,27 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        SessionUtils.SessionModel model =  SessionUtils
+                .parserSessionId(ctx.channel().attr(NettyProxyMappingConstant.SESSION).get());
+        if(null != model){
+            Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+            // 向桥接端发送关闭事件 数据
+            sendMessage(model,
+                    target,
+                    Unpooled.wrappedBuffer("CLOSE".getBytes()),ConstantValue.CLOSE)
+            .addListener((ChannelFutureListener) channelFuture -> {
+                log.info("哨兵服务端关闭事件 发送关闭消息 {}",channelFuture.isSuccess());
+                target.close();
+            }) ;
+        }
         A2BUtils.removeMapping(ctx.channel());
         super.channelInactive(ctx);
     }
 
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        cause.printStackTrace();
+        super.exceptionCaught(ctx, cause);
+    }
 }
