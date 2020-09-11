@@ -1,5 +1,6 @@
 package com.haojiangbo.container;
 
+import com.haojiangbo.config.RecvByteBufAllocatorCofigParSet;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.hander.ProxyClientHander;
@@ -52,7 +53,7 @@ public class ProxySSLEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-
+                        RecvByteBufAllocatorCofigParSet.set(ch);
 
                         // =====================以下为SSL处理代码=================================
 

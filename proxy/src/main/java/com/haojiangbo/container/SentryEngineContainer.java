@@ -1,6 +1,7 @@
 package com.haojiangbo.container;
 
 import com.haojiangbo.codec.CustomProtocolDecoder;
+import com.haojiangbo.config.RecvByteBufAllocatorCofigParSet;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.hander.SentryClientHander;
@@ -59,6 +60,7 @@ public class SentryEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
+                        RecvByteBufAllocatorCofigParSet.set(ch);
                         ch.pipeline().addLast(new SentryServerHander(clientId,clientBootstrap,url));
                     }
                 })

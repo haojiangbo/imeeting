@@ -3,15 +3,13 @@ package com.haojiangbo.container;
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.BrigdeChannelMapping;
+import com.haojiangbo.config.RecvByteBufAllocatorCofigParSet;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.hander.BrigdeHander;
 import com.haojiangbo.inteface.Container;
 import io.netty.bootstrap.ServerBootstrap;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInitializer;
-import io.netty.channel.ChannelOption;
-import io.netty.channel.EventLoopGroup;
+import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -44,6 +42,7 @@ public class BridgeEngineContainner implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
+                        RecvByteBufAllocatorCofigParSet.set(ch);
                         // 添加自定义协议的编解码工具
                         ch.pipeline().addLast(new CustomProtocolEncoder());
                         ch.pipeline().addLast(new CustomProtocolDecoder());

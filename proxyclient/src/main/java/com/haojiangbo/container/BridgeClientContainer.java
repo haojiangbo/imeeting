@@ -3,6 +3,7 @@ package com.haojiangbo.container;
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import com.haojiangbo.codec.CustomProtocolEncoder;
 import com.haojiangbo.config.ClientConfig;
+import com.haojiangbo.config.RecvByteBufAllocatorCofigParSet;
 import com.haojiangbo.hander.ClientHander;
 import com.haojiangbo.hander.ClientProxyHander;
 import com.haojiangbo.hander.IdleCheckHandler;
@@ -42,6 +43,7 @@ public class BridgeClientContainer implements Container {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
+                        RecvByteBufAllocatorCofigParSet.set(ch);
                         ch.pipeline().addLast(new ClientProxyHander());
                     }
                 });

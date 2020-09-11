@@ -1,5 +1,6 @@
 package com.haojiangbo.container;
 
+import com.haojiangbo.config.RecvByteBufAllocatorCofigParSet;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.hander.ProxyClientHander;
@@ -54,6 +55,7 @@ public class ProxyEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
+                        RecvByteBufAllocatorCofigParSet.set(ch);
                         // 处理网络IO
                         ch.pipeline().addLast(new ProxyServerHander(clientBootstrap));
                     }
