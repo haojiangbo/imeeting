@@ -53,7 +53,6 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
                 break;
             case ConstantValue.CONCAT_RPLAY:
                 //处理本地哨兵数据的转发
-                log.info("客户端的数据 == {}",message.getContent().toString(Charset.forName("UTF-8")));
                 dataHander(ctx, message);
                 break;
             default:
