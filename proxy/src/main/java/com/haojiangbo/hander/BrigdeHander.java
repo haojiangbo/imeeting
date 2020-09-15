@@ -30,6 +30,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
+        log.info("BrigdeHander 发送数据 == {} byte",message.getContent().readableBytes());
         switch (message.getMeesgeType()) {
             case ConstantValue.PING:
                 // 处理管道和消息的映射
@@ -62,10 +63,9 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
 
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message,int type) {
-        log.info("FFF1 收到哨兵端的数据 {} byte channel = {} ,消息类型 = {}", message.getContent().readableBytes(),ctx.channel(),type);
-        //ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
+        //log.info("FFF1 收到哨兵端的数据 {} byte channel = {} ,消息类型 = {}", message.getContent().readableBytes(),ctx.channel(),type);
         String clientId = SessionUtils.parserSessionId(message.getSessionId()).getClientId();
-        log.info("FFF2 准备转发至客户端解析 clientId = {},sesisonId = {}",clientId,message.getSessionId());
+        //log.info("FFF2 准备转发至客户端解析 clientId = {},sesisonId = {}",clientId,message.getSessionId());
         Channel target = BrigdeChannelMapping.CLIENT_ID_MAPPING.get(clientId);
         if (null == target || !target.isActive()) {
             log.info("FFF3ERROR 客户端 {} 已失效 强制关闭 桥接 -> 哨兵客户端 的链接 ",clientId);
@@ -74,35 +74,31 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
             return;
         }
 
-
         //绑定这个会话  和 哨兵的 channel 连接
         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), ctx.channel());
-
         flag = System.currentTimeMillis();
-
         //向客户端发送消息
         target.writeAndFlush(message.setMeesgeType(type)).addListener((ChannelFutureListener) future -> {
-           // ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
-           log.info("FFF3 转发至客户端发送成功 clientId = {},sesisonId = {} ",clientId,message.getSessionId());
+           //log.info("FFF3 转发至客户端发送成功 clientId = {},sesisonId = {} ",clientId,message.getSessionId());
         });
 
 
     }
 
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        log.info("RRR1 收到客户端的数据 {} byte", message.getContent().readableBytes());
+        //log.info("RRR1 收到客户端的数据 {} byte", message.getContent().readableBytes());
         Channel target = SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
         if (null == target || !target.isActive()) {
             SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());
             // 此处关闭的是 客户端 到 服务端的链接 是一个bug
             // ctx.close();
-            log.info("RRR2 使用sessionId {} get 哨兵 channel已关闭或为空",message.getSessionId());
+            //log.info("RRR2 使用sessionId {} get 哨兵 channel已关闭或为空",message.getSessionId());
             ReferenceCountUtil.release(message);
         } else {
             // 向哨兵客户端发送数据
             target.writeAndFlush(message).addListener((ChannelFutureListener) channelFuture -> {
                 if(channelFuture.isSuccess()){
-                    log.info("RRR2 向哨兵端发送 {}", channelFuture.isSuccess());
+                    //log.info("RRR2 向哨兵端发送 {}", channelFuture.isSuccess());
                 }
             });
         }

@@ -8,6 +8,7 @@ import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
  /**
@@ -16,12 +17,14 @@ import java.util.List;
  　　* @author 郝江波
  　　* @date 2020/4/18 9:20
  　　*/
+ @Slf4j
 public class CustomProtocolDecoder extends ByteToMessageDecoder {
 
-    private static final ByteBufAllocator allocator = PooledByteBufAllocator.DEFAULT;
+    // private static final ByteBufAllocator allocator = PooledByteBufAllocator.DEFAULT;
     public final static int BASE_LENGTH = 4 + 4 + 4;
 
-    @Override
+
+     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
                           List<Object> out) {
         // 可读长度必须大于基本长度
@@ -79,7 +82,8 @@ public class CustomProtocolDecoder extends ByteToMessageDecoder {
                 buffer.readerIndex(beginReader);
                 return;
             }
-            ByteBuf byteBuf = allocator.directBuffer(length);
+            ByteBuf byteBuf = ctx.channel().config().getAllocator().directBuffer(length);
+            //
             //ByteBuf byteBuf = Unpooled.directBuffer(length);
             buffer.readBytes(byteBuf);
 

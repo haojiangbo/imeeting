@@ -13,6 +13,6 @@ import  io.netty.channel.socket.SocketChannel;
 */
 public class RecvByteBufAllocatorCofigParSet {
     public static void  set(SocketChannel ch){
-        ch.config().setRecvByteBufAllocator(new AdaptiveRecvByteBufAllocator(1024,2048,65535));
+        // ch.config().setRecvByteBufAllocator(new AdaptiveRecvByteBufAllocator(1024*4,1024*10,65535));
     }
 }

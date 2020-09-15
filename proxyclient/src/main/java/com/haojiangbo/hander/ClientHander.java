@@ -34,7 +34,8 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-        log.info("接收到的消息 = {}",message.getContent().copy().toString(Charset.forName("UTF-8")));
+        //log.info("接收到的消息 = {}",message.getContent().copy().toString(Charset.forName("UTF-8")));
+        log.info("接收到的消息 = {} byte",message.getContent().readableBytes());
         switch (message.getMeesgeType()){
             case ConstantValue.PING:
                 pingHander(ctx,message);

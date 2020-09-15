@@ -9,6 +9,7 @@ import com.haojiangbo.utils.A2BUtils;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
@@ -89,6 +90,9 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
      * @param byteBuf
      */
     private ChannelFuture sendMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf,int type) {
+        AdaptiveRecvByteBufAllocator byteBufAllocator =  channel.config().getRecvByteBufAllocator();
+        // log.info("byteBufAllocator 发送数据 == {} byte",byteBufAllocator.DEFAULT);
+        log.info("SentryServerHander 发送数据 == {} byte",byteBuf.readableBytes());
         return   channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(
                 type,
                 model.getSessionId().getBytes().length,
