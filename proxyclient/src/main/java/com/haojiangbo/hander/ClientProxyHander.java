@@ -5,6 +5,9 @@ import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.constant.NettyProxyMappingConstant;
 import com.haojiangbo.model.CustomProtocol;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
@@ -21,8 +24,27 @@ public class ClientProxyHander extends ChannelInboundHandlerAdapter {
 
      @Override
      public void channelActive(ChannelHandlerContext ctx) throws Exception {
+         Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+         if(target  == null || !target.isActive()){
+             ctx.close();
+             return;
+         }
+         String concatReply = "concatReply";
+         ByteBuf byteBuf =  Unpooled.wrappedBuffer(concatReply.getBytes());
+         String sessionId = ctx.channel().attr(NettyProxyMappingConstant.SESSION).get();
+         target.writeAndFlush(new CustomProtocol(
+                 ConstantValue.CONCAT_RPLAY,
+                 sessionId.getBytes().length,
+                 sessionId,
+                 byteBuf.readableBytes(),
+                 byteBuf
+         ));
          super.channelActive(ctx);
      }
+
+
+
+
 
      @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {

@@ -14,6 +14,8 @@ import io.netty.channel.*;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.Charset;
+
 /**
  * 桥梁中继hander
  *
@@ -48,6 +50,11 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
             case ConstantValue.CLOSE:
                 //处理本地哨兵数据的转发
                 forWardHander(ctx, message,ConstantValue.CLOSE);
+                break;
+            case ConstantValue.CONCAT_RPLAY:
+                //处理本地哨兵数据的转发
+                log.info("客户端的数据 == {}",message.getContent().toString(Charset.forName("UTF-8")));
+                dataHander(ctx, message);
                 break;
             default:
                 break;

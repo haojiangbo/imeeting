@@ -24,10 +24,11 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
      public void channelRead(ChannelHandlerContext ctx, Object msg) {
         CustomProtocol customProtocol = (CustomProtocol) msg;
         Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-       /* if(customProtocol.getMeesgeType() == ConstantValue.CONCAT){
+        if(customProtocol.getMeesgeType() == ConstantValue.CONCAT_RPLAY){
             target.config().setOption(ChannelOption.AUTO_READ,true);
+            ReferenceCountUtil.release(customProtocol);
             return;
-        }*/
+        }
         boolean b = (null != target && target.isActive());
         log.info("RRR3 哨兵 clentHander 向用户发送数据 {} byte 结果 {}",customProtocol.getContent().readableBytes(),b);
         if(b){

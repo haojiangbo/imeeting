@@ -13,6 +13,7 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.image.ConvolveOp;
+import java.nio.charset.Charset;
 import java.util.Map;
 
 /**
@@ -33,9 +34,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-        byte [] b = new byte[message.getContent().readableBytes()];
-        message.getContent().copy().readBytes(b);
-        //log.info("{}",new String(b));
+        log.info("接收到的消息 = {}",message.getContent().copy().toString(Charset.forName("UTF-8")));
         switch (message.getMeesgeType()){
             case ConstantValue.PING:
                 pingHander(ctx,message);
@@ -49,7 +48,9 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
             case ConstantValue.CLOSE:
                 Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
                 log.info("收到服务端关闭事件，关闭一个链接 {}",target);
-                target.close();
+                if(null != target){
+                    target.close();
+                }
                 break;
             default:
                 break;
@@ -57,11 +58,9 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     }
 
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        log.info("收到服务端的消息 {} byte", message.getContent().readableBytes());
         String sessionId =  message.getSessionId();
         Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(sessionId);
-        if(target == null || !target.isActive()){
-            // ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
+        if(target == null/* || !target.isActive()*/){
             createConnect(ctx,message);
         }else{
             target.writeAndFlush(message.getContent());
@@ -72,7 +71,8 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     private void createConnect(ChannelHandlerContext ctx, CustomProtocol message) {
         // 连接服务端
         // 2020/08/29日改
-        ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
+        //ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
+
         SessionUtils.SessionModel model =  SessionUtils.parserSessionId(message.getSessionId());
         bootstrap.connect(model.getHost(),model.getPort())
                 .addListener((ChannelFutureListener) future -> {
@@ -83,20 +83,19 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
                         future.channel().attr(NettyProxyMappingConstant.MAPPING).set(ctx.channel());
                         //下次服务端再有数据的时候，不需要重新连接
                         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), future.channel());
+                        if(message.getMeesgeType() != ConstantValue.CONCAT){
+                            //向服务发送数据
+                            future.channel().writeAndFlush(message.getContent());
+                        }
+                        ReferenceCountUtil.release(message);
+                        //ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                     }
-                    // log.info(">>>>>",message.getContent());
-                    if(message.getMeesgeType() != ConstantValue.CONCAT){
-                       //向服务发送数据
-                       future.channel().writeAndFlush(message.getContent());
-                    }
-                    ReferenceCountUtil.release(message);
-                    ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                 });
     }
 
 
     private  void  pingHander(ChannelHandlerContext ctx,CustomProtocol message){
-        log.info("收到服务器的心跳消息  clientId = {}",SessionUtils.parserSessionId(message.getSessionId()).getClientId());
+        //log.info("收到服务器的心跳消息  clientId = {}",SessionUtils.parserSessionId(message.getSessionId()).getClientId());
         String meesgae = message.getContent().toString(CharsetUtil.UTF_8);
         if(meesgae.equals(ConstantValue.CLIENTID_ERROR)
                 || meesgae.equals(ConstantValue.REPEATED_ERROR)){

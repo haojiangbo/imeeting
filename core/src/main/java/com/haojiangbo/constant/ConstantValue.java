@@ -35,6 +35,13 @@ public class ConstantValue {
     public static final int CONCAT = 0X80;
 
 
+
+    /**
+     * 连接消息
+     */
+    public static final int CONCAT_RPLAY = 0X82;
+
+
     /**
      * 关闭消息
      */
