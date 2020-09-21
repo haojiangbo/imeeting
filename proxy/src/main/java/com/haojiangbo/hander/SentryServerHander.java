@@ -98,7 +98,7 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                 model.getSessionId(),
                 byteBuf.readableBytes(),
                 byteBuf
-        )));
+        ),channel.alloc()));
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.haojiangbo.model;
 
 import com.haojiangbo.codec.CustomProtocolDecoder;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.Unpooled;
 import io.netty.util.ReferenceCountUtil;
 
@@ -14,6 +15,12 @@ import io.netty.util.ReferenceCountUtil;
 * @version V1.0
 */
 public class CustomProtocolConverByteBuf {
+
+    public static ByteBuf getByteBuf(CustomProtocol msg, ByteBufAllocator byteBufAllocator) {
+        ByteBuf out = byteBufAllocator.directBuffer(CustomProtocolDecoder.BASE_LENGTH+msg.getContent().readableBytes());
+        return getByteBuf(out,msg);
+    }
+
 
     public static ByteBuf getByteBuf(CustomProtocol msg) {
         ByteBuf out = Unpooled.directBuffer(CustomProtocolDecoder.BASE_LENGTH+msg.getContent().readableBytes());
