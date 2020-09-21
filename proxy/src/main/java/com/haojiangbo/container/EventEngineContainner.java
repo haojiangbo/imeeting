@@ -48,8 +48,6 @@ public class EventEngineContainner implements Container {
                 })
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(ServerConfig.INSTAND.getEventPort()).addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()){
                 log.info("事件处理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getEventPort());

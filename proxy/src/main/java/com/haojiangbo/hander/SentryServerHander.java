@@ -90,7 +90,6 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
      * @param byteBuf
      */
     private ChannelFuture sendMessage(SessionUtils.SessionModel model, Channel channel, ByteBuf byteBuf,int type) {
-        AdaptiveRecvByteBufAllocator byteBufAllocator =  channel.config().getRecvByteBufAllocator();
         // log.info("byteBufAllocator 发送数据 == {} byte",byteBufAllocator.DEFAULT);
         log.info("SentryServerHander 发送数据 == {} byte",byteBuf.readableBytes());
         return   channel.writeAndFlush(CustomProtocolConverByteBuf.getByteBuf(new CustomProtocol(

@@ -34,7 +34,9 @@ public class IdleCheckHandler extends IdleStateHandler {
         if (IdleStateEvent.FIRST_WRITER_IDLE_STATE_EVENT == evt) {
             sendPingMessage(ctx.channel());
         } else if (IdleStateEvent.FIRST_READER_IDLE_STATE_EVENT == evt) {
-            ctx.channel().close();
+            if(!ctx.channel().isActive()){
+                ctx.channel().close();
+            }
         }
         super.channelIdle(ctx, evt);
     }

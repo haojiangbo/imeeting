@@ -55,15 +55,13 @@ public class ProxyEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        RecvByteBufAllocatorCofigParSet.set(ch);
+                        //RecvByteBufAllocatorCofigParSet.set(ch);
                         // 处理网络IO
                         ch.pipeline().addLast(new ProxyServerHander(clientBootstrap));
                     }
                 })
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(ServerConfig.INSTAND.getProxyPort()).addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
                         log.info("反向代理引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getProxyPort());

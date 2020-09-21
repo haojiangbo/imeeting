@@ -43,7 +43,6 @@ public class BridgeClientContainer implements Container {
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) throws Exception {
-                        RecvByteBufAllocatorCofigParSet.set(ch);
                         ch.pipeline().addLast(new ClientProxyHander());
                     }
                 });
