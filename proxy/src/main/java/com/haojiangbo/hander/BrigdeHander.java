@@ -4,6 +4,7 @@ package com.haojiangbo.hander;
 import com.haojiangbo.alloc.MyLimitByteBufAllocator;
 import com.haojiangbo.config.BrigdeChannelMapping;
 import com.haojiangbo.config.ClientCheckConfig;
+import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.ConfigModel;
@@ -88,8 +89,8 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         if(null != tmp && tmp instanceof  MyLimitByteBufAllocator){
             MyLimitByteBufAllocator myLimitByteBufAllocator = (MyLimitByteBufAllocator)tmp;
             myLimitByteBufAllocator.getHandle().setChannel(ctx.channel());
-            // 限速管理 暂时 限速每秒 128KB  可以自行修改此参数
-            myLimitByteBufAllocator.getHandle().setLimit(1024 * 128);
+            // 限速管理 可以自行修改此参数
+            myLimitByteBufAllocator.getHandle().setLimit(1024 * ServerConfig.INSTAND.getLimitClientByteSize());
         }
         Channel target = SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
         if (null == target || !target.isActive()) {
