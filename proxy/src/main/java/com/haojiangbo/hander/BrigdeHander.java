@@ -87,10 +87,16 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
         Object tmp =   ctx.channel().config().getRecvByteBufAllocator();
         if(null != tmp && tmp instanceof  MyLimitByteBufAllocator){
+            String clientId =  SessionUtils.parserSessionId(message.getSessionId()).getClientId();
+            int baseLimit = 1024 * ServerConfig.INSTAND.getLimitClientByteSize();
+            // 测试代码
+            if(clientId.equals("666")){
+                baseLimit = 1024 * 128;
+            }
             MyLimitByteBufAllocator myLimitByteBufAllocator = (MyLimitByteBufAllocator)tmp;
             myLimitByteBufAllocator.getHandle().setChannel(ctx.channel());
             // 限速管理 可以自行修改此参数
-            myLimitByteBufAllocator.getHandle().setLimit(1024 * ServerConfig.INSTAND.getLimitClientByteSize());
+            myLimitByteBufAllocator.getHandle().setLimit(baseLimit);
         }
         Channel target = SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
         if (null == target || !target.isActive()) {
