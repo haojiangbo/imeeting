@@ -33,7 +33,6 @@ public class SentryClientHander extends ChannelInboundHandlerAdapter {
             return;
         }
         boolean b = (null != target && target.isActive());
-        // log.info("RRR3 哨兵 clentHander 向用户发送数据 {} byte 结果 {}",customProtocol.getContent().readableBytes(),b);
         if(b){
             target.writeAndFlush(customProtocol.getContent());
         }else{

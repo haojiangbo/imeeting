@@ -1,8 +1,10 @@
 package com.haojiangbo.hander;
 
 
+import com.haojiangbo.alloc.MyLimitByteBufAllocator;
 import com.haojiangbo.config.BrigdeChannelMapping;
 import com.haojiangbo.config.ClientCheckConfig;
+import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.model.ConfigModel;
@@ -10,11 +12,12 @@ import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.utils.SessionUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
-
-import java.nio.charset.Charset;
 
 /**
  * 桥梁中继hander
@@ -30,7 +33,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         CustomProtocol message = (CustomProtocol) msg;
-        log.info("BrigdeHander 发送数据 == {} byte",message.getContent().readableBytes());
+        log.info("BrigdeHander  {} byte",message.getContent().readableBytes());
         switch (message.getMeesgeType()) {
             case ConstantValue.PING:
                 // 处理管道和消息的映射
@@ -63,12 +66,9 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
 
 
     private void forWardHander(ChannelHandlerContext ctx, CustomProtocol message,int type) {
-        //log.info("FFF1 收到哨兵端的数据 {} byte channel = {} ,消息类型 = {}", message.getContent().readableBytes(),ctx.channel(),type);
         String clientId = SessionUtils.parserSessionId(message.getSessionId()).getClientId();
-        //log.info("FFF2 准备转发至客户端解析 clientId = {},sesisonId = {}",clientId,message.getSessionId());
         Channel target = BrigdeChannelMapping.CLIENT_ID_MAPPING.get(clientId);
         if (null == target || !target.isActive()) {
-            log.info("FFF3ERROR 客户端 {} 已失效 强制关闭 桥接 -> 哨兵客户端 的链接 ",clientId);
             ctx.close();
             ReferenceCountUtil.release(message);
             return;
@@ -79,26 +79,35 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         flag = System.currentTimeMillis();
         //向客户端发送消息
         target.writeAndFlush(message.setMeesgeType(type)).addListener((ChannelFutureListener) future -> {
-           //log.info("FFF3 转发至客户端发送成功 clientId = {},sesisonId = {} ",clientId,message.getSessionId());
         });
 
 
     }
 
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
-        //log.info("RRR1 收到客户端的数据 {} byte", message.getContent().readableBytes());
+        Object tmp =   ctx.channel().config().getRecvByteBufAllocator();
+        if(null != tmp && tmp instanceof  MyLimitByteBufAllocator){
+            String clientId =  SessionUtils.parserSessionId(message.getSessionId()).getClientId();
+            int baseLimit = 1024 * ServerConfig.INSTAND.getLimitClientByteSize();
+            // 测试代码
+            if(clientId.equals("666")){
+                baseLimit = 1024 * 128;
+            }
+            MyLimitByteBufAllocator myLimitByteBufAllocator = (MyLimitByteBufAllocator)tmp;
+            myLimitByteBufAllocator.getHandle().setChannel(ctx.channel());
+            // 限速管理 可以自行修改此参数
+            myLimitByteBufAllocator.getHandle().setLimit(baseLimit);
+        }
         Channel target = SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
         if (null == target || !target.isActive()) {
             SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());
             // 此处关闭的是 客户端 到 服务端的链接 是一个bug
             // ctx.close();
-            //log.info("RRR2 使用sessionId {} get 哨兵 channel已关闭或为空",message.getSessionId());
             ReferenceCountUtil.release(message);
         } else {
             // 向哨兵客户端发送数据
             target.writeAndFlush(message).addListener((ChannelFutureListener) channelFuture -> {
                 if(channelFuture.isSuccess()){
-                    //log.info("RRR2 向哨兵端发送 {}", channelFuture.isSuccess());
                 }
             });
         }

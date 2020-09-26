@@ -61,7 +61,7 @@ public class ClientHander extends ChannelInboundHandlerAdapter {
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
         String sessionId =  message.getSessionId();
         Channel target =  SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(sessionId);
-        if(target == null/* || !target.isActive()*/){
+        if(target == null || !target.isActive()){
             createConnect(ctx,message);
         }else{
             target.writeAndFlush(message.getContent());

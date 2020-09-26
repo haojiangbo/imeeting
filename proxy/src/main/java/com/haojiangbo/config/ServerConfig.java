@@ -56,6 +56,12 @@ public class ServerConfig implements Container {
      * 是否开启代理服务器模式 默认为关闭  如果设置为true 请参考文档
      */
    private boolean isProxyModel;
+
+    /**
+     * 客户端每秒传输数据的速率
+     */
+   private int limitClientByteSize;
+
     /**
      * 配置文件缓存
      */
@@ -86,6 +92,7 @@ public class ServerConfig implements Container {
         this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
         this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
         this.isProxyModel = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
+        this.limitClientByteSize = PrppertiesReadUtils.INSTAND.getIntValue("limitClientByteSize");
         this.configList = initConfigList();
 
         if (configList.size() == 0) {

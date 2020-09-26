@@ -52,8 +52,8 @@ public class BridgeEngineContainner implements Container {
                 })
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
+                //.option(ChannelOption.SO_REUSEADDR, true)
+                //.childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(ServerConfig.INSTAND.getBridgePort()).addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
                         log.info("桥梁服务引擎启动成功... 监听端口...{}",ServerConfig.INSTAND.getBridgePort());

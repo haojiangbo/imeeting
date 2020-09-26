@@ -1,8 +1,7 @@
 package com.haojiangbo.config;
 
-import io.netty.channel.AdaptiveRecvByteBufAllocator;
-
-import  io.netty.channel.socket.SocketChannel;
+import com.haojiangbo.alloc.MyLimitByteBufAllocator;
+import io.netty.channel.socket.SocketChannel;
 /**
 * @Title: RecvByteBufAllocatorCofigParSet
 * @Package com.haojiangbo.config
@@ -13,6 +12,6 @@ import  io.netty.channel.socket.SocketChannel;
 */
 public class RecvByteBufAllocatorCofigParSet {
     public static void  set(SocketChannel ch){
-        // ch.config().setRecvByteBufAllocator(new AdaptiveRecvByteBufAllocator(1024*4,1024*10,65535));
+       ch.config().setRecvByteBufAllocator(new MyLimitByteBufAllocator());
     }
 }

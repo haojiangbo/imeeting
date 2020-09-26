@@ -60,14 +60,12 @@ public class SentryEngineContainer implements Container {
                 .childHandler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     protected void initChannel(SocketChannel ch) {
-                        RecvByteBufAllocatorCofigParSet.set(ch);
+                        //RecvByteBufAllocatorCofigParSet.set(ch);
                         ch.pipeline().addLast(new SentryServerHander(clientId,clientBootstrap,url));
                     }
                 })
                 // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
-                .option(ChannelOption.SO_REUSEADDR, true)
-                .childOption(ChannelOption.SO_KEEPALIVE, true)
                 .bind(port).addListener((ChannelFutureListener) future -> {
                     if(future.isSuccess()){
                         log.info("哨兵服务引擎启动成功... 监听端口...{}",port);
