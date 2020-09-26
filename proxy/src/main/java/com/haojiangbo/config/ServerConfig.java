@@ -92,7 +92,8 @@ public class ServerConfig implements Container {
         this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
         this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
         this.isProxyModel = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
-        this.limitClientByteSize = PrppertiesReadUtils.INSTAND.getIntValue("limitClientByteSize");
+        // 单位是 KB 此处乘 1024
+        this.limitClientByteSize = 1024 * PrppertiesReadUtils.INSTAND.getIntValue("limitClientByteSize");
         this.configList = initConfigList();
 
         if (configList.size() == 0) {
