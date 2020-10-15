@@ -7,6 +7,7 @@ import com.haojiangbo.config.ClientCheckConfig;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.config.SessionChannelMapping;
 import com.haojiangbo.constant.ConstantValue;
+import com.haojiangbo.enums.LmitStreamEnmu;
 import com.haojiangbo.model.ConfigModel;
 import com.haojiangbo.model.CustomProtocol;
 import com.haojiangbo.utils.SessionUtils;
@@ -88,12 +89,12 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         Object tmp =   ctx.channel().config().getRecvByteBufAllocator();
         if(null != tmp && tmp instanceof  MyLimitByteBufAllocator){
             String clientId =  SessionUtils.parserSessionId(message.getSessionId()).getClientId();
-            int baseLimit = 1024 * ServerConfig.INSTAND.getLimitClientByteSize();
-            // 测试代码
+            int baseLimit = ServerConfig.INSTAND.getLimitClientByteSize();
+            // 测试代码 针对某个client限速
             if(clientId.equals("666")){
-                baseLimit = 1024 * 128;
+                baseLimit = LmitStreamEnmu.LIMIT_1024KB.getValue();
             }
-            MyLimitByteBufAllocator myLimitByteBufAllocator = (MyLimitByteBufAllocator)tmp;
+            MyLimitByteBufAllocator myLimitByteBufAllocator = ((MyLimitByteBufAllocator)tmp);
             myLimitByteBufAllocator.getHandle().setChannel(ctx.channel());
             // 限速管理 可以自行修改此参数
             myLimitByteBufAllocator.getHandle().setLimit(baseLimit);

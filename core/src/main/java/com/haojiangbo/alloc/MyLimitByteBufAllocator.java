@@ -1,6 +1,4 @@
 package com.haojiangbo.alloc;
-
-
 import io.netty.channel.Channel;
 import io.netty.channel.DefaultMaxMessagesRecvByteBufAllocator;
 import io.netty.util.AttributeKey;
@@ -29,29 +27,31 @@ public class MyLimitByteBufAllocator extends DefaultMaxMessagesRecvByteBufAlloca
     public static final long TIME_1S = 1000;
 
 
-    private static final int DEFAULT_LIMIT = 1024;
+    public static final int DEFAULT_LIMIT = 1024;
 
-    private HandleImpl handle;
+    private AbstractHandleImpl handle;
 
     @Override
     public Handle newHandle() {
         if (this.handle == null) {
-            this.handle = new HandleImpl(MyLimitByteBufAllocator.DEFAULT_LIMIT);
+            this.handle = new DynamicAllocatorHandImp(MyLimitByteBufAllocator.DEFAULT_LIMIT);
         }
         return this.handle;
     }
 
-    public HandleImpl getHandle() {
+    public AbstractHandleImpl getHandle() {
         return handle;
     }
 
 
-    public final class HandleImpl extends MaxMessageHandle {
-        private  int limit;
-        private volatile int readByteLength = 0;
-        private  Channel channel;
+    public  abstract class AbstractHandleImpl extends MaxMessageHandle {
+        protected   int limit;
+        protected  int readByteLength = 0;
+        protected  Channel channel;
+        protected  int dynamic;
+        protected  int step = 1024;
 
-        public HandleImpl(int limit) {
+        public AbstractHandleImpl(int limit) {
             this.limit = limit;
         }
 
@@ -64,31 +64,101 @@ public class MyLimitByteBufAllocator extends DefaultMaxMessagesRecvByteBufAlloca
         }
 
         @Override
+        public abstract int guess() ;
+    }
+
+
+    class DynamicAllocatorHandImp extends MyLimitByteBufAllocator.AbstractHandleImpl {
+        public DynamicAllocatorHandImp(int limit) {
+            super(limit);
+        }
+
+        @Override
+        public int guess() {
+            if(null == channel){
+                this.dynamic = MyLimitByteBufAllocator.DEFAULT_LIMIT;
+                return MyLimitByteBufAllocator.DEFAULT_LIMIT;
+            }
+
+            int lastReadByteSize = this.lastBytesRead();
+            // 累加读取字节数
+            this.readByteLength += lastReadByteSize;
+            // 如果累加的字节数 大于限制字节数 则计算是否触发限流
+            if(this.readByteLength >= this.limit){
+                if (triggerLimit()) return 0;
+            }
+            // 如果最后一次读取的字节数 小于 上一次分配的字节数 就减少点分配
+            if(lastReadByteSize < this.dynamic){
+                if(this.dynamic <= MyLimitByteBufAllocator.DEFAULT_LIMIT){
+                    this.dynamic = MyLimitByteBufAllocator.DEFAULT_LIMIT;
+                }else{
+                    int tmp = (this.dynamic-lastReadByteSize);
+                    this.dynamic = this.dynamic - tmp;
+                }
+            }else{
+                this.dynamic += step;
+            }
+            return  this.dynamic;
+        }
+
+        private boolean triggerLimit() {
+            Long old =  channel.attr(MyLimitByteBufAllocator.LIMIT_TIME).get();
+            Long now = System.currentTimeMillis();
+            // 重新统计等待时间
+            if(null == old || now - old >= MyLimitByteBufAllocator.TIME_1S){
+                this.readByteLength = 0;
+                //  此处调试用
+                //  if(null != old){
+                //    log.info("解除限制 wait   {} S",(now - old)/1000);
+                //  }
+                log.info("限速分配大小 malloc {} KB",this.limit/1024);
+                channel.attr(MyLimitByteBufAllocator.LIMIT_TIME).set(now);
+                return false;
+            }else{
+                return true;
+            }
+        }
+
+    }
+
+
+    class StaticAllocatorHandImp extends MyLimitByteBufAllocator.AbstractHandleImpl {
+
+
+        public StaticAllocatorHandImp(int limit) {
+            super(limit);
+        }
+
+        @Override
         public int guess() {
             int tmp = this.limit;
+            // channel 为空的时候 肯定是 刚刚初始化的时候
             if(null == channel){
-                return tmp;
+                return DEFAULT_LIMIT;
             }
+            // 累加读取字节数
             this.readByteLength += this.lastBytesRead();
+            // 如果累加的字节数 小于限制字节数 则直接返回要分配的内存大小
             if(this.readByteLength < this.limit){
                 return tmp;
             }
             Long old =  channel.attr(LIMIT_TIME).get();
             Long now = System.currentTimeMillis();
+            // 重新统计等待时间
             if(null == old || now - old >= TIME_1S){
                 this.readByteLength = 0;
-            //  此处调试用  有空指针 bug
-            //  if(null != old){
-            //    log.info("解除限制 wait   {} S",(now - old)/1000);
-            //  }
+                //  此处调试用  有空指针 bug
+                //  if(null != old){
+                //    log.info("解除限制 wait   {} S",(now - old)/1000);
+                //  }
                 log.info("分配大小 malloc {} KB",this.limit/1024);
                 channel.attr(LIMIT_TIME).set(now);
             }else{
+                // 如果触发限制 则返回0
                 tmp = 0;
             }
             return tmp;
         }
     }
-
 
 }
