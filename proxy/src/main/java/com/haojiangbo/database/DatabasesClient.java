@@ -14,10 +14,17 @@ import lombok.SneakyThrows;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-
+/**
+* @Title: DatabasesClient
+* @Package com.haojiangbo.database
+* @Description: 采用sql的方式配置
+* @author Administrator
+* @date 2020/10/28
+* @version V1.0
+*/
 public class DatabasesClient {
     private static String sessionId = "666";
-    public static void main(String [] ages){
+    public  void main(String [] ages){
         start(new ServerConfig(), new EventClientEngineContainner());
     }
 

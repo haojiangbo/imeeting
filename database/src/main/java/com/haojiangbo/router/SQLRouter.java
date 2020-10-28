@@ -8,6 +8,7 @@ import com.haojiangbo.parser.imp.*;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.crypto.Data;
+import java.io.File;
 import java.util.List;
 
 import static com.alibaba.druid.util.JdbcConstants.MYSQL;
@@ -24,7 +25,7 @@ public class SQLRouter {
     private static  String DB_PATH =  null;
 
     public static void setDbPath(String dbPath) {
-        DB_PATH = dbPath;
+        DB_PATH = dbPath+ File.separator;
     }
 
     public static String getDbPath() {

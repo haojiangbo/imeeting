@@ -25,7 +25,7 @@ public class HDatabaseConfigRead implements ConfigRead {
 
     @Override
     public List<ConfigModel> readLine(String path) {
-        String  INSERT_VALUES = "insert into config values ('xxx',65534,'"+ UUID.randomUUID() +"','127.0.0.1:80')";
+        String  INSERT_VALUES = "insert into config values ('xxx',65534,'"+ UUID.randomUUID().toString().substring(0,5) +"','127.0.0.1:80')";
         SQLRouter.setDbPath(path);
         SQLRouter.router(CREATE_ROUTER_CONFIG);
         List<HDatabasseRowModel> result = (List<HDatabasseRowModel>) SQLRouter.router(GET_CONFIG);
