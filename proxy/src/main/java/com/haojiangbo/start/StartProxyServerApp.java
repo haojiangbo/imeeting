@@ -3,6 +3,7 @@ package com.haojiangbo.start;
 import com.haojiangbo.config.ServerConfig;
 import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.container.*;
+import com.haojiangbo.database.DatabasesClient;
 import com.haojiangbo.event.EventListener;
 import com.haojiangbo.inteface.Container;
 import com.haojiangbo.model.EventMessage;
@@ -40,7 +41,8 @@ public class StartProxyServerApp implements EventListener {
         }
         // 支持控制台交互
         else if(args[0].equals(ConstantValue.CLI)){
-            CmdShellHander.start(new ServerConfig(),new EventClientEngineContainner());
+            //CmdShellHander.start(new ServerConfig(),new EventClientEngineContainner());
+            DatabasesClient.start(new ServerConfig(),new EventClientEngineContainner());
         }
     }
 

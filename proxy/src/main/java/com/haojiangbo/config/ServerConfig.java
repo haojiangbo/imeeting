@@ -1,6 +1,7 @@
 package com.haojiangbo.config;
 
 import com.haojiangbo.config.imp.NioLocalFileConfigReadImp;
+import com.haojiangbo.database.HDatabaseConfigRead;
 import com.haojiangbo.inteface.Container;
 import com.haojiangbo.model.ConfigModel;
 import com.haojiangbo.utils.PathUtils;
@@ -23,7 +24,7 @@ import java.util.Map;
 @Slf4j
 public class ServerConfig implements Container {
 
-   public static volatile   ServerConfig INSTAND;
+   public static volatile ServerConfig INSTAND;
 
     /**
      * 事件监听端口号
@@ -73,7 +74,8 @@ public class ServerConfig implements Container {
 
 
     private List<ConfigModel> initConfigList(){
-        ConfigRead configRead =   new NioLocalFileConfigReadImp();
+        // ConfigRead configRead =   new NioLocalFileConfigReadImp();
+        ConfigRead configRead = new  HDatabaseConfigRead();
         return   configRead.readLine(PathUtils.getPath(ServerConfig.class));
    }
 

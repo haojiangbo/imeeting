@@ -16,6 +16,14 @@
             <artifactId>core</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+
+        <dependency>
+            <groupId>com.haojiangbo</groupId>
+            <artifactId>database</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>
