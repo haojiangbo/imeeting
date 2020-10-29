@@ -13,12 +13,14 @@ import com.haojiangbo.inteface.TableDataParserCallback;
 import com.haojiangbo.option.LeftValueParserInteface;
 import com.haojiangbo.router.SQLRouter;
 import com.haojiangbo.utils.ByteUtil;
+import com.haojiangbo.utils.DateUtils;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 
@@ -294,7 +296,7 @@ public abstract class CommonStatementParser {
         columnModel.setData(cdata);
         columnModel.setName(iterator.next());
         try {
-            columnModel.setValue(converData(columnModel));
+            columnModel.setValue(byte2java(columnModel));
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -308,7 +310,7 @@ public abstract class CommonStatementParser {
      * @return
      * @throws UnsupportedEncodingException
      */
-    private Object converData(HDatabaseColumnModel databaseColumnModel) throws UnsupportedEncodingException {
+    private Object byte2java(HDatabaseColumnModel databaseColumnModel) throws UnsupportedEncodingException {
 
         if(databaseColumnModel == null  || databaseColumnModel.getData().length == 0 ||  databaseColumnModel.getData() == null){
             return  null;
@@ -317,10 +319,18 @@ public abstract class CommonStatementParser {
             return ByteUtil.getLong(databaseColumnModel.getData());
         }else if (databaseColumnModel.getType() == ColumnVauleType.INT.getValue()) {
             return ByteUtil.getInt(databaseColumnModel.getData());
+        }else if (databaseColumnModel.getType() == ColumnVauleType.FlOAT.getValue()) {
+            return ByteUtil.getFloat(databaseColumnModel.getData());
+        }else if (databaseColumnModel.getType() == ColumnVauleType.DOUBLE.getValue()) {
+            return ByteUtil.getDouble(databaseColumnModel.getData());
         }else if (databaseColumnModel.getType() == ColumnVauleType.VARCHAR.getValue()) {
             return  new String(databaseColumnModel.getData(),"UTF-8");
         }else if (databaseColumnModel.getType() == ColumnVauleType.DATE.getValue()) {
-            throw  new RuntimeException("不支持的类型");
+            return  new String(databaseColumnModel.getData(),"UTF-8");
+        }else if (databaseColumnModel.getType() == ColumnVauleType.DATETIME.getValue()) {
+            return  new String(databaseColumnModel.getData(),"UTF-8");
+        }else if (databaseColumnModel.getType() == ColumnVauleType.TIME.getValue()) {
+            return  new String(databaseColumnModel.getData(),"UTF-8");
         }
         return  null;
     }
@@ -331,13 +341,35 @@ public abstract class CommonStatementParser {
      * @param value
      * @param columnModel
      */
-    protected void converInsertDateHander(String value, HDatabaseColumnModel columnModel) {
+    protected void java2byte(Object value, HDatabaseColumnModel columnModel) {
         if (columnModel.getType() == ColumnVauleType.INT.getValue()) {
-            columnModel.setData(ByteUtil.getBytes(Integer.parseInt(value)));
-        } else if (columnModel.getType() == ColumnVauleType.BIGINT.getValue()) {
-            columnModel.setData(ByteUtil.getBytes(Long.parseLong(value)));
+            columnModel.setData(ByteUtil.getBytes(Integer.parseInt(value.toString())));
+        }else if (columnModel.getType() == ColumnVauleType.BIGINT.getValue()) {
+            columnModel.setData(ByteUtil.getBytes(Long.parseLong(value.toString())));
+        }else if (columnModel.getType() == ColumnVauleType.FlOAT.getValue()) {
+            columnModel.setData(ByteUtil.getBytes(Float.parseFloat(value.toString())));
+        }else if (columnModel.getType() == ColumnVauleType.DOUBLE.getValue()) {
+            columnModel.setData(ByteUtil.getBytes(Double.parseDouble(value.toString())));
+        }else if (columnModel.getType() == ColumnVauleType.DATE.getValue()) {
+            Date date = DateUtils.pasre(value.toString(),DateUtils.DATE_PATTERN);
+            if(null == date){
+                throw  new RuntimeException("时间格式错误，正确格式 "+DateUtils.DATE_PATTERN);
+            }
+            columnModel.setData(ByteUtil.getBytes(DateUtils.format(date,DateUtils.DATE_PATTERN)));
+        }else if (columnModel.getType() == ColumnVauleType.DATETIME.getValue()) {
+            Date date = DateUtils.pasre(value.toString(),DateUtils.DATE_TIME_PATTERN);
+            if(null == date){
+                throw  new RuntimeException("时间格式错误，正确格式 "+DateUtils.DATE_TIME_PATTERN);
+            }
+            columnModel.setData(ByteUtil.getBytes(DateUtils.format(date,DateUtils.DATE_TIME_PATTERN)));
+        }else if (columnModel.getType() == ColumnVauleType.TIME.getValue()) {
+            Date date = DateUtils.pasre(value.toString(),DateUtils.TIME);
+            if(null == date){
+                throw  new RuntimeException("时间格式错误，正确格式 "+DateUtils.TIME);
+            }
+            columnModel.setData(ByteUtil.getBytes(DateUtils.format(date,DateUtils.TIME)));
         }else if (columnModel.getType() == ColumnVauleType.VARCHAR.getValue() || columnModel.getType() == ColumnVauleType.CHAR.getValue()) {
-            columnModel.setData(ByteUtil.getBytes(value));
+            columnModel.setData(ByteUtil.getBytes(value.toString()));
         }
     }
 

@@ -54,7 +54,7 @@ public class UpdateStatementParser  extends CommonStatementParser
                             SQLValuableExpr valuable = (SQLValuableExpr) setItem.getValue();
                             HDatabaseColumnModel columnModel =  row.getData().get(colName);
                             // 设置新value
-                            converInsertDateHander(valuable.getValue().toString(),columnModel);
+                            java2byte(valuable.getValue(),columnModel);
                         }
 
                         // 移动到末尾 添加新数据

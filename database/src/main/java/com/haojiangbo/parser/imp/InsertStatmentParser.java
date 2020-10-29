@@ -109,7 +109,7 @@ public class InsertStatmentParser extends CommonStatementParser
             HDatabaseColumnModel columnModel = new HDatabaseColumnModel();
             if(insertColumns.containsKey(entry.getKey())){
                 columnModel.setType(baseColumnsInfo.getByte(entry.getKey()).byteValue());
-                converInsertDateHander(((SQLValuableExpr)values.get(i)).getValue().toString(), columnModel);
+                java2byte(((SQLValuableExpr)values.get(i)).getValue(), columnModel);
                 waitSaveColumn.add(columnModel);
                 i++;
             }else{
@@ -125,14 +125,23 @@ public class InsertStatmentParser extends CommonStatementParser
         if(baseColumnsInfo.size()-values.size() > 2){
             throw  new RuntimeException("传入的参数有错误，缺少列");
         }
+        Map.Entry<String, Object> pri = null;
+        for(Map.Entry<String, Object> entry : baseColumnsInfo.entrySet()) {
+            if (entry.getKey().equals(HDatabaseTableModel.PRIMARY)) {
+                pri = entry;
+                break;
+            }
+        }
+        // 删除主键原数据
+        if(null != pri){
+            baseColumnsInfo.remove(HDatabaseTableModel.PRIMARY);
+        }
+
         // 说明没有带着ID 需要自己生成ID
-        if(baseColumnsInfo.size() - values.size() == 2){
+        if(baseColumnsInfo.size() > values.size()){
 
             int i = -1;
             for(Map.Entry<String, Object> entry : baseColumnsInfo.entrySet()){
-                if(entry.getKey().equals("PRIMARY")){
-                    continue;
-                }
                 // 处理自动主键  只能在建表的第一个字段 否则无法处理 自动赋值的情况
                 columnModel = new HDatabaseColumnModel();
                 if(i == -1){
@@ -143,19 +152,16 @@ public class InsertStatmentParser extends CommonStatementParser
                     continue;
                 }
                 columnModel.setType(baseColumnsInfo.getByte(entry.getKey()).byteValue());
-                converInsertDateHander(((SQLValuableExpr)values.get(i)).getValue().toString(), columnModel);
+                java2byte(((SQLValuableExpr)values.get(i)).getValue(), columnModel);
                 waitSaveColumn.add(columnModel);
                 i++;
             }
         }else{
             int i = 0;
             for(Map.Entry<String, Object> entry : baseColumnsInfo.entrySet()){
-                if(entry.getKey().equals("PRIMARY")){
-                    continue;
-                }
                 columnModel = new HDatabaseColumnModel();
                 columnModel.setType(baseColumnsInfo.getByte(entry.getKey()).byteValue());
-                converInsertDateHander(((SQLValuableExpr)values.get(i)).getValue().toString(), columnModel);
+                java2byte(((SQLValuableExpr)values.get(i)).getValue(), columnModel);
                 waitSaveColumn.add(columnModel);
                 i++;
             }

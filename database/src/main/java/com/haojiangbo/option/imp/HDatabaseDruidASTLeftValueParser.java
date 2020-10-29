@@ -4,8 +4,11 @@ import com.haojiangbo.common.ColumnVauleType;
 import com.haojiangbo.datamodel.HDatabaseColumnModel;
 import com.haojiangbo.datamodel.HDatabasseRowModel;
 import com.haojiangbo.option.LeftValueParserInteface;
+import com.haojiangbo.utils.DateUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Date;
 
 /**
  * HDatabasse 左值解析器
@@ -34,10 +37,10 @@ public class HDatabaseDruidASTLeftValueParser
             if(null == tmp){
                 return false;
             }
-            if(tmp[0] instanceof  Comparable){
-               return  ((Comparable) tmp[0]).compareTo(tmp[1]) == 0;
-            }else if(tmp[0] instanceof  String){
-                return tmp[0].equals(tmp[1]);
+            if(tmp[0] instanceof  String){
+               return  tmp[0].equals(tmp[1]);
+            }else if(tmp[0] instanceof  Comparable){
+                return ((Comparable) tmp[0]).compareTo(tmp[1]) == 0;
             }
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
@@ -47,7 +50,33 @@ public class HDatabaseDruidASTLeftValueParser
 
     @Override
     public boolean Like(Object value) {
-        throw new RuntimeException("暂不支持 like 操作");
+        Object[] tmp = null;
+        try {
+            tmp = converData(value);
+            if(null == tmp){
+                return false;
+            }
+            String left = (String) tmp[0];
+            String rigth = (String) tmp[1];
+            if(StringUtils.isEmpty(rigth)){
+                return false;
+            }
+            if(rigth.length() == 1){
+                return  equality(value);
+            }
+
+            if(rigth.startsWith("%")  && rigth.endsWith("%") ){
+                return  left.contains(rigth.substring(1, rigth.length()-1));
+            }else if(rigth.startsWith("%")){
+                return  left.endsWith(rigth.substring(1));
+            }else if(rigth.endsWith("%")){
+                return  left.startsWith(rigth.substring(0,rigth.length()-1));
+            }
+            return false;
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
@@ -174,12 +203,28 @@ public class HDatabaseDruidASTLeftValueParser
 
     @Override
     public boolean Is(Object value) {
-        throw new RuntimeException("暂不支持 Is 操作");
+        try {
+            Object[]  tmp = converData(value);
+            if(null == tmp){
+                return true;
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     @Override
     public boolean IsNot(Object value) {
-        throw new RuntimeException("暂不支持 IsNot 操作");
+        try {
+            Object[]  tmp = converData(value);
+            if(null != tmp){
+                return true;
+            }
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     /**
@@ -196,20 +241,36 @@ public class HDatabaseDruidASTLeftValueParser
         if (databaseColumnModel.getType() == ColumnVauleType.BIGINT.getValue()) {
             result[0] = databaseColumnModel.getValue();
             result[1] = Long.parseLong(rigth.toString());
-            databaseColumnModel.setValue(result[0]);
+            return result;
+        }else if (databaseColumnModel.getType() == ColumnVauleType.FlOAT.getValue()) {
+            result[0] = databaseColumnModel.getValue();
+            result[1] = Float.parseFloat(rigth.toString());
+            return result;
+        }else if (databaseColumnModel.getType() == ColumnVauleType.DOUBLE.getValue()) {
+            result[0] = databaseColumnModel.getValue();
+            result[1] = Double.parseDouble(rigth.toString());
             return result;
         }else if (databaseColumnModel.getType() == ColumnVauleType.INT.getValue()) {
             result[0] = databaseColumnModel.getValue();
             result[1] = Integer.parseInt(rigth.toString());
-            databaseColumnModel.setValue(result[0]);
             return result;
         }else if (databaseColumnModel.getType() == ColumnVauleType.VARCHAR.getValue() || databaseColumnModel.getType() == ColumnVauleType.CHAR.getValue()) {
             result[0] = databaseColumnModel.getValue();
             result[1] = rigth.toString();
-            databaseColumnModel.setValue(result[0]);
             return result;
         }else if (databaseColumnModel.getType() == ColumnVauleType.DATE.getValue()) {
-             throw  new RuntimeException("不支持的类型");
+            result[0] = DateUtils.pasre(databaseColumnModel.getValue().toString(),DateUtils.DATE_PATTERN);
+            result[1] = DateUtils.pasre(rigth.toString(),DateUtils.DATE_PATTERN);
+            //databaseColumnModel.setValue(result[0]);
+            return result;
+        }else if (databaseColumnModel.getType() == ColumnVauleType.DATETIME.getValue()) {
+            result[0] = DateUtils.pasre(databaseColumnModel.getValue().toString(),DateUtils.DATE_TIME_PATTERN);
+            result[1] = DateUtils.pasre(rigth.toString(),DateUtils.DATE_TIME_PATTERN);
+            return result;
+        }else if (databaseColumnModel.getType() == ColumnVauleType.TIME.getValue()) {
+            result[0] = DateUtils.pasre(databaseColumnModel.getValue().toString(),DateUtils.TIME);
+            result[1] = DateUtils.pasre(rigth.toString(),DateUtils.TIME);
+            return result;
         }
         return  null;
     }

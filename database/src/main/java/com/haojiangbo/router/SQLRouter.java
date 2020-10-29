@@ -36,6 +36,9 @@ public class SQLRouter {
     }
 
     public static Object router(String sql){
+        if(StringUtils.isEmpty(DB_PATH)){
+            throw new RuntimeException("DB_PATH 不能为空");
+        }
         List<SQLStatement> sqlStatements = SQLUtils.parseStatements(sql, MYSQL);
         return do_router(sqlStatements);
     }

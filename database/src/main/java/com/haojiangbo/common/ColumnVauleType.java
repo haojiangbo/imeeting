@@ -12,7 +12,11 @@ public enum ColumnVauleType {
     CHAR(2),
     VARCHAR(3),
     TEXT(4),
-    DATE(5);
+    DATE(5),
+    TIME(6),
+    DATETIME(7),
+    FlOAT(8),
+    DOUBLE(9);
 
     private byte value;
 

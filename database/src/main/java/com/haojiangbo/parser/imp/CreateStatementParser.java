@@ -1,6 +1,7 @@
 package com.haojiangbo.parser.imp;
 
 import com.alibaba.druid.sql.ast.SQLDataType;
+import com.alibaba.druid.sql.ast.SQLDataTypeImpl;
 import com.alibaba.druid.sql.ast.expr.SQLIdentifierExpr;
 import com.alibaba.druid.sql.ast.statement.SQLColumnDefinition;
 import com.alibaba.druid.sql.ast.statement.SQLCreateTableStatement;
@@ -49,6 +50,21 @@ public class CreateStatementParser extends CommonStatementParser implements Stat
                     case SQLDataType.Constants.INT:
                         tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.INT.getValue());
                         break;
+                    case SQLDataType.Constants.TINYINT:
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.INT.getValue());
+                        break;
+                    case SQLDataType.Constants.FLOAT:
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.FlOAT.getValue());
+                        break;
+                    case SQLDataType.Constants.DOUBLE:
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.DOUBLE.getValue());
+                        break;
+                    case SQLDataType.Constants.DOUBLE_PRECISION:
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.DOUBLE.getValue());
+                        break;
+                    case SQLDataType.Constants.DECIMAL:
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.DOUBLE.getValue());
+                        break;
                     case SQLDataType.Constants.BIGINT:
                         tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.BIGINT.getValue());
                         break;
@@ -58,11 +74,17 @@ public class CreateStatementParser extends CommonStatementParser implements Stat
                     case SQLDataType.Constants.CHAR:
                         tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.VARCHAR.getValue());
                         break;
-                    case SQLDataType.Constants.TINYINT:
-                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.INT.getValue());
+                    case SQLDataType.Constants.TEXT:
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.VARCHAR.getValue());
                         break;
                     case SQLDataType.Constants.DATE:
                         tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.DATE.getValue());
+                        break;
+                    case "DATETIME":
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.DATETIME.getValue());
+                        break;
+                    case "TIME":
+                        tableHeader.put(definition.getColumnName().replace("`", "").toUpperCase(), ColumnVauleType.TIME.getValue());
                         break;
                     default:
                         throw new RuntimeException("不支持的类型");

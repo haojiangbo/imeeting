@@ -172,6 +172,9 @@ public class SelectStatementParser
         int i = start;
         int j = end;
         HDatabasseRowModel p = tableList.get(i);
+        if(!p.getData().containsKey(fieldKey)){
+            throw  new RuntimeException(" "+fieldKey+" 列不存在");
+        }
         while (i < j){
             Object tmpData = p.getData().get(fieldKey).getValue();
             if (tmpData == null || tmpData.toString().length() == 0) {

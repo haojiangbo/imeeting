@@ -11,6 +11,7 @@ import com.haojiangbo.shell.AbstractShellHander;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import lombok.SneakyThrows;
+import org.junit.Test;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -24,7 +25,8 @@ import java.io.InputStreamReader;
 */
 public class DatabasesClient {
     private static String sessionId = "666";
-    public  void main(String [] ages){
+
+    public  static void main(String [] a){
         start(new ServerConfig(), new EventClientEngineContainner());
     }
 
@@ -36,7 +38,10 @@ public class DatabasesClient {
         }
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String line = null;
-        System.out.println("welcome to use HDatabase version 0.0.1");
+        System.out.println("******************************************");
+        System.out.println("* welcome to use HDatabase version 0.0.1 *");
+        System.out.println("******************************************");
+        System.out.println("config 表 用来配置动态路由");
         System.out.print("HDatabase>");
         StringBuilder stringBuilder = new StringBuilder();
         while ((line = br.readLine()) != null) {
