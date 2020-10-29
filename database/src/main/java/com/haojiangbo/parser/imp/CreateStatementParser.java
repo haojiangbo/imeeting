@@ -29,7 +29,8 @@ import java.util.List;
 * @date 2020/10/26
 * @version V1.0
 */
-public class CreateStatementParser extends CommonStatementParser implements StatementParserInteface<SQLCreateTableStatement,Boolean> {
+public class CreateStatementParser extends CommonStatementParser
+        implements StatementParserInteface<SQLCreateTableStatement,Boolean> {
 
     /**
      *  创建表 ddl

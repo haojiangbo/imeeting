@@ -5,6 +5,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.statement.*;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlExplainStatement;
 import com.haojiangbo.parser.imp.*;
+import com.haojiangbo.parser.imp.dboption.ShowTableStatementParser;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.xml.crypto.Data;
@@ -74,6 +75,8 @@ public class SQLRouter {
             }
         }else if(sqlStatement instanceof MySqlExplainStatement){
             new ExplainStatementParser().parser((MySqlExplainStatement) sqlStatement);
+        }else if(sqlStatement instanceof SQLShowTablesStatement){
+            new ShowTableStatementParser().parser((SQLShowTablesStatement) sqlStatement);
         }
         return true;
     }
