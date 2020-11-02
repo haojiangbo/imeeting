@@ -24,7 +24,7 @@ public class MySqlServer implements Container {
     ServerBootstrap serverBootstrap = new ServerBootstrap();
 
 
-    public  void testServer(){
+    public static void  main(String [] args){
         MySqlServer mySqlServer = new MySqlServer();
         mySqlServer.start();
     }
