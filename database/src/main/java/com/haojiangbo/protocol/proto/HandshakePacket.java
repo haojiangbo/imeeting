@@ -129,8 +129,8 @@ public class HandshakePacket  extends  AbstratorMySqlPacket{
         ByteBuf byteBuf = channel.alloc().buffer(calcSize+4);
         // 数据大小 以及 序列号 小端存储方式发送 java是大端存储 需要移位
         byteBuf.writeByte(calcSize & 0xff);
-        byteBuf.writeByte(calcSize >> 8);
-        byteBuf.writeByte(calcSize >> 16);
+        byteBuf.writeByte(calcSize >>> 8);
+        byteBuf.writeByte(calcSize >>> 16);
         byteBuf.writeByte(0);
         // 版本信息
         byteBuf.writeByte(this.protoVersion);
@@ -145,24 +145,27 @@ public class HandshakePacket  extends  AbstratorMySqlPacket{
         int capabilities =   getServerCapabilities();
         //权能标记 高16位 对应 mysql 官网的 lower 2 bytes
         byteBuf.writeByte(capabilities);
-        byteBuf.writeByte(capabilities >> 8);
+        byteBuf.writeByte(capabilities >>> 8);
         // 编码集
         byteBuf.writeByte(this.charset);
         // 服务器状态
         byteBuf.writeBytes(this.statusFlags);
         //权能标记 低16位 对应 mysql 官网的 upper 2 bytes
-        byteBuf.writeByte(capabilities >> 16);
-        byteBuf.writeByte(capabilities >> 24);
+        byteBuf.writeByte(capabilities >>> 16);
+        byteBuf.writeByte(capabilities >>> 24);
         //长度 填充0
         byteBuf.writeByte(this.authPluginDataLen);
         // 填充10个字节
         byteBuf.writeBytes(filler);
-        // 挑战随机数2
+        // 挑战随机数2 此处的末尾补0 官网没写 但是通过抓包
+        // 发现是需要携带的
         byteBuf.writeBytes(this.authPluginDataPart2);
         byteBuf.writeByte(fillerByte);
+
+        // 打印协议16内容
         StringBuilder stb = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(stb,byteBuf);
-        log.info("协议\n"+stb.toString());
+        log.info("\n服务端发起的握手协议\n"+stb.toString());
         // 发送
         channel.writeAndFlush(byteBuf);
     }
