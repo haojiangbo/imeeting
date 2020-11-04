@@ -15,6 +15,9 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
+
+import  com.haojiangbo.protocol.config.Capabilities;
+
 @Slf4j
 public class MysqlAuthHander extends ChannelInboundHandlerAdapter {
     public static final AttributeKey<byte[]> PASSWORDPART = AttributeKey.newInstance("PASSWORDPART");
@@ -62,6 +65,10 @@ public class MysqlAuthHander extends ChannelInboundHandlerAdapter {
         byteBuf.readBytes(tmp_capability_and_extend);
         // 能力以及扩展
         int  capability_and_extend = ByteUtilBigLittle.bytes2IntLittle(tmp_capability_and_extend);
+
+
+        log.info("能力 CLIENT_PROTOCOL_41  == {}",((capability_and_extend & Capabilities.CLIENT_PROTOCOL_41)  ==  Capabilities.CLIENT_PROTOCOL_41));
+
 
         //最大包大小 统一小端解析
         ByteBuf maxPacket = byteBuf.readBytes(4);
