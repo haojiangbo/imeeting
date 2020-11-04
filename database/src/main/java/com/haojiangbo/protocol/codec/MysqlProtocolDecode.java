@@ -45,11 +45,10 @@ public class MysqlProtocolDecode extends ByteToMessageDecoder {
         if(byteBuf.readableBytes() >= 4){
             byteBuf.markReaderIndex();
             // 数据总长度
-            int byte1 = byteBuf.readByte();
+            int byte1 = byteBuf.readByte() & 0xff;
             int byte2 = byteBuf.readByte() << 8;
             int byte3 = byteBuf.readByte() << 16;
-            int byte4 = 0 << 24;
-            int dataLen =  byte1|byte2|byte3|byte4;
+            int dataLen =  byte1|byte2|byte3;
 
             // 长度不足 直接 return
             if(byteBuf.readableBytes() < dataLen){

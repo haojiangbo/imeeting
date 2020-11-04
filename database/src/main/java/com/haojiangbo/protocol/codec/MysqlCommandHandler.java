@@ -30,16 +30,16 @@ public class MysqlCommandHandler extends ChannelInboundHandlerAdapter {
         StringBuilder str = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(str,((BaseMysqlPacket) msg).payload);
         log.info("\n 客户端发来的命令 \n {}",str);
-
+        OkPackert okPackert = new OkPackert();
         switch (baseMysqlPacket.payload.readByte()) {
-
+            case CommandTypeFlag.COM_INIT_DB:
+                okPackert.success(ctx, (byte) (baseMysqlPacket.packetNumber + 1));
+                break;
             case CommandTypeFlag.COM_QUERY:
                 QueryCommandParser queryCommandParser = new QueryCommandParser();
                 queryCommandParser.parder(ctx,baseMysqlPacket);
                 break;
             case CommandTypeFlag.COM_PING:
-                // todo ping , last access time update
-                OkPackert okPackert = new OkPackert();
                 okPackert.success(ctx, (byte) (baseMysqlPacket.packetNumber + 1));
                 break;
             default:

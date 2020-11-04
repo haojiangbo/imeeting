@@ -21,4 +21,21 @@ public class ResponsePackert {
         ByteBuf byteBuf = ctx.alloc().buffer().writeBytes(b);
         ctx.writeAndFlush(byteBuf);
     }
+
+    /**
+     * 字符串转 LengthEncodedString
+     * @param str
+     * @return
+     */
+    public static byte[] readLengthEncodedString(String str){
+        int  len = (byte) str.getBytes().length;
+        /*if(len < 251){
+            return ;
+        }else if (len >= 251 && len < Math.pow())*/
+        byte [] r = new byte[len + 1];
+        System.arraycopy(str.getBytes(),0,r,1,len);
+        r[0] = (byte) len;
+        return r;
+    }
+
 }
