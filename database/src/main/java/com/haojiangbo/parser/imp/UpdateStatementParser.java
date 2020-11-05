@@ -50,7 +50,7 @@ public class UpdateStatementParser  extends CommonStatementParser
 
                         //设置值
                         for(SQLUpdateSetItem setItem  : sqlUpdateSetItems){
-                            String colName = ((SQLIdentifierExpr) setItem.getColumn()).getName().toUpperCase();
+                            String colName = ((SQLIdentifierExpr) setItem.getColumn()).getName().replace("`","").toUpperCase();
                             SQLValuableExpr valuable = (SQLValuableExpr) setItem.getValue();
                             HDatabaseColumnModel columnModel =  row.getData().get(colName);
                             // 设置新value

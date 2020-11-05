@@ -61,7 +61,7 @@ public class MysqlProtocolDecode extends ByteToMessageDecoder {
             baseMysqlPacket.packerLength = dataLen;
             baseMysqlPacket.packetNumber = byteBuf.readByte();
             baseMysqlPacket.payload = byteBuf.readBytes(dataLen);
-
+            baseMysqlPacket.context = ctx;
             list.add(baseMysqlPacket);
         }
     }

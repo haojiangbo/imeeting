@@ -172,7 +172,7 @@ public abstract class CommonStatementParser {
         }
         // 关系运算
         else if (operator.isRelational()) {
-            LeftValueParserInteface parser = (LeftValueParserInteface) getLeftValueParser().parserData(((SQLIdentifierExpr) left).getName().toUpperCase(),row);
+            LeftValueParserInteface parser = (LeftValueParserInteface) getLeftValueParser().parserData(((SQLIdentifierExpr) left).getName().replace("`","").toUpperCase(),row);
             switch (operator) {
                 case Equality:
                     return parser.equality(rigth);

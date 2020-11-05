@@ -4,6 +4,10 @@ package com.haojiangbo.datamodel;
 　　* @date 2020/10/26 14:22
 　　*/
 public class HDatabaseTableModel {
+     /**
+      *  数据库名称 默认
+      */
+    public static final String  DEFULT_DATABASE_NAME = "HDATABASE";
     public static final String  PRIMARY  = "PRIMARY";
      /**
       * 头部大小

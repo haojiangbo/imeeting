@@ -67,7 +67,7 @@ public class InsertStatmentParser extends CommonStatementParser
             insertColumns = new JSONObject(true);
             int i = 0;
             for(SQLExpr item : columns){
-                String key = ((SQLIdentifierExpr)item).getName().toUpperCase();
+                String key = ((SQLIdentifierExpr)item).getName().replace("`","").toUpperCase();
                 if(!baseColumnsInfo.containsKey(key)){
                     throw  new RuntimeException("不存在的列");
                 }

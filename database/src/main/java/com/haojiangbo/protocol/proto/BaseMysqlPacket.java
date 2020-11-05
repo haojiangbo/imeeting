@@ -1,6 +1,7 @@
 package com.haojiangbo.protocol.proto;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
 * @Title: BaseMysqlPacket
@@ -11,6 +12,10 @@ import io.netty.buffer.ByteBuf;
 * @version V1.0
 */
 public class BaseMysqlPacket {
+    /**
+     * 管道上下文
+     */
+    public ChannelHandlerContext context;
     /**
      * 此处只有3位
      */

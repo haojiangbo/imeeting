@@ -18,6 +18,10 @@ import com.haojiangbo.option.LeftValueParserInteface;
 import com.haojiangbo.option.imp.HDatabaseDruidASTLeftValueParser;
 import com.haojiangbo.parser.CommonStatementParser;
 import com.haojiangbo.parser.StatementParserInteface;
+import com.haojiangbo.protocol.proto.BaseMysqlPacket;
+import com.haojiangbo.protocol.proto.ResultSetPacket;
+import com.haojiangbo.thread.RuntimeInstance;
+import com.haojiangbo.utils.MetaDataUtils;
 
 import java.io.RandomAccessFile;
 import java.util.*;
@@ -94,7 +98,13 @@ public class SelectStatementParser
 
             orderByHander(tableList, query);
 
+            BaseMysqlPacket packet =  RuntimeInstance.currentThreadPacket.get();
+            ResultSetPacket resultSetPacket = new ResultSetPacket();
+
+            resultSetPacket.buildHeader(tableMetaData,HDatabaseTableModel.DEFULT_DATABASE_NAME,tableName);
+
             int maxTitleLength = 0;
+            List<String []> rowData = new LinkedList<>();
             for (int i = 0; i < tableList.size(); i++) {
                 Iterator<Map.Entry<String, HDatabaseColumnModel>> colIterator = tableList.get(i).getData().entrySet().iterator();
                 if (i == 0) {
@@ -113,14 +123,24 @@ public class SelectStatementParser
                 }
                 StringBuilder tmp = new StringBuilder();
                 tmp.append("|");
+                String [] colDataArray = new String[MetaDataUtils.calcMetaDataSize(tableMetaData)];
+                int index = 0;
                 for (Map.Entry<String, Object> meta : tableMetaData.entrySet()) {
                     if (meta.getKey().equals(HDatabaseTableModel.PRIMARY)) {
                         continue;
                     }
                     Map.Entry<String, HDatabaseColumnModel> colData = colIterator.next();
-                    tmp.append(String.format(" %-15s|", colData.getValue().getSize() == 0 ? "NULL" : colData.getValue().getValue()));
+                    String value = colData.getValue().getSize() == 0 ? "NULL" : colData.getValue().getValue().toString();
+                    colDataArray[index] = value;
+                    tmp.append(String.format(" %-15s|", value));
+                    index ++;
                 }
+                rowData.add(colDataArray);
                 System.out.println(tmp);
+            }
+            resultSetPacket.buildRowData(rowData);
+            if(null != packet){
+                resultSetPacket.write(packet);
             }
             System.out.println(genLineString(maxTitleLength));
             //System.out.println(JSONArray.toJSONString(tableList,true));
