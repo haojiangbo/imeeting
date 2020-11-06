@@ -74,10 +74,10 @@ public class SQLRouter {
                 System.out.println("删除成功");
             }
         }else if(sqlStatement instanceof MySqlExplainStatement){
-            new ExplainStatementParser().parser((MySqlExplainStatement) sqlStatement);
+           return   new ExplainStatementParser().parser((MySqlExplainStatement) sqlStatement);
         }else if(sqlStatement instanceof SQLShowTablesStatement){
-            new ShowTableStatementParser().parser((SQLShowTablesStatement) sqlStatement);
+           return   new ShowTableStatementParser().parser((SQLShowTablesStatement) sqlStatement);
         }
-        return true;
+        return false;
     }
 }

@@ -29,7 +29,7 @@ public class MysqlCommandHandler extends ChannelInboundHandlerAdapter {
         BaseMysqlPacket baseMysqlPacket = (BaseMysqlPacket) msg;
         StringBuilder str = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(str,((BaseMysqlPacket) msg).payload);
-        log.info("\n 客户端发来的命令 \n {}",str);
+        //log.info("\n 客户端发来的命令 \n {}",str);
         OkPackert okPackert = new OkPackert();
         switch (baseMysqlPacket.payload.readByte()) {
             case CommandTypeFlag.COM_INIT_DB:

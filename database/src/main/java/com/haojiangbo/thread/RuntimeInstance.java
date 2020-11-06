@@ -30,11 +30,10 @@ public class RuntimeInstance  implements Runnable{
         currentThreadPacket.set(this.packet);
         String command = packet.payload.toString(Charset.forName("utf-8"));
         log.info("QUERY == {}",command);
-        SQLRouter.router(command);
         //SHOW DATABASES
         //此处没有设计数据库的概念 所以这块需要手动返回
-        if("SHOW DATABASES".equals(command)
-                || " SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA".equals(command)){
+        if("SHOW DATABASES".contains(command)
+                || "SELECT SCHEMA_NAME, DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA".contains(command)){
             ResultSetPacket resultSetPacket = new ResultSetPacket();
             resultSetPacket.write(packet.context.channel(),packet);
         } else if("SHOW STATUS".equals(command)){
@@ -44,8 +43,14 @@ public class RuntimeInstance  implements Runnable{
             err.message = "Unknown command";
             err.write(packet.context.channel());
         } else {
-            OkPackert okPackert = new OkPackert();
-            okPackert.success(packet.context, (byte) (packet.packetNumber + 1));
+            Object re =  SQLRouter.router(command);
+            if(re instanceof  Boolean && re.equals(true)){
+              /*  OkPackert okPackert = new OkPackert();
+                okPackert.success(packet.context, (byte) (packet.packetNumber + 1));*/
+            }else {
+                OkPackert okPackert = new OkPackert();
+                okPackert.success(packet.context, (byte) (packet.packetNumber + 1));
+            }
         }
         ReferenceCountUtil.release(packet.payload);
     }

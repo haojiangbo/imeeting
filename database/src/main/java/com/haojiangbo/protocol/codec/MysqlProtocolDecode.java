@@ -35,7 +35,7 @@ import java.util.List;
 */
 @Slf4j
 public class MysqlProtocolDecode extends ByteToMessageDecoder {
-
+    public static final AttributeKey<String> INPUTLOG = AttributeKey.newInstance("INPUTLOG");
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> list) throws Exception {
@@ -65,6 +65,7 @@ public class MysqlProtocolDecode extends ByteToMessageDecoder {
             list.add(baseMysqlPacket);
         }
     }
+
 
 
 }

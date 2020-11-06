@@ -7,6 +7,7 @@ import com.haojiangbo.constant.ConstantValue;
 import com.haojiangbo.inteface.Container;
 import com.haojiangbo.protocol.codec.MysqlAuthHander;
 import com.haojiangbo.protocol.codec.MysqlProtocolDecode;
+import com.haojiangbo.protocol.codec.MysqlProtocolWriteLog;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelInitializer;
@@ -39,6 +40,7 @@ public class MySqlServer implements Container {
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         // 添加协议的编解码工具
+                        ch.pipeline().addLast(new MysqlProtocolWriteLog());
                         ch.pipeline().addLast(new MysqlProtocolDecode());
                         ch.pipeline().addLast(new MysqlAuthHander());
                     }
