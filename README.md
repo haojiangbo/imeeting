@@ -30,6 +30,10 @@ clientUrl   指的是 代理客户端哪个服务 比如 本地的
 flushall; 命令  使 当前路由表 立即生效
 修改 和 删除命令 和 普通数据库操作指令一样
 ```
+
+#####简单示例
+
+![](images/6c486a7c5bd0fcb33c3ae9947fd813f.png)
 ~~目前只支持 list  get set del  flush exit 这几条命令~~
 ~~list 命令 查看 当前所有路由表~~
 ~~get 命令  get <clientId> 查看某一个clientId的路由表 例如   get abc~~
