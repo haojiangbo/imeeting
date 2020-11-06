@@ -17,13 +17,6 @@ git clone https://gitee.com/haojiangbo/venomous_sting.git
 先按照第四步的配置，配置成功后，找到proxyclient模块start包目录下面的ClientAppStart.java 启动main函数即可
 
 ## 如何使用 cli  使用命令行的方式 操作 config（路由表）
-~~目前只支持 list  get set del  flush exit 这几条命令~~
-~~list 命令 查看 当前所有路由表~~
-~~get 命令  get <clientId> 查看某一个clientId的路由表 例如   get abc~~
-~~set 命令  set <clientId> <field> <value>  设置路由表中具体的属性 比如 set abc port  999 ~~
-~~del 命令  del <clientId> 删除路由表中的某一条记录~~
-~~详细配置会在此文档同步
-https://www.kancloud.cn/haojiangbo/stinger~~
 ```
 java -jar proxyServer.jar cli  #启动 cli
 目前只支持 select update insert delete 简单操作
@@ -37,5 +30,11 @@ clientUrl   指的是 代理客户端哪个服务 比如 本地的
 flushall; 命令  使 当前路由表 立即生效
 修改 和 删除命令 和 普通数据库操作指令一样
 ```
-
+~~目前只支持 list  get set del  flush exit 这几条命令~~
+~~list 命令 查看 当前所有路由表~~
+~~get 命令  get <clientId> 查看某一个clientId的路由表 例如   get abc~~
+~~set 命令  set <clientId> <field> <value>  设置路由表中具体的属性 比如 set abc port  999 ~~
+~~del 命令  del <clientId> 删除路由表中的某一条记录~~
+~~详细配置会在此文档同步
+https://www.kancloud.cn/haojiangbo/stinger~~
  
