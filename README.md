@@ -32,7 +32,7 @@ flushall; 命令  使 当前路由表 立即生效
 ```
 
 
-####简单示例
+#### 简单示例
 
 ![](images/6c486a7c5bd0fcb33c3ae9947fd813f.png)
 ~~目前只支持 list  get set del  flush exit 这几条命令~~
