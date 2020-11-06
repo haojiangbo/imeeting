@@ -14,14 +14,17 @@ import java.util.Properties;
 @Slf4j
 public class PrppertiesReadUtils {
     public static final String DEFAULT_CONF = "config.properties";
-    public  static final PrppertiesReadUtils INSTAND = new PrppertiesReadUtils();
+    private  static  PrppertiesReadUtils INSTAND;
     private Properties configuration = new Properties();
 
-    public PrppertiesReadUtils() {
-        initConfig(DEFAULT_CONF,true);
+    public static PrppertiesReadUtils getDefaultInstand() {
+        if(null  == INSTAND){
+            INSTAND = new PrppertiesReadUtils().initConfig(DEFAULT_CONF,true);
+        }
+        return INSTAND;
     }
 
-    public PrppertiesReadUtils initConfig(String defaultConf,boolean isResource) {
+    public PrppertiesReadUtils initConfig(String defaultConf, boolean isResource) {
         log.info("config file path = {}",defaultConf);
         InputStream is = null;
         if(isResource){

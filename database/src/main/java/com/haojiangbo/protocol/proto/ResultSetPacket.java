@@ -1,13 +1,10 @@
 package com.haojiangbo.protocol.proto;
 
 import com.alibaba.fastjson.JSONObject;
-import com.haojiangbo.common.ColumnVauleType;
 import com.haojiangbo.datamodel.HDatabaseTableModel;
 import com.haojiangbo.protocol.config.Fields;
-import com.haojiangbo.utils.ByteUtil;
 import com.haojiangbo.utils.ByteUtilBigLittle;
 import com.haojiangbo.utils.MetaDataUtils;
-import com.oracle.webservices.internal.api.message.BasePropertySet;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 
