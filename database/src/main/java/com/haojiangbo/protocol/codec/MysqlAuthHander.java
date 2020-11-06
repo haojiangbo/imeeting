@@ -5,6 +5,7 @@ import com.haojiangbo.protocol.proto.BaseMysqlPacket;
 import com.haojiangbo.protocol.proto.HandshakePacket;
 import com.haojiangbo.protocol.proto.OkPackert;
 import com.haojiangbo.utils.ByteUtilBigLittle;
+import com.haojiangbo.utils.MySqlProtocolUtils;
 import com.haojiangbo.utils.RandomUtil;
 import com.haojiangbo.utils.SecurityUtil;
 import io.netty.buffer.ByteBuf;
@@ -13,6 +14,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.util.AttributeKey;
 import lombok.extern.slf4j.Slf4j;
 
+import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
@@ -65,20 +67,13 @@ public class MysqlAuthHander extends ChannelInboundHandlerAdapter {
         byteBuf.readBytes(tmp_capability_and_extend);
         // 能力以及扩展
         int  capability_and_extend = ByteUtilBigLittle.bytes2IntLittle(tmp_capability_and_extend);
-
-
         log.info("能力 CLIENT_PROTOCOL_41  == {}",((capability_and_extend & Capabilities.CLIENT_PROTOCOL_41)  ==  Capabilities.CLIENT_PROTOCOL_41));
-
-
         //最大包大小 统一小端解析
         ByteBuf maxPacket = byteBuf.readBytes(4);
-
         // 编码集 用于解析下面4字节的 字符串
         byte charSet = byteBuf.readByte();
-
         // 23 填充值
         ByteBuf filler = byteBuf.readBytes(23);
-
         //账号
         int tmpIndex = 1;
         byteBuf.markReaderIndex();
@@ -91,14 +86,17 @@ public class MysqlAuthHander extends ChannelInboundHandlerAdapter {
         ByteBuf userName =  byteBuf.readBytes(tmpIndex - 1);
         // 跳过字符串结尾
         byteBuf.readByte();
-
-        int pwdLen = byteBuf.readByte();
+        int pwdLen = MySqlProtocolUtils.readLenencInt(byteBuf);
         byte[] passwordArray = new byte[pwdLen];
         byteBuf.readBytes(passwordArray);
-
         byte [] tmp = SecurityUtil.scramble411("root".getBytes(),ctx.channel().attr(PASSWORDPART).get());
         log.info("tmp == {}", Arrays.toString(tmp));
-        log.info("pwd == {}", Arrays.toString(passwordArray));
+        log.info("username = {}, pwd == {}",userName.toString(Charset.forName("utf-8")), Arrays.toString(passwordArray));
+        int diff = baseMysqlPacket.packerLength - byteBuf.readerIndex();
+        if(diff > 0){
+            // 释放掉未读取完的数据
+            byteBuf.readerIndex(diff);
+        }
         return true;
     }
 

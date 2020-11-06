@@ -172,7 +172,7 @@ public class SelectStatementParser
                 throw new RuntimeException("数据已超过1万条,无法直接在内存排序");
             }
             for (SQLSelectOrderByItem orderItem : orderByItems) {
-                String fieldKey = ((SQLIdentifierExpr) orderItem.getExpr()).getName().toUpperCase();
+                String fieldKey = ((SQLIdentifierExpr) orderItem.getExpr()).getName().replace("`","").toUpperCase();
                 sortResutListHander(fieldKey,tableList,0,tableList.size()-1);
                 if(orderItem.getType() == SQLOrderingSpecification.DESC){
                     Collections.reverse(tableList);

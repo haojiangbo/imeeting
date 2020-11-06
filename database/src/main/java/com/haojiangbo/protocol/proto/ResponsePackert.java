@@ -1,5 +1,7 @@
 package com.haojiangbo.protocol.proto;
 
+import com.alibaba.druid.util.MySqlUtils;
+import com.haojiangbo.utils.MySqlProtocolUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 
@@ -27,14 +29,14 @@ public class ResponsePackert {
      * @param str
      * @return
      */
-    public static byte[] readLengthEncodedString(String str){
-        int  len = (byte) str.getBytes().length;
-        /*if(len < 251){
-            return ;
-        }else if (len >= 251 && len < Math.pow())*/
-        byte [] r = new byte[len + 1];
-        System.arraycopy(str.getBytes(),0,r,1,len);
-        r[0] = (byte) len;
+    public static byte[] readLengthEncodedString(byte[] str){
+        int  len = str.length;
+        byte[] lenArray =  MySqlProtocolUtils.intToLenencInt(len);
+        byte [] r = new byte[len + lenArray.length];
+        // 拷贝字符串内容
+        System.arraycopy(str,0,r,lenArray.length,len);
+        //拷贝长度内容
+        System.arraycopy(lenArray,0,r,0,lenArray.length);
         return r;
     }
 

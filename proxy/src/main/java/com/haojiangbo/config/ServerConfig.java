@@ -86,16 +86,16 @@ public class ServerConfig implements Container {
    }
 
     private void setValue() {
-        this.eventPort = PrppertiesReadUtils.INSTAND.getIntValue("eventPort");
-        this.proxyPort = PrppertiesReadUtils.INSTAND.getIntValue("proxyPort");
-        this.proxySSLPort = PrppertiesReadUtils.INSTAND.getIntValue("proxySSLPort");
-        this.keyStoryPath = PrppertiesReadUtils.INSTAND.getStringValue("keyStoryPath");
-        this.keyStoryPassword = PrppertiesReadUtils.INSTAND.getStringValue("keyStoryPassword");
-        this.bridgeHost = PrppertiesReadUtils.INSTAND.getStringValue("bridgeHost");
-        this.bridgePort = PrppertiesReadUtils.INSTAND.getIntValue("bridgePort");
-        this.isProxyModel = PrppertiesReadUtils.INSTAND.getBooleanValue("isProxyModel");
+        this.eventPort = PrppertiesReadUtils.getDefaultInstand().getIntValue("eventPort");
+        this.proxyPort = PrppertiesReadUtils.getDefaultInstand().getIntValue("proxyPort");
+        this.proxySSLPort = PrppertiesReadUtils.getDefaultInstand().getIntValue("proxySSLPort");
+        this.keyStoryPath = PrppertiesReadUtils.getDefaultInstand().getStringValue("keyStoryPath");
+        this.keyStoryPassword = PrppertiesReadUtils.getDefaultInstand().getStringValue("keyStoryPassword");
+        this.bridgeHost = PrppertiesReadUtils.getDefaultInstand().getStringValue("bridgeHost");
+        this.bridgePort = PrppertiesReadUtils.getDefaultInstand().getIntValue("bridgePort");
+        this.isProxyModel = PrppertiesReadUtils.getDefaultInstand().getBooleanValue("isProxyModel");
         // 单位是 KB 此处乘 1024
-        this.limitClientByteSize = 1024 * PrppertiesReadUtils.INSTAND.getIntValue("limitClientByteSize");
+        this.limitClientByteSize = 1024 * PrppertiesReadUtils.getDefaultInstand().getIntValue("limitClientByteSize");
         this.configList = initConfigList();
 
         if (configList.size() == 0) {

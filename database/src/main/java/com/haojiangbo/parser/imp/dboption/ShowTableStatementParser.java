@@ -33,9 +33,9 @@ public class ShowTableStatementParser extends CommonStatementParser
         System.out.println(String.format("| %-15s |","TABLE_NAME"));
         System.out.println(genLineString(1));
         JSONObject metaData = new JSONObject(true);
-        metaData.put("TABLE_SCHEMA", ColumnVauleType.VARCHAR);
-        metaData.put("TABLE_NAME", ColumnVauleType.VARCHAR);
-        metaData.put("TABLE_TYPE", ColumnVauleType.VARCHAR);
+        metaData.put("TABLE_SCHEMA", ColumnVauleType.VARCHAR.getValue());
+        metaData.put("TABLE_NAME", ColumnVauleType.VARCHAR.getValue());
+        metaData.put("TABLE_TYPE", ColumnVauleType.VARCHAR.getValue());
         BaseMysqlPacket packet =  RuntimeInstance.currentThreadPacket.get();
         ResultSetPacket resultSetPacket = new ResultSetPacket();
         //检查是不是网络包
