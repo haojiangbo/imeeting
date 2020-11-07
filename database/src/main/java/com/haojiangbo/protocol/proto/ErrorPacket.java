@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
 * @version V1.0
 */
 public class ErrorPacket extends ResponsePackert{
-    public static  byte packetId = 1;
+    public   byte packetId = 1;
 
     /**
      * 错误包是固定值

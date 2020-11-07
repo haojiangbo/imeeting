@@ -27,7 +27,7 @@ public class MysqlAuthHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         HandshakePacket handshakePacket = new HandshakePacket();
-        handshakePacket.serverVersion = "5.6.45";
+        handshakePacket.serverVersion = "Hdatabase 0.0.1";
         handshakePacket.authPluginDataPart1 = RandomUtil.randomBytes(8);
         handshakePacket.authPluginDataPart2 = RandomUtil.randomBytes(12);
 
@@ -86,7 +86,7 @@ public class MysqlAuthHander extends ChannelInboundHandlerAdapter {
         ByteBuf userName =  byteBuf.readBytes(tmpIndex - 1);
         // 跳过字符串结尾
         byteBuf.readByte();
-        int pwdLen = MySqlProtocolUtils.readLenencInt(byteBuf);
+        int pwdLen = (int) MySqlProtocolUtils.readLenencInt(byteBuf);
         byte[] passwordArray = new byte[pwdLen];
         byteBuf.readBytes(passwordArray);
         byte [] tmp = SecurityUtil.scramble411("root".getBytes(),ctx.channel().attr(PASSWORDPART).get());

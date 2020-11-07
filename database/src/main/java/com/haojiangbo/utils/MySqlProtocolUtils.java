@@ -21,9 +21,9 @@ public class MySqlProtocolUtils  extends ByteUtilBigLittle{
      * If the value is ≥ (224) and < (264) it is stored as fe + 8-byte integer.
      * @param buf
      */
-    public static int readLenencInt(ByteBuf buf){
+    public static long readLenencInt(ByteBuf buf){
         int len = buf.readByte() & 0xff;
-        int v = 0;
+        long v = 0;
         switch (len){
             case 251:
                 return 0;
@@ -38,6 +38,10 @@ public class MySqlProtocolUtils  extends ByteUtilBigLittle{
                 return v;
             // 数据总长度才3个字节 我深深怀疑 mysql
             // 这个值是否可以真真的遇到
+
+            // 2020/11/07
+            // 找到会使用到的情况了
+            // 返回 last insert-id 肯定会出现long的情况
             case 254:
                 v |= buf.readByte() & 0xff;
                 v |= (long) (buf.readByte() & 0xff) << 8;
@@ -67,22 +71,32 @@ public class MySqlProtocolUtils  extends ByteUtilBigLittle{
      * @param input
      * @return
      */
-    public static byte [] intToLenencInt(int input){
+    public static byte [] intToLenencInt(long input){
        if(input > 0 && input < 251){
            return new byte[]{(byte) (input & 0xff)};
        }else if(input >= 251 && input < Math.pow(16,2)){
             byte [] bytes = new byte[3];
             bytes[0] = (byte) 0xfc;
             bytes[1] = (byte) (input & 0xff);
-            bytes[2] = (byte) ((input & 0xff) >>> 8);
+            bytes[2] = (byte) (input >>> 8);
        }else if(input >= Math.pow(16,2) && input < Math.pow(24,2)){
            byte [] bytes = new byte[4];
            bytes[0] = (byte) 0xfd;
            bytes[1] = (byte) (input & 0xff);
-           bytes[2] = (byte) ((input & 0xff) >>> 8);
-           bytes[3] = (byte) ((input & 0xff) >>> 16);
+           bytes[2] = (byte) (input >>> 8);
+           bytes[3] = (byte) (input >>> 16);
        }else if(input >= Math.pow(24,2) && input < Math.pow(64,2)){
-           throw  new RuntimeException("不支持的数据大小");
+           byte [] bytes = new byte[9];
+           bytes[0] = (byte) 0xfd;
+           bytes[1] = (byte) (input & 0xff);
+           bytes[2] = (byte) (input >>> 8);
+           bytes[3] = (byte) (input >>> 16);
+           bytes[4] = (byte) (input >>> 24);
+           bytes[5] = (byte) (input >>> 32);
+           bytes[6] = (byte) (input >>> 40);
+           bytes[7] = (byte) (input >>> 48);
+           bytes[8] = (byte) (input >>> 56);
+           return  bytes;
        }else{
            return  new byte[]{(byte) 0xfb};
        }

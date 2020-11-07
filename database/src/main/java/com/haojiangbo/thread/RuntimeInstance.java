@@ -6,18 +6,21 @@ import com.haojiangbo.protocol.proto.ErrorPacket;
 import com.haojiangbo.protocol.proto.OkPackert;
 import com.haojiangbo.protocol.proto.ResultSetPacket;
 import com.haojiangbo.router.SQLRouter;
+import com.haojiangbo.utils.PathUtils;
 import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.nio.charset.Charset;
+import java.util.List;
 
 @Slf4j
 public class RuntimeInstance  implements Runnable{
 
     public RuntimeInstance(BaseMysqlPacket packet) {
         this.packet = packet;
-        SQLRouter.setDbPath("D:/work/springCloudOnline/stinger/proxy/");
+        SQLRouter.setDbPath("E:/work/venomous_sting/proxy/");
     }
+
 
     /**
      * 当前线程获取的packet
@@ -44,9 +47,10 @@ public class RuntimeInstance  implements Runnable{
             err.write(packet.context.channel());
         } else {
             Object re =  SQLRouter.router(command);
-            if(re instanceof  Boolean && re.equals(true)){
-              /*  OkPackert okPackert = new OkPackert();
-                okPackert.success(packet.context, (byte) (packet.packetNumber + 1));*/
+            if((re instanceof  Boolean && re.equals(true))){
+
+            }else if(re instanceof List){
+
             }else {
                 OkPackert okPackert = new OkPackert();
                 okPackert.success(packet.context, (byte) (packet.packetNumber + 1));

@@ -53,26 +53,26 @@ public class SQLRouter {
             boolean b =    createStatementParser.parser((SQLCreateTableStatement) sqlStatement);
             if(b){
                 System.out.println("创建成功");
-            }else{
-                return false;
             }
+            return b;
         }else if(sqlStatement instanceof SQLInsertStatement){
             boolean b =    new InsertStatmentParser().parser((SQLInsertStatement) sqlStatement);
             if(b){
                 System.out.println("插入成功");
-            }else{
-                return false;
             }
+            return b;
         }else if(sqlStatement instanceof SQLUpdateStatement){
             boolean b =    new UpdateStatementParser().parser((SQLUpdateStatement) sqlStatement);
             if(b){
                 System.out.println("修改成功");
             }
+            return b;
         }else if(sqlStatement instanceof SQLDeleteStatement){
             boolean b =    new DeleteStatementParser().parser((SQLDeleteStatement) sqlStatement);
             if(b){
                 System.out.println("删除成功");
             }
+            return b;
         }else if(sqlStatement instanceof MySqlExplainStatement){
            return   new ExplainStatementParser().parser((MySqlExplainStatement) sqlStatement);
         }else if(sqlStatement instanceof SQLShowTablesStatement){

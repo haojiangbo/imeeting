@@ -13,6 +13,9 @@ import com.haojiangbo.option.LeftValueParserInteface;
 import com.haojiangbo.option.imp.HDatabaseDruidASTLeftValueParser;
 import com.haojiangbo.parser.CommonStatementParser;
 import com.haojiangbo.parser.StatementParserInteface;
+import com.haojiangbo.protocol.proto.BaseMysqlPacket;
+import com.haojiangbo.protocol.proto.OkPackert;
+import com.haojiangbo.thread.RuntimeInstance;
 
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -81,6 +84,9 @@ public class UpdateStatementParser  extends CommonStatementParser
                 e.printStackTrace();
             }
         }
+        BaseMysqlPacket packet =  RuntimeInstance.currentThreadPacket.get();
+        OkPackert okPackert = new OkPackert();
+        okPackert.write(packet,1,1000);
         return  true;
     }
 
