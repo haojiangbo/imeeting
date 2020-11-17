@@ -25,7 +25,7 @@ public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
         DatagramPacket  datagramPacket = (DatagramPacket) msg;
         StringBuilder stringBuilder = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(stringBuilder,datagramPacket.content());
-        log.info("接收到客户端消息 >>> {} ip >>> {} \n  {}",datagramPacket.content().toString(Charset.forName("utf-8")),datagramPacket.sender(),stringBuilder.toString());
+        log.info("接收到客户端消息 >>> ip >>> {} \n  {}",datagramPacket.sender(),stringBuilder.toString());
         //ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),datagramPacket.sender()));
         try {
             byte [] b = new byte[datagramPacket.content().readableBytes()];
