@@ -13,15 +13,8 @@ project("ndkdemo")
 # or SHARED, and provides the relative paths to its source code.
 # You can define multiple libraries, and CMake builds them for you.
 # Gradle automatically packages shared libraries with your APK.
+set(JNI_LIBS_DIR ${PROJECT_SOURCE_DIR}/app/src/main/jniLibs)
 
-add_library( # Sets the name of the library.
-             native-lib
-
-             # Sets the library as a shared library.
-             SHARED
-
-             # Provides a relative path to your source file(s).
-             native-lib.cpp )
 
 # Searches for a specified prebuilt library and stores the path as a
 # variable. Because CMake includes system libraries in the search path by
@@ -40,9 +33,24 @@ find_library( # Sets the name of the path variable.
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
+
+
+add_library( # Sets the name of the library.
+        native-lib
+
+        # Sets the library as a shared library.
+        SHARED
+
+        # Provides a relative path to your source file(s).
+        native-lib.cpp )
+
+
+include_directories(${CMAKE_SOURCE_DIR} ../jniLibs/includes)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI} ")
 target_link_libraries( # Specifies the target library.
                        native-lib
-
+                       avutil avresample swresample swscale avcodec avformat avfilter avdevice
                        # Links the target library to the log library
                        # included in the NDK.
                        ${log-lib} )
