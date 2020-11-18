@@ -7,16 +7,25 @@ import io.netty.channel.socket.DatagramPacket;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
 
 @Slf4j
 public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
     File file = new File("D:/video/udp.pcm");
+    int totalByte = 0;
+    OutputStream outputStream;
     public UdpServerMessageReadHander(){
         if(file.exists()){
             file.delete();
+        }
+        try {
+            outputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
     }
 
@@ -25,16 +34,21 @@ public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
         DatagramPacket  datagramPacket = (DatagramPacket) msg;
         StringBuilder stringBuilder = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(stringBuilder,datagramPacket.content());
-        log.info("接收到客户端消息 >>> ip >>> {} \n  {}",datagramPacket.sender(),stringBuilder.toString());
+        totalByte += datagramPacket.content().readableBytes();
+        log.info(">>> ip >>> {} byteLen = {} totalLen = {}  \n  {}",
+                datagramPacket.sender(),
+                datagramPacket.content().readableBytes(),
+                totalByte,
+                stringBuilder.toString());
         //ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),datagramPacket.sender()));
-        try {
+        ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),new InetSocketAddress("10.10.10.218", 10089)));
+        /*try {
             byte [] b = new byte[datagramPacket.content().readableBytes()];
             datagramPacket.content().readBytes(b);
-            OutputStream outputStream = new FileOutputStream(file);
             outputStream.write(b);
             outputStream.flush();
         } catch (Exception e) {
             e.printStackTrace();
-        }
+        }*/
     }
 }
