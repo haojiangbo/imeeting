@@ -22,6 +22,13 @@ import android.widget.TextView;
  *  代码地址
  * https://github.com/coopsrc/FFPlayerDemo/tree/master/app/src/main/java/cc/dewdrop/ffplayer
  *
+ *
+ * 安卓如何播放 pcm 数据
+ * https://blog.csdn.net/c1392851600/article/details/86532500
+ *
+ * 11
+ * https://www.jianshu.com/p/0a7f3175c1b9
+ *
  */
 public class MainActivity extends AppCompatActivity {
 
