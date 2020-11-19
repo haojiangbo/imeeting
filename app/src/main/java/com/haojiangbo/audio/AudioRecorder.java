@@ -88,7 +88,6 @@ public class AudioRecorder {
         bufferSizeInBytes = 2304; /*AudioRecord.getMinBufferSize(AUDIO_SAMPLE_RATE,
                 AUDIO_CHANNEL, AUDIO_ENCODING);*/
         audioRecord = new AudioRecord(AUDIO_INPUT, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL, AUDIO_ENCODING, bufferSizeInBytes);
-        NettpUdpClientUtils.init();
     }
 
 
@@ -146,12 +145,12 @@ public class AudioRecorder {
                         DatagramPacket datagramPacket = new DatagramPacket(byteBuf,new InetSocketAddress(NettpUdpClientUtils.HOST,NettpUdpClientUtils.PORT));
                         NettpUdpClientUtils.CHANNEL.writeAndFlush(datagramPacket);
                     }
-                    try {
+                   /* try {
                         outputStream.write(converData,0,converData.length);
                         Thread.sleep(15);
                     } catch (Exception e) {
                         e.printStackTrace();
-                    }
+                    }*/
                 }
                 audioEncode.freeContext();
             }

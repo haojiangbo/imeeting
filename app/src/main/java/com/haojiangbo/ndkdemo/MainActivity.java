@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.haojiangbo.audio.AudioRecorder;
+import com.haojiangbo.service.AudioPalyService;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -97,6 +98,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         audiCodeUtils.initEncode();*/
         AudioRecorder.getInstance().createDefaultAudio();
         //this.startMp3(Environment.getExternalStorageDirectory().getAbsolutePath()+"/mp3/test.mp3");
+
+        // 开启音频播放的service
+        startAudioPlayService();
+    }
+
+
+    private void startAudioPlayService(){
+        Intent intent = new Intent(this,AudioPalyService.class);
+        startService(intent);
     }
 
 

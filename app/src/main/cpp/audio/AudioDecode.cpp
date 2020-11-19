@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "JtoolUtils.h"
 #include "log/Hlog.h"
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -19,9 +20,9 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 }
 
-namespace myDecode{
+namespace myDecode {
 
-    AVCodecContext *c= NULL;
+    AVCodecContext *c = NULL;
     AVCodecParserContext *parser = NULL;
     AVCodec *codec;
     AVPacket *pkt;
@@ -66,10 +67,11 @@ Java_com_haojiangbo_ffmpeg_AudioDecode_initContext(JNIEnv *env, jobject thiz) {
 extern "C"
 JNIEXPORT jbyteArray JNICALL
 Java_com_haojiangbo_ffmpeg_AudioDecode_decodeFrame(JNIEnv *env, jobject thiz, jbyteArray bytes) {
-    char * dataBuff = myDecode::jtoolUtils.jarray2charponit(env,bytes);
+    char *dataBuff = myDecode::jtoolUtils.jarray2charponit(env, bytes);
     // 把数据包解析到packet里
-    int ret = av_parser_parse2(myDecode::parser, myDecode::c, &myDecode::pkt->data, &myDecode::pkt->size,
-                               (uint8_t*)dataBuff, myDecode::jtoolUtils.charLen,
+    int ret = av_parser_parse2(myDecode::parser, myDecode::c, &myDecode::pkt->data,
+                               &myDecode::pkt->size,
+                               (uint8_t *) dataBuff, myDecode::jtoolUtils.charLen,
                                AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
     if (ret < 0) {
         ALOGE("Error while parsing\n");
@@ -84,6 +86,8 @@ Java_com_haojiangbo_ffmpeg_AudioDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
     }
 
     /* read all the output frames (in general there may be any number of them */
+//    int totalBuffLen = 1024 * 3;
+//    char * resultBuff = (char *) malloc(totalBuffLen);
     while (ret >= 0) {
         ret = avcodec_receive_frame(myDecode::c, myDecode::decoded_frame);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
@@ -92,7 +96,16 @@ Java_com_haojiangbo_ffmpeg_AudioDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
             ALOGE("Error during decoding\n");
             return NULL;
         }
+        myDecode::jtoolUtils.charLen =  myDecode::decoded_frame->linesize[0];
+        return myDecode::jtoolUtils.
+        charpoint2jarray(env,(char *)myDecode::decoded_frame->data[0]);
+//        if (totalBuffLen < myDecode::decoded_frame->linesize[0]){
+//            totalBuffLen += myDecode::decoded_frame->linesize[0] - totalBuffLen;
+//            realloc(resultBuff,totalBuffLen);
+//        }
+//        memcpy(resultBuff, myDecode::decoded_frame->data[0], myDecode::decoded_frame->linesize[0]);
     }
+
     return NULL;
 }
 
