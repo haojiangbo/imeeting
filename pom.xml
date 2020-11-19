@@ -13,6 +13,7 @@
       <module>proxy</module>
         <module>proxyclient</module>
         <module>database</module>
+      <module>multimedia</module>
     </modules>
 
     <name>stinger</name>
