@@ -16,36 +16,6 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 }
 
-void show_audio_device() {
-    AVFormatContext *formatContext = avformat_alloc_context();
-    AVDictionary *options = NULL;
-    av_dict_set(&options, "list_devices", "true", 0);
-    AVInputFormat *iformat = av_find_input_format("vfw");
-    ALOGE("Device Info=============\n");
-    avformat_open_input(&formatContext, "video=dummy", iformat, &options);
-    ALOGE("========================\n");
-}
-
-
-extern "C" JNIEXPORT jstring JNICALL
-Java_com_haojiangbo_ndkdemo_MainActivity_stringFromJNI(
-        JNIEnv *env,
-        jobject /* this */) {
-    std::string hello = "Hello from C++";
-    return env->NewStringUTF(hello.c_str());
-}
-
-
-
-
-
-
-extern "C"
-JNIEXPORT jstring JNICALL
-Java_com_haojiangbo_ndkdemo_MainActivity_message(JNIEnv *env, jobject thiz) {
-    // TODO: implement message()
-}
-
 
 extern "C"
 JNIEXPORT void JNICALL

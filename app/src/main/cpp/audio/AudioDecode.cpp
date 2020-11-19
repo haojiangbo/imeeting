@@ -78,14 +78,14 @@ Java_com_haojiangbo_ffmpeg_AudioDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
         return NULL;
     }
 
-    /* send the packet with the compressed data to the decoder */
+    // 把包数据发送到 codecContext
     ret = avcodec_send_packet(myDecode::c, myDecode::pkt);
     if (ret < 0) {
         ALOGE("Error submitting the packet to the decoder\n");
         return NULL;
     }
 
-    /* read all the output frames (in general there may be any number of them */
+    // 从codeContext接收一帧数据
 //    int totalBuffLen = 1024 * 3;
 //    char * resultBuff = (char *) malloc(totalBuffLen);
     while (ret >= 0) {

@@ -44,20 +44,13 @@ public class AudioRecorder {
     private final static int AUDIO_ENCODING = AudioFormat.ENCODING_PCM_16BIT;
     // 缓冲区字节大小
     private int bufferSizeInBytes = 0;
-
     //录音对象
     private AudioRecord audioRecord;
-
     //录音状态
     private volatile Status status = Status.STATUS_NO_READY;
-
-    //文件名
-    private String fileName;
-
     //录音文件
     private List<String> filesName = new ArrayList<>();
-
-
+    // 文件输出测试
     private OutputStream outputStream;
 
 
@@ -70,10 +63,6 @@ public class AudioRecorder {
          * 静态初始化器，由JVM来保证线程安全
          */
         private static AudioRecorder instance = new  AudioRecorder();
-    }
-
-    private AudioRecorder() {
-
     }
 
     public static AudioRecorder getInstance() {
@@ -93,7 +82,6 @@ public class AudioRecorder {
 
     /**
      * 开始录音
-
      */
     public void startRecord() {
         status = Status.STATUS_READY;
@@ -133,7 +121,6 @@ public class AudioRecorder {
                     totalLen += readsize;
                     Log.e("maoc   data    size>>>>", " >>>"+bufferSizeInBytes);
                     Log.e("read   data    size>>>>", " >>>"+readsize);
-                    //Log.e("totalLen>>>>", " >>>"+totalLen);
                     byte [] tmpByte = new byte[readsize];
                     System.arraycopy(audiodata,0,tmpByte,0,readsize);
                     long startTime = System.nanoTime();
@@ -207,32 +194,11 @@ public class AudioRecorder {
      */
     public void canel() {
         filesName.clear();
-        fileName = null;
         if (audioRecord != null) {
             audioRecord.release();
             audioRecord = null;
         }
-
         status = Status.STATUS_NO_READY;
-    }
-
-
-    /**
-     * 获取录音对象的状态
-     *
-     * @return
-     */
-    public Status getStatus() {
-        return status;
-    }
-
-    /**
-     * 获取本次录音文件的个数
-     *
-     * @return
-     */
-    public int getPcmFilesCount() {
-        return filesName.size();
     }
 
     /**

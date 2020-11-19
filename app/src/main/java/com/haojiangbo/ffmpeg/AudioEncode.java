@@ -14,12 +14,10 @@ public class AudioEncode implements Codec{
      * @return
      */
     public native byte[] encodeFrame(byte[] bytes);
-
     @Override
     public byte[] decodeFrame(byte[] bytes) {
         throw new UnsupportedOperationException("不支持的操作");
     }
-
     /**
      * 释放编码器
      */

@@ -5,17 +5,14 @@ import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-
+/**
+ * PCM数据播放
+ * 参考博客
+ * https://www.jianshu.com/p/632dce664c3d
+ */
 public class AudioTrackManager {
     private AudioTrack mAudioTrack;
-    private DataInputStream mDis;//播放文件的数据流
-    private Thread mRecordThread;
-    private boolean isStart = false;
     private volatile static AudioTrackManager mInstance;
-
     //音频流类型
     private static final int mStreamType = AudioManager.STREAM_MUSIC;
     //指定采样率 （MediaRecoder 的采样率通常是8000Hz AAC的通常是44100Hz。 设置采样率为44100，目前为常用的采样率，官方文档表示这个值可以兼容所有的设置）
