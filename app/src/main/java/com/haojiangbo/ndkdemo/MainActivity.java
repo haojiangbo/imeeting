@@ -1,6 +1,7 @@
 package com.haojiangbo.ndkdemo;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
@@ -14,7 +15,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
+
+import com.haojiangbo.audio.AudioRecorder;
+import com.haojiangbo.ffmpeg.AudiCodeUtils;
+
+import java.util.Arrays;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -53,20 +60,30 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * 关于安卓工具 每次都需要 download maven metadata 的问题
  * 一般都是 gradle 的依赖 有不确定的依赖版本 版本后面带 + 号的
  * 去掉就可以了
+ *
+ *
+ * 不用下载那个，执行这个就ok了；ln -s arm-linux-androideabi-4.9 mipsel-linux-android2年前回复
+    wind 下mklink /j mips64el-linux-android aarch64-linux-android-4.9
+ *
+ *
+ *
+ * 编解码  实例代码 都在 github上了
+ * https://github.com/FFmpeg/FFmpeg/tree/master/doc/examples
+ *
  */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener{
 
     // Used to load the 'native-lib' library on application startup.
     static {
 
         // avutil avresample swresample swscale avcodec avformat avfilter avdevice
-        System.loadLibrary("avutil");
+      /*  System.loadLibrary("avutil");
         System.loadLibrary("avresample");
         System.loadLibrary("swresample");
         System.loadLibrary("swscale");
         System.loadLibrary("avcodec");
         System.loadLibrary("avformat");
-        System.loadLibrary("avdevice");
+        System.loadLibrary("avdevice");*/
         System.loadLibrary("native-lib");
     }
 
@@ -74,16 +91,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        // Example of a call to a native method
-        TextView tv = findViewById(R.id.sample_text);
-        tv.setText(stringFromJNI());
-
+        ActionBar actionBar = getSupportActionBar();
+        if(null !=  actionBar){
+            actionBar.hide();
+        }
         if(!initPermission()){
            return;
         }
-
-        this.startMp3(Environment.getExternalStorageDirectory().getAbsolutePath()+"/mp3/test.mp3");
+     /*   AudiCodeUtils audiCodeUtils = new AudiCodeUtils();
+        audiCodeUtils.initEncode();*/
+        AudioRecorder.getInstance().createDefaultAudio();
+        //this.startMp3(Environment.getExternalStorageDirectory().getAbsolutePath()+"/mp3/test.mp3");
     }
 
 
@@ -189,4 +207,15 @@ public class MainActivity extends AppCompatActivity {
         mPermissionDialog.cancel();
     }
 
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.start_recorder:
+                AudioRecorder.getInstance().startRecord();
+                break;
+            case R.id.end_recorder:
+                AudioRecorder.getInstance().stopRecord();
+                break;
+        }
+    }
 }

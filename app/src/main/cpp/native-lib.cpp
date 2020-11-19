@@ -1,8 +1,8 @@
 #include <jni.h>
 #include <string>
 #include "stdio.h"
-#include <android/log.h>
-
+#include "JtoolUtils.h"
+#include "log/Hlog.h"
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -15,13 +15,6 @@ extern "C" {
 #include <libswresample/swresample.h>
 #include <libavdevice/avdevice.h>
 }
-#define LOG_TAG "HJB>>>>>"
-#define ALOGV(...) ((void)__android_log_print(ANDROID_LOG_VERBOSE, LOG_TAG, __VA_ARGS__))
-#define ALOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
-#define ALOGI(...) ((void)__android_log_print(ANDROID_LOG_INFO, LOG_TAG, __VA_ARGS__))
-#define ALOGW(...) ((void)__android_log_print(ANDROID_LOG_WARN, LOG_TAG, __VA_ARGS__))
-#define ALOGE(...) ((void)__android_log_print(ANDROID_LOG_ERROR, LOG_TAG, __VA_ARGS__))
-
 
 void show_audio_device() {
     AVFormatContext *formatContext = avformat_alloc_context();
@@ -39,16 +32,6 @@ Java_com_haojiangbo_ndkdemo_MainActivity_stringFromJNI(
         JNIEnv *env,
         jobject /* this */) {
     std::string hello = "Hello from C++";
-    ////////////////// 源设置//////////////////////
-    AVFormatContext *formatContext;
-    // 注册所有编码器
-    av_register_all();
-    // 支持网络
-    avformat_network_init();
-    // 得到格式化工厂的上下文
-    formatContext = avformat_alloc_context();
-    show_audio_device();
-
     return env->NewStringUTF(hello.c_str());
 }
 
@@ -61,7 +44,6 @@ extern "C"
 JNIEXPORT jstring JNICALL
 Java_com_haojiangbo_ndkdemo_MainActivity_message(JNIEnv *env, jobject thiz) {
     // TODO: implement message()
-
 }
 
 
@@ -164,5 +146,3 @@ Java_com_haojiangbo_ndkdemo_MainActivity_startMp3(JNIEnv *env, jobject thiz, jst
     avcodec_close(audioCodecContext);
     avformat_close_input(&formatContext);
 }
-
-
