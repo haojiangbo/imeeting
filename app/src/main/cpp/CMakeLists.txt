@@ -47,6 +47,7 @@ add_library( # Sets the name of the library.
         JtoolUtils.cpp
         log/Hlog.h
         audio/AudioEncode.cpp
+        audio/AudioDecode.cpp
         )
 
 

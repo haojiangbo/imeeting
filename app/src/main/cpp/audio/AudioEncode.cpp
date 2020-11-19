@@ -28,8 +28,7 @@ AVPacket *pkt;
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_haojiangbo_ffmpeg_AudiCodeUtils_initEncode(JNIEnv *env, jobject thiz) {
-
+Java_com_haojiangbo_ffmpeg_AudioEncode_initContext(JNIEnv *env, jobject thiz) {
     /* find the MP2 encoder */
     codec = avcodec_find_encoder(AV_CODEC_ID_MP2);
     if (!codec) {
@@ -78,31 +77,34 @@ Java_com_haojiangbo_ffmpeg_AudiCodeUtils_initEncode(JNIEnv *env, jobject thiz) {
         return;
     }
 }
+
+
 // 转换工具类
 JtoolUtils jtoolUtils;
 extern "C"
 JNIEXPORT jbyteArray JNICALL
-Java_com_haojiangbo_ffmpeg_AudiCodeUtils_encodeFrame(JNIEnv *env, jobject thiz, jbyteArray bytes) {
+Java_com_haojiangbo_ffmpeg_AudioEncode_encodeFrame(JNIEnv *env, jobject thiz, jbyteArray bytes) {
     char * data =  jtoolUtils.jarray2charponit(env,bytes);
     // 指针拷贝 用于后面的内存释放
     char * freeDataPoint = data;
     ALOGE("111111 inputDataLen = %d,  nb_samples = %d ",jtoolUtils.charLen,frame->nb_samples);
+    int srcLen = jtoolUtils.charLen;
     int totalSamples = jtoolUtils.charLen;
     int constSamplesLen = frame->nb_samples;
     int totalResultIndex = 0;
     char *resultBuff = (char *)malloc(jtoolUtils.charLen);
+    // 样本数转换 转换成实际的占用字节数
+    int tmpSamplesLen = frame->nb_samples * 2;
     while (totalSamples > 0){
         //frame->data[0]
-        // 样本数转换 转换成实际的占用字节数
-        int tmpSamplesLen = frame->nb_samples * 2;
         // 比较大小，如果剩余数据 小于 样本数据 就 返回 剩余数据
         int tmp =  totalSamples > tmpSamplesLen ? tmpSamplesLen : totalSamples;
-        memcpy(frame->data[0],data,tmp);
-        totalSamples -= tmp;
+        frame->data[0] = (uint8_t*)data;
         // 移动数据指针
         data += tmp;
-        // 重新修改样本数 此处为什么 codecContext也要赋值呢
-        // 因为样本不一致 导致数据出问题
+        totalSamples -= tmp;
+        // 重新修改样本数
+        // 此处为什么 codecContext也要赋值呢 因为样本不一致 导致数据出问题
         frame->nb_samples = tmp  / 2;
         c->frame_size = frame->nb_samples;
         int ret;
@@ -113,8 +115,6 @@ Java_com_haojiangbo_ffmpeg_AudiCodeUtils_encodeFrame(JNIEnv *env, jobject thiz, 
             continue;
         }
         ALOGE("222222 inputDataLen = %d,  nb_samples = %d ",jtoolUtils.charLen,frame->nb_samples);
-        /* read all the available output packets (in general there may be any
-         * number of them */
         while (ret >= 0) {
             ret = avcodec_receive_packet(c, pkt);
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
@@ -132,17 +132,18 @@ Java_com_haojiangbo_ffmpeg_AudiCodeUtils_encodeFrame(JNIEnv *env, jobject thiz, 
     //恢复样本数
     frame->nb_samples = constSamplesLen;
     c->frame_size = frame->nb_samples;
-
     jtoolUtils.charLen = totalResultIndex;
     jbyteArray  r = jtoolUtils.charpoint2jarray(env,resultBuff);
     free(freeDataPoint);
+    free(resultBuff);
+    ALOGE("原始长度 = %d , 压缩后的长度 %d",srcLen,totalResultIndex);
     return r;
 }
 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_haojiangbo_ffmpeg_AudiCodeUtils_freeEncode(JNIEnv *env, jobject thiz) {
+Java_com_haojiangbo_ffmpeg_AudioEncode_freeContext(JNIEnv *env, jobject thiz) {
     av_frame_free(&frame);
     av_packet_free(&pkt);
     avcodec_free_context(&c);

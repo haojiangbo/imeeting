@@ -4,10 +4,10 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 
-import com.haojiangbo.ffmpeg.AudiCodeUtils;
+import com.haojiangbo.ffmpeg.AudioEncode;
+import com.haojiangbo.net.NettpUdpClientUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -30,7 +30,7 @@ import io.netty.channel.socket.DatagramPacket;
  */
 public class AudioRecorder {
 
-    AudiCodeUtils audiCodeUtils = new AudiCodeUtils();
+    AudioEncode audioEncode = new AudioEncode();
 
     //音频输入-麦克风
     private final static int AUDIO_INPUT = MediaRecorder.AudioSource.MIC;
@@ -88,8 +88,7 @@ public class AudioRecorder {
         bufferSizeInBytes = 2304; /*AudioRecord.getMinBufferSize(AUDIO_SAMPLE_RATE,
                 AUDIO_CHANNEL, AUDIO_ENCODING);*/
         audioRecord = new AudioRecord(AUDIO_INPUT, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL, AUDIO_ENCODING, bufferSizeInBytes);
-        // 初始化编解码器
-        audiCodeUtils.initEncode();
+        NettpUdpClientUtils.init();
     }
 
 
@@ -119,6 +118,9 @@ public class AudioRecorder {
             e.printStackTrace();
         }
 
+        // 初始化编解码器
+        audioEncode.initContext();
+
        new Thread(new Runnable() {
             @Override
             public void run() {
@@ -130,25 +132,28 @@ public class AudioRecorder {
                 while (status != Status.STATUS_STOP) {
                    int readsize = audioRecord.read(audiodata, 0, bufferSizeInBytes);
                     totalLen += readsize;
+                    Log.e("maoc   data    size>>>>", " >>>"+bufferSizeInBytes);
                     Log.e("read   data    size>>>>", " >>>"+readsize);
-                    Log.e("malloc data    size>>>>", " >>>"+bufferSizeInBytes);
                     //Log.e("totalLen>>>>", " >>>"+totalLen);
                     byte [] tmpByte = new byte[readsize];
                     System.arraycopy(audiodata,0,tmpByte,0,readsize);
-                    byte[] converData =  audiCodeUtils.encodeFrame(tmpByte);
-                    /*if (AudioRecord.ERROR_INVALID_OPERATION != readsize) {
-                        ByteBuf byteBuf =  NettpUdpClientUtils.CHANNEL.config().getAllocator().directBuffer(readsize);
-                        byteBuf.writeBytes(audiodata,0,readsize);
+                    long startTime = System.nanoTime();
+                    byte[] converData =  audioEncode.encodeFrame(tmpByte);
+                    Log.e("useTime ",(System.nanoTime() - startTime) + " us ");
+                    if (AudioRecord.ERROR_INVALID_OPERATION != readsize) {
+                        ByteBuf byteBuf =  NettpUdpClientUtils.CHANNEL.config().getAllocator().directBuffer(converData.length);
+                        byteBuf.writeBytes(converData,0,converData.length);
                         DatagramPacket datagramPacket = new DatagramPacket(byteBuf,new InetSocketAddress(NettpUdpClientUtils.HOST,NettpUdpClientUtils.PORT));
                         NettpUdpClientUtils.CHANNEL.writeAndFlush(datagramPacket);
-                    }*/
+                    }
                     try {
                         outputStream.write(converData,0,converData.length);
-                        Thread.sleep(30);
+                        Thread.sleep(15);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
+                audioEncode.freeContext();
             }
         }).start();
     }
@@ -175,6 +180,7 @@ public class AudioRecorder {
             throw new IllegalStateException("录音尚未开始");
         } else {
             audioRecord.stop();
+            // 释放编码器
             status = Status.STATUS_STOP;
             try {
                 outputStream.flush();

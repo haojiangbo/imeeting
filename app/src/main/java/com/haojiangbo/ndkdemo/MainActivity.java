@@ -12,16 +12,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import com.haojiangbo.audio.AudioRecorder;
-import com.haojiangbo.ffmpeg.AudiCodeUtils;
-
-import java.util.Arrays;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
