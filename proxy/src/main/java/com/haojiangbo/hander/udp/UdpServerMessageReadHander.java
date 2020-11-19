@@ -15,7 +15,7 @@ import java.nio.charset.Charset;
 
 @Slf4j
 public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
-    File file = new File("D:/video/udp.pcm");
+    File file = new File("D:/video/udp.mp3");
     int totalByte = 0;
     OutputStream outputStream;
     public UdpServerMessageReadHander(){
