@@ -43,6 +43,20 @@
         android:onClick="onClick"
         />
 
+    <!--注册号码-->
+    <TextView
+        android:id="@+id/register_number"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="100dp"
+        android:layout_height="70dp"
+        android:background="@color/white"
+        android:gravity="center"
+        android:textColor="@color/lanse"
+        android:text="点击注册"
+        android:onClick="onClick"
+        />
+
 
 
     <TextView
@@ -51,7 +65,7 @@
         android:layout_marginTop="300dp"
         android:textSize="30dp"
         android:gravity="center"
-        android:hint="请输入6位靓号"
+        android:hint="请输入6位号码"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 

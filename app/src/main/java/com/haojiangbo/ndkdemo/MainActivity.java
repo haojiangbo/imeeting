@@ -97,14 +97,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(null !=  actionBar){
             actionBar.hide();
         }
-
+        StatusBarColorUtils.setBarColor(this,R.color.design_default_color_background);
         numberShow = findViewById(R.id.number_show);
-
         // 初始化权限
         if(!initPermission()){
            return;
         }
-        StatusBarColorUtils.setBarColor(this,R.color.design_default_color_background);
         // 初始化音频录制
         initAudioRecorder();
         // 开启音频播放的service
@@ -137,6 +135,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.end_recorder:
                 AudioRecorder.getInstance().stopRecord();
+                break;
+            case R.id.register_number:
+                Intent intent = new Intent(this,RigisterNumber.class);
+                startActivity(intent);
                 break;
             default:
                 viewHander(v);
