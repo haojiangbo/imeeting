@@ -4,16 +4,48 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/heise"
     tools:context=".Call">
 
 
-
     <TextView
+        android:id="@+id/number_show_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="正在拨打电话..."
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="300dp"
+        android:textColor="@color/baise"
+        android:text="号码：123456"
         >
     </TextView>
+    <TextView
+        android:layout_below="@id/number_show_text"
+        android:id="@+id/call_status_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:textColor="@color/baise"
+        android:text="正在呼叫..."
+        >
+    </TextView>
+
+
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="100dp"
+        android:gravity="center"
+        android:layout_height="wrap_content">
+        <ImageButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/close_call"
+            android:background="@color/heise"
+            ></ImageButton>
+    </LinearLayout>
+
 
 </RelativeLayout>

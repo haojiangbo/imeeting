@@ -7,7 +7,10 @@ import android.os.Environment;
 import android.util.Log;
 
 import com.haojiangbo.ffmpeg.AudioEncode;
-import com.haojiangbo.net.NettpUdpClientUtils;
+import com.haojiangbo.ndkdemo.MainActivity;
+import com.haojiangbo.net.MediaProtocolManager;
+import com.haojiangbo.net.config.NettyKeyConfig;
+import com.haojiangbo.net.protocol.MediaDataProtocol;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -108,40 +111,47 @@ public class AudioRecorder {
         // 初始化编解码器
         audioEncode.initContext();
 
-       new Thread(new Runnable() {
-            @Override
-            public void run() {
-                //将录音状态设置成正在录音状态
-                status = Status.STATUS_START;
-                // new一个byte数组用来存一些字节数据，大小为缓冲区大小
-                byte[] audiodata = new byte[bufferSizeInBytes];
-                int totalLen = 0;
-                while (status != Status.STATUS_STOP) {
-                   int readsize = audioRecord.read(audiodata, 0, bufferSizeInBytes);
-                    totalLen += readsize;
-                    Log.e("maoc   data    size>>>>", " >>>"+bufferSizeInBytes);
-                    Log.e("read   data    size>>>>", " >>>"+readsize);
-                    byte [] tmpByte = new byte[readsize];
-                    System.arraycopy(audiodata,0,tmpByte,0,readsize);
-                    long startTime = System.nanoTime();
-                    byte[] converData =  audioEncode.encodeFrame(tmpByte);
-                    Log.e("useTime ",(System.nanoTime() - startTime) + " us ");
-                    if (AudioRecord.ERROR_INVALID_OPERATION != readsize) {
-                        ByteBuf byteBuf =  NettpUdpClientUtils.CHANNEL.config().getAllocator().directBuffer(converData.length);
-                        byteBuf.writeBytes(converData,0,converData.length);
-                        DatagramPacket datagramPacket = new DatagramPacket(byteBuf,new InetSocketAddress(NettpUdpClientUtils.HOST,NettpUdpClientUtils.PORT));
-                        NettpUdpClientUtils.CHANNEL.writeAndFlush(datagramPacket);
-                    }
-                   /* try {
-                        outputStream.write(converData,0,converData.length);
-                        Thread.sleep(15);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }*/
-                }
-                audioEncode.freeContext();
-            }
-        }).start();
+       new Thread(() -> {
+           //将录音状态设置成正在录音状态
+           status = Status.STATUS_START;
+           // new一个byte数组用来存一些字节数据，大小为缓冲区大小
+           byte[] audiodata = new byte[bufferSizeInBytes];
+           int totalLen = 0;
+           while (status != Status.STATUS_STOP) {
+              int readsize = audioRecord.read(audiodata, 0, bufferSizeInBytes);
+               totalLen += readsize;
+               Log.e("maoc   data    size>>>>", " >>>"+bufferSizeInBytes);
+               Log.e("read   data    size>>>>", " >>>"+readsize);
+               if (AudioRecord.ERROR_INVALID_OPERATION != readsize) {
+                   byte [] tmpByte = new byte[readsize];
+                   System.arraycopy(audiodata,0,tmpByte,0,readsize);
+                   long startTime = System.nanoTime();
+                   byte[] converData =  audioEncode.encodeFrame(tmpByte);
+                   Log.e("useTime ",(System.nanoTime() - startTime) + " us ");
+
+                  /* ByteBuf byteBuf =  MediaProtocolManager.CHANNEL.config().getAllocator().directBuffer(converData.length);
+                   byteBuf.writeBytes(converData,0,converData.length);*/
+                   MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
+                   mediaDataProtocol.type = MediaDataProtocol.AUDIO_DATA;
+                   mediaDataProtocol.number = MainActivity.TARGET_NUMBER.getBytes();
+                   mediaDataProtocol.dataSize = converData.length;
+                   mediaDataProtocol.data = converData;
+
+                   //发送音频数据
+                   DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol
+                           .mediaDataProtocolToByteBuf(MediaProtocolManager.CHANNEL,
+                           mediaDataProtocol),new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
+                   MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
+               }
+              /* try {
+                   outputStream.write(converData,0,converData.length);
+                   Thread.sleep(15);
+               } catch (Exception e) {
+                   e.printStackTrace();
+               }*/
+           }
+           audioEncode.freeContext();
+       }).start();
     }
 
     /**

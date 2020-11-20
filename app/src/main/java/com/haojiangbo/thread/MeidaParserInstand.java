@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.ffmpeg.AudioDecode;
+import com.haojiangbo.net.protocol.MediaDataProtocol;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -30,8 +31,11 @@ public class MeidaParserInstand implements Runnable {
             try {
                ByteBuf byteBuf =  MEDIA_DATA_QUEUE.take();
                if(byteBuf.readableBytes() > 0){
+                   byteBuf.readBytes(11);
                    byte [] bytes = new byte[byteBuf.readableBytes()];
                    byteBuf.readBytes(bytes);
+                  /* // 转换协议
+                   MediaDataProtocol protocol =   MediaDataProtocol.byteBufToMediaDataProtocol(byteBuf);*/
                    byte [] converData =  decode.decodeFrame(bytes);
                    if(converData != null){
                        Log.e("解析后的数据",">>>>>"+converData.length);

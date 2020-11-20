@@ -1,5 +1,6 @@
 package com.haojiangbo.net;
 
+import com.haojiangbo.net.config.NettyKeyConfig;
 import com.haojiangbo.net.hander.MediaProtocolHander;
 
 import java.net.InetSocketAddress;
@@ -15,15 +16,11 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramPacket;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 
-public class NettpUdpClientUtils {
+public class MediaProtocolManager {
 
-
-    public static String HOST = "10.10.10.218";
-    public static int PORT = 10086;
     public static Channel CHANNEL = null;
-
-    public static void init(){
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
+    EventLoopGroup workerGroup = new NioEventLoopGroup();
+    public void start(){
         Bootstrap bootstrap = new Bootstrap();
         bootstrap.group(workerGroup)
                 .channel(NioDatagramChannel.class)
@@ -32,17 +29,10 @@ public class NettpUdpClientUtils {
                 .handler(new ChannelInitializer<NioDatagramChannel>(){
                     @Override
                     protected void initChannel(NioDatagramChannel nioDatagramChannel) throws Exception {
-                        //nioDatagramChannel.pipeline().addLast(new LoggingHandler(LogLevel.INFO));
-                        //nioDatagramChannel.pipeline().addLast(new UdpClientMessageReaderHander());
                         nioDatagramChannel.pipeline().addLast(new MediaProtocolHander());
                     }
                 });
-        CHANNEL =  bootstrap.bind(10089).channel();
-       /* String message = "my is client";
-        ByteBuf byteBuf =  CHANNEL.config().getAllocator().directBuffer(message.getBytes().length);
-        byteBuf.writeBytes(message.getBytes());
-        DatagramPacket datagramPacket = new DatagramPacket(byteBuf,new InetSocketAddress(HOST,PORT));
-        CHANNEL.writeAndFlush(datagramPacket);*/
+        CHANNEL =  bootstrap.bind(NettyKeyConfig.getPORT()).channel();
     }
 
 

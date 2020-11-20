@@ -6,7 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
-import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -20,12 +20,18 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSONObject;
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
 import com.haojiangbo.eventbus.MessageModel;
+import com.haojiangbo.net.MediaProtocolManager;
+import com.haojiangbo.net.protocol.ControlProtocol;
+import com.haojiangbo.net.protocol.Pod;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
 import com.haojiangbo.service.AudioPalyService;
 import com.haojiangbo.storage.NumberStorageManager;
+import com.haojiangbo.thread.MeidaParserInstand;
+import com.haojiangbo.thread.ParserMediaProtoThreadPool;
 import com.haojiangbo.utils.ToastUtils;
 import com.haojiangbo.utils.aes.AesEncodeUtil;
 import com.haojiangbo.utils.android.StatusBarColorUtils;
@@ -87,7 +93,11 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    // 自己的号码
     public static String CALL_NUMBER = null;
+    // 对方的号码
+    public static String TARGET_NUMBER = null;
+
     // 案件缓存
     private static List<String> KEY_WORD_CATCH =  new ArrayList<>(6);
 
@@ -118,17 +128,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         // 初始化音频录制
         initAudioRecorder();
-        // 开启音频播放的service
-        startAudioPlayService();
+        // 开启音频播放
+        startAudioPlay();
         // 获取配置信息
         initConfigInfo();
-        // 初始化网络数据
-        initNetworkServer();
+        // 初始化网络配置
+        initNetworkConfig();
     }
 
-    private void initNetworkServer(){
+    private void initNetworkConfig(){
+        // tcp初始化
         ControlProtocolManager controlProtocolManager =  new ControlProtocolManager();
         controlProtocolManager.start();
+
+        // udp初始化
+        MediaProtocolManager mediaProtocolManager = new MediaProtocolManager();
+        mediaProtocolManager.start();
     }
 
 
@@ -143,17 +158,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initAudioRecorder() {
         AudioRecorder.getInstance().createDefaultAudio();
     }
-    private void startAudioPlayService(){
-        Intent intent = new Intent(this,AudioPalyService.class);
-        startService(intent);
+    private void startAudioPlay(){
+        //Intent intent = new Intent(this,AudioPalyService.class);
+        //startService(intent);
+        // 启动接受音频数据的队列
+        ParserMediaProtoThreadPool.exec(new MeidaParserInstand());
     }
 
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void mssageEventBus(final MessageModel message)  {
-        ToastUtils.showToastShort("收到消息");
+        ToastUtils.showToastShort("收到呼叫消息");
+        message.channel.writeAndFlush(message.payLoad);
+        AudioRecorder.getInstance().startRecord();
     }
-
 
 
     public void printRet(int t){
