@@ -13,10 +13,9 @@ import lombok.Data;
  * @Description: 多媒体数据传输协议
  * @date 2020/11/19
  */
-@Data
 public class MediaDataProtocol {
-    private byte header;
-    private byte type;
-    private int dataSize;
-    private byte[] data;
+    public byte header;
+    public byte type;
+    public int dataSize;
+    public byte[] data;
 }

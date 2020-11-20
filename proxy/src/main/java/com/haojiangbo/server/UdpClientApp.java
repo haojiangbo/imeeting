@@ -1,7 +1,6 @@
-package com.haojiangbo.udp;
+package com.haojiangbo.server;
 
 import com.haojiangbo.hander.udp.UdpClientMessageReaderHander;
-import com.haojiangbo.hander.udp.UdpServerMessageReadHander;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;

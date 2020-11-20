@@ -41,7 +41,7 @@ public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
                 stringBuilder.toString());
         //ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),datagramPacket.sender()));
         //ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),new InetSocketAddress("192.168.43.208", 10089)));
-        ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),new InetSocketAddress("255.255.255.255", 10089)));
+        ctx.writeAndFlush(new DatagramPacket(datagramPacket.content(),new InetSocketAddress("10.10.10.234", 10089)));
         /*try {
             byte [] b = new byte[datagramPacket.content().readableBytes()];
             datagramPacket.content().readBytes(b);
