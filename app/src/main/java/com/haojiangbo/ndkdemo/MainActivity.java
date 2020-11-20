@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import io.netty.channel.Channel;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -21,8 +22,17 @@ import android.widget.Toast;
 
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
+import com.haojiangbo.eventbus.MessageModel;
+import com.haojiangbo.net.tcp.ControlProtocolManager;
 import com.haojiangbo.service.AudioPalyService;
+import com.haojiangbo.storage.NumberStorageManager;
+import com.haojiangbo.utils.ToastUtils;
+import com.haojiangbo.utils.aes.AesEncodeUtil;
 import com.haojiangbo.utils.android.StatusBarColorUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +87,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    public static String CALL_NUMBER = null;
     // 案件缓存
     private static List<String> KEY_WORD_CATCH =  new ArrayList<>(6);
 
@@ -87,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private TextView numberShow;
-
+    private TextView myCallNumber;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,7 +109,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             actionBar.hide();
         }
         StatusBarColorUtils.setBarColor(this,R.color.design_default_color_background);
+        EventBus.getDefault().register(this);
         numberShow = findViewById(R.id.number_show);
+        myCallNumber = findViewById(R.id.my_call_number);
         // 初始化权限
         if(!initPermission()){
            return;
@@ -107,8 +120,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initAudioRecorder();
         // 开启音频播放的service
         startAudioPlayService();
+        // 获取配置信息
+        initConfigInfo();
+        // 初始化网络数据
+        initNetworkServer();
     }
 
+    private void initNetworkServer(){
+        ControlProtocolManager controlProtocolManager =  new ControlProtocolManager();
+        controlProtocolManager.start();
+    }
+
+
+    private void initConfigInfo(){
+        byte[] bytes = NumberStorageManager.build().getData("number.cnf");
+        if (null != bytes) {
+            String data = AesEncodeUtil.decode(new String(bytes));
+            myCallNumber.setText("我的号码："+data);
+            MainActivity.CALL_NUMBER = data;
+        }
+    }
     private void initAudioRecorder() {
         AudioRecorder.getInstance().createDefaultAudio();
     }
@@ -116,6 +147,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Intent intent = new Intent(this,AudioPalyService.class);
         startService(intent);
     }
+
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void mssageEventBus(final MessageModel message)  {
+        ToastUtils.showToastShort("收到消息");
+    }
+
 
 
     public void printRet(int t){
@@ -149,8 +187,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(view instanceof  Button){
             Button button  = (Button) view;
             String keyWord =  button.getText().toString();
+
             switch (keyWord){
                 case "CALL":
+                    String result =  list2str(KEY_WORD_CATCH);
+                    if(result.getBytes().length != 6){
+                        Toast.makeText(MyApplication.getContext(),"仅支持6位电话号码",Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    Intent call =  new Intent(this,Call.class);
+                    call.putExtra("src",MainActivity.CALL_NUMBER);
+                    call.putExtra("dst",result);
+                    startActivity(call);
                     break;
                 case "DEL":
                     if(KEY_WORD_CATCH.size() > 0){
@@ -166,7 +214,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             String result =  list2str(KEY_WORD_CATCH);
             numberShow.setText(result);
-            //
         }
     }
 
@@ -176,6 +223,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             stringBuilder.append(item);
         }
         return stringBuilder.toString();
+    }
+
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
 
