@@ -31,6 +31,7 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ControlProtocol protocol = (ControlProtocol) msg;
+        String payLaod = new String(protocol.data);
         switch (protocol.flag) {
             case ControlProtocol.PING:
                 log.info("channel={},PING = {}", ctx.channel(), Arrays.toString(protocol.data));
@@ -39,7 +40,9 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
                 }
                 break;
             case ControlProtocol.CALL:
-                String payLaod = new String(protocol.data);
+                callMessageHander(ctx, protocol, payLaod);
+                break;
+            case ControlProtocol.CALL_REPLY:
                 Pod pod = JSONObject.parseObject(payLaod, Pod.class);
                 Channel targetChannel = CallNumberAndChannelMapping.NUMBER_CHANNEL_MAPPING.get(pod.getDst());
                 if (null != targetChannel) {
@@ -49,13 +52,23 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
                     }
                     targetChannel.writeAndFlush(protocol);
                 }
-                log.info("channel={},CALL = {}", ctx.channel(), payLaod);
-                break;
-            case ControlProtocol.CALL_REPLY:
                 break;
             case ControlProtocol.HANG:
                 break;
         }
+    }
+
+    private void callMessageHander(ChannelHandlerContext ctx, ControlProtocol protocol, String payLaod) {
+        Pod pod = JSONObject.parseObject(payLaod, Pod.class);
+        Channel targetChannel = CallNumberAndChannelMapping.NUMBER_CHANNEL_MAPPING.get(pod.getDst());
+        if (null != targetChannel) {
+            if (!targetChannel.isActive()) {
+                CallNumberAndChannelMapping.NUMBER_CHANNEL_MAPPING.remove(pod.getDst());
+                return;
+            }
+            targetChannel.writeAndFlush(protocol);
+        }
+        log.info("channel={},CALL = {}", ctx.channel(), payLaod);
     }
 
     @Override
