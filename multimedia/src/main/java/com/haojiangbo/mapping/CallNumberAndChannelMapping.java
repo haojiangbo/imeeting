@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
   * <p>
   *
-  *     电话号和
+  *     电话号和channel的映射
   *
   *
   * </p>
