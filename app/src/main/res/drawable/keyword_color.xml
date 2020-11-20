@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:autoMirrored="true"
+    android:dither="true"
+    android:enterFadeDuration="50"
+    android:exitFadeDuration="50"
+    android:variablePadding="false"
+    android:visible="true"
+    android:constantSize="true"
+   >
+    <!---->
+    <item  android:state_pressed="true">
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+            <!-- 连框颜色值 -->
+            <item>
+                <shape>
+                   <!-- <corners android:radius="5dp"></corners>-->
+                    <solid android:color="@color/qianhuise"></solid>
+                </shape>
+            </item>
+            <!-- -->
+           <!-- <item android:top="0.5dp" android:left="0.5dp" android:right="0.5dp" android:bottom="0.5dp"> &lt;!&ndash;设置只有右边有边框 &ndash;&gt;
+                <shape >
+                    <corners android:radius="5dp"></corners>
+                    <solid android:color="@color/yingkou"></solid>
+                </shape>
+            </item>-->
+        </layer-list>
+    </item>
+    <item   >
+        <layer-list xmlns:android="http://schemas.android.com/apk/res/android" >
+            <!-- 连框颜色值 -->
+            <item>
+                <shape>
+                  <!--  <corners android:radius="5dp"></corners>-->
+                    <solid android:color="@color/white"></solid>
+                </shape>
+            </item>
+            <!-- -->
+            <!--<item android:top="0.5dp" android:left="0.5dp" android:right="0.5dp" android:bottom="0.5dp"> &lt;!&ndash;设置只有右边有边框 &ndash;&gt;
+                <shape >
+                    <corners android:radius="5dp"></corners>
+                    <solid android:color="@color/yingkou"></solid>
+                </shape>
+            </item>-->
+        </layer-list>
+    </item>
+</selector>

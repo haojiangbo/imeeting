@@ -15,9 +15,17 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
 import com.haojiangbo.service.AudioPalyService;
+import com.haojiangbo.utils.android.StatusBarColorUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
@@ -42,7 +50,7 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * 安卓如何播放 pcm 数据
  * https://blog.csdn.net/c1392851600/article/details/86532500
  *
- * 11
+ *
  * https://www.jianshu.com/p/0a7f3175c1b9
  *
  *
@@ -61,27 +69,25 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * 不用下载那个，执行这个就ok了；ln -s arm-linux-androideabi-4.9 mipsel-linux-android2年前回复
     wind 下mklink /j mips64el-linux-android aarch64-linux-android-4.9
  *
- *
+ * 样式无法改变的问题
+ * https://q.cnblogs.com/q/129915/
  *
  * 编解码  实例代码 都在 github上了
  * https://github.com/FFmpeg/FFmpeg/tree/master/doc/examples
  *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+    // 案件缓存
+    private static List<String> KEY_WORD_CATCH =  new ArrayList<>(6);
 
     // Used to load the 'native-lib' library on application startup.
     static {
-
         // avutil avresample swresample swscale avcodec avformat avfilter avdevice
-      /*  System.loadLibrary("avutil");
-        System.loadLibrary("avresample");
-        System.loadLibrary("swresample");
-        System.loadLibrary("swscale");
-        System.loadLibrary("avcodec");
-        System.loadLibrary("avformat");
-        System.loadLibrary("avdevice");*/
         System.loadLibrary("native-lib");
     }
+
+    private TextView numberShow;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,19 +97,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if(null !=  actionBar){
             actionBar.hide();
         }
+
+        numberShow = findViewById(R.id.number_show);
+
+        // 初始化权限
         if(!initPermission()){
            return;
         }
-     /*   AudiCodeUtils audiCodeUtils = new AudiCodeUtils();
-        audiCodeUtils.initEncode();*/
-        AudioRecorder.getInstance().createDefaultAudio();
-        //this.startMp3(Environment.getExternalStorageDirectory().getAbsolutePath()+"/mp3/test.mp3");
-
+        StatusBarColorUtils.setBarColor(this,R.color.design_default_color_background);
+        // 初始化音频录制
+        initAudioRecorder();
         // 开启音频播放的service
         startAudioPlayService();
     }
 
-
+    private void initAudioRecorder() {
+        AudioRecorder.getInstance().createDefaultAudio();
+    }
     private void startAudioPlayService(){
         Intent intent = new Intent(this,AudioPalyService.class);
         startService(intent);
@@ -114,10 +124,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.e("HJB>>>>>","call back"+t);
     }
 
-
-
-
     public native void startMp3(String url);
+
+
+
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.start_recorder:
+                AudioRecorder.getInstance().startRecord();
+                break;
+            case R.id.end_recorder:
+                AudioRecorder.getInstance().stopRecord();
+                break;
+            default:
+                viewHander(v);
+        }
+    }
+
+    private void viewHander(View view){
+        if(view instanceof  Button){
+            Button button  = (Button) view;
+            String keyWord =  button.getText().toString();
+            switch (keyWord){
+                case "CALL":
+                    break;
+                case "DEL":
+                    if(KEY_WORD_CATCH.size() > 0){
+                        KEY_WORD_CATCH.remove(KEY_WORD_CATCH.size() - 1);
+                    }
+                    break;
+                default:
+                    KEY_WORD_CATCH.add(keyWord);
+            }
+            if(KEY_WORD_CATCH.size() > 6){
+                KEY_WORD_CATCH.remove(KEY_WORD_CATCH.size() - 1);
+                Toast.makeText(MyApplication.getContext(),"最大支持6位电话号码",Toast.LENGTH_SHORT).show();
+            }
+            String result =  list2str(KEY_WORD_CATCH);
+            numberShow.setText(result);
+            //
+        }
+    }
+
+    private <T> String list2str(List<T> list){
+        StringBuilder stringBuilder = new StringBuilder();
+        for(T item : list){
+            stringBuilder.append(item);
+        }
+        return stringBuilder.toString();
+    }
+
 
 
     //////////////////////////////////////动态申请权限模块///////////////////////////////////////
@@ -204,15 +262,4 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPermissionDialog.cancel();
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.start_recorder:
-                AudioRecorder.getInstance().startRecord();
-                break;
-            case R.id.end_recorder:
-                AudioRecorder.getInstance().stopRecord();
-                break;
-        }
-    }
 }

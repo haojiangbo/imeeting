@@ -7,4 +7,22 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+
+    <color name="baise">#ffffff</color>
+    <color name="heise">#000000</color>
+    <color name="lanse">#3388FF</color>
+    <color name="lansem">#5487cf</color>
+    <color name="huise">#F0F0F0</color>
+    <color name="qianhuise">#f7f7f7</color>
+    <color name="huangse">#f3c82c</color>
+    <color name="qianhuangse">#BAA566</color>
+    <color name="red">#CC0000</color>
+    <color name="shenhuise">#d2d2d2</color>
+    <color name="juse">#ED7D31</color>
+    <color name="yingkou">#2b548e</color>
+    <color name="linzhang_login_edit">#353D56</color>
+    <color name="zise">#5A81FF</color>
+
+
 </resources>

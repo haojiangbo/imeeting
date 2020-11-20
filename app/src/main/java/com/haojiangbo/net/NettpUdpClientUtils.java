@@ -18,7 +18,7 @@ import io.netty.channel.socket.nio.NioDatagramChannel;
 public class NettpUdpClientUtils {
 
 
-    public static String HOST = "192.168.43.184";
+    public static String HOST = "10.10.10.218";
     public static int PORT = 10086;
     public static Channel CHANNEL = null;
 

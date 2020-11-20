@@ -6,6 +6,10 @@ import android.media.AudioRecord;
 import android.media.AudioTrack;
 
 /**
+ * 回音消除
+ * https://blog.csdn.net/badongdyc/article/details/73555007
+ *
+ *
  * PCM数据播放
  * 参考博客
  * https://www.jianshu.com/p/632dce664c3d
