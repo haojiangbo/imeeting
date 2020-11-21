@@ -62,5 +62,6 @@ public class RigisterNumber extends AppCompatActivity implements View.OnClickLis
         }else{
             ToastUtils.showToastShort("您已经注册过电话号码");
         }
+        this.finish();
     }
 }

@@ -19,6 +19,7 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -42,10 +43,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.Arrays;
 import java.util.UUID;
 
-/**
- * 切换播放模式
- * https://blog.csdn.net/u010936731/article/details/70599482
- */
+
 public class Call extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
     // 发送
     public static final byte attack = 1;
@@ -114,6 +112,9 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
             numberShowText.setText("来电号码："+dst);
             callStatusShow.setVisibility(View.GONE);
         }
+        // 保持屏幕常量
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         //初始化距离传感器
         initRangeSensor();
     }

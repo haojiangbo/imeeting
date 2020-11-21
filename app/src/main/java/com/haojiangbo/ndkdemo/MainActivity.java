@@ -148,10 +148,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initAudioRecorder();
         // 开启音频播放
         startAudioPlay();
-        // 获取配置信息
-        initConfigInfo();
         // 初始化网络配置
         initNetworkConfig();
+    }
+
+    @Override
+    protected void onStart() {
+        // 获取配置信息
+        initConfigInfo();
+        super.onStart();
     }
 
     private void initNetworkConfig(){

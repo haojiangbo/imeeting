@@ -1,11 +1,14 @@
 package com.haojiangbo.audio;
 
+import android.content.Context;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
 import android.media.audiofx.AcousticEchoCanceler;
 import android.util.Log;
+
+import com.haojiangbo.application.MyApplication;
 
 /**
  * 回音消除
@@ -70,7 +73,14 @@ public class AudioTrackManager {
             mAudioTrack = new AudioTrack(streamType, mSampleRateInHz,mChannelConfig,
                     mAudioFormat,mMinBufferSize,mMode);
         }
-
+        //
+        /*AudioManager audioManager = (AudioManager) MyApplication.getContext().getSystemService(Context.AUDIO_SERVICE);
+        int max = audioManager.getStreamMaxVolume(AudioManager.STREAM_SYSTEM);
+        audioManager.adjustStreamVolume(AudioManager.STREAM_SYSTEM
+                , AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND) ;
+        int current = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
+        audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);*/
+        //mAudioTrack.setVolume(0.9f);
     }
 
     /**
