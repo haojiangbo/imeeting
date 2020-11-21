@@ -3,16 +3,25 @@ package com.haojiangbo.ndkdemo;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorListener;
+import android.hardware.SensorManager;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
@@ -30,18 +39,20 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.util.Arrays;
 import java.util.UUID;
 
 /**
  * 切换播放模式
  * https://blog.csdn.net/u010936731/article/details/70599482
  */
-public class Call extends AppCompatActivity implements View.OnClickListener {
+public class Call extends AppCompatActivity implements View.OnClickListener, SensorEventListener {
     // 发送
     public static final byte attack = 1;
     // 接受
     public static final byte accept = 2;
 
+    public long oldTime = 0;
 
     private  volatile int runloding = 1;
     MediaPlayer mediaPlayer = null;
@@ -49,6 +60,13 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
     String src,dst,key;
     Button acceptCall,hangCall,checkStream;
     byte type = 0;
+
+    // 电源管理对象
+    // 屏幕开关
+    private PowerManager localPowerManager = null;// 电源管理对象
+    private PowerManager.WakeLock localWakeLock = null;// 电源锁
+    public SensorManager sm;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,7 +87,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
         // 切换音频流到耳机
         AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
 
-
+        // 初始化一些数据
         Intent intent =  getIntent();
         src = intent.getStringExtra("src");
         dst = intent.getStringExtra("dst");
@@ -96,7 +114,25 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
             numberShowText.setText("来电号码："+dst);
             callStatusShow.setVisibility(View.GONE);
         }
+        //初始化距离传感器
+        initRangeSensor();
     }
+
+
+    @SuppressLint("InvalidWakeLockTag")
+    private void initRangeSensor(){
+        //初始化距离传感器
+        //根据传入的传感器类型初始化传感器
+        sm = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
+        Sensor acceleromererSensor = sm.getDefaultSensor(Sensor.TYPE_PROXIMITY);
+        // //注册传感器，第一个参数为距离监听器，第二个是传感器类型，第三个是获取数据速度
+        sm.registerListener(this, acceleromererSensor,
+                SensorManager.SENSOR_DELAY_NORMAL);
+        localPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        // 获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+        localWakeLock = localPowerManager.newWakeLock(32, "MyPower");
+    }
+
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void mssageEventBus(final CallReplyModel callReplyModel)  {
@@ -208,11 +244,37 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
         this.finish();
     }
 
-
+    /**
+     * 退出事件
+     * @param keyCode
+     * @param event
+     * @return
+     */
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event){
+        if(keyCode==KeyEvent.KEYCODE_BACK){
+            if(oldTime == 0){
+                ToastUtils.showToastShort("连续滑动2次退出哦~");
+                oldTime = System.currentTimeMillis();
+                return false;
+            }
+            if(System.currentTimeMillis() - oldTime  < 500){
+                return super.onKeyDown(keyCode,event);
+            }else{
+                oldTime = System.currentTimeMillis();
+            }
+            return false;
+        }
+        return super.onKeyDown(keyCode,event);
+    }
     @Override
     protected void onDestroy() {
         hangCall();
         EventBus.getDefault().unregister(this);
+        sm.unregisterListener(this);
+        if(localWakeLock != null){
+            localWakeLock.release();//释放电源锁，如果不释放，finish这个acitivity后仍然会有自动锁屏的效果，不信可以试一试
+        }
         super.onDestroy();
     }
 
@@ -236,10 +298,37 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
             case R.id.check_stream:
                 if(checkStream.getText().toString().equals("免提")){
                     checkStream.setText("听筒");
+                    checkStream.setTextColor(getResources().getColor(R.color.lanse));
                     AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_MUSIC);
                 } else{
+                    AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
                     checkStream.setText("免提");
+                    checkStream.setTextColor(getResources().getColor(R.color.white));
                 }
         }
+    }
+
+
+    @Override
+    public void onSensorChanged(SensorEvent event) {
+        if(event.values[0] <= 0){
+            if (localWakeLock.isHeld()) {
+                return;
+            } else{
+                localWakeLock.acquire();// 申请设备电源锁
+            }
+        }else{
+            if (localWakeLock.isHeld()) {
+                return;
+            } else{
+                localWakeLock.setReferenceCounted(false);
+                localWakeLock.release(); // 释放设备电源锁
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+        Log.e("onAccuracyChanged", ">>>>>>"+accuracy);
     }
 }
