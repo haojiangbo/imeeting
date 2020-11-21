@@ -105,9 +105,14 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  *     收到call类型的数据包之后
  *     MainActivity 的 eventBus处理器会收到一个call类型的消息
  *     然后回复一个 CALL_REPLY 类型的消息 代表通话成功接通
- *     .... 此处缺少步骤
+ *     然后 发送 event 到 MainActivity
+ *     然后重新打开 Call Activity 进行数据接听
  *
+ *      视频通话准备工作
+ *      https://www.cnblogs.com/yydcdut/p/3887250.html
  *
+ *      // 如何获取yuv数据
+ *      https://blog.csdn.net/import_sadaharu/article/details/52744899
  *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
