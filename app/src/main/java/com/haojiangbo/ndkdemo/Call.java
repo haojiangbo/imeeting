@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
+import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.eventbus.CallReplyModel;
 import com.haojiangbo.eventbus.MessageModel;
 import com.haojiangbo.net.config.NettyKeyConfig;
@@ -46,7 +47,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
     MediaPlayer mediaPlayer = null;
     TextView numberShowText,callStatusShow;
     String src,dst,key;
-    Button acceptCall,hangCall;
+    Button acceptCall,hangCall,checkStream;
     byte type = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,6 +64,10 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
         callStatusShow = findViewById(R.id.call_status_show);
         acceptCall  = findViewById(R.id.accept_call);
         hangCall = findViewById(R.id.hang_call);
+        checkStream = findViewById(R.id.check_stream);
+
+        // 切换音频流到耳机
+        AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
 
 
         Intent intent =  getIntent();
@@ -100,6 +105,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
             runloding = 0;
             mediaPlayer.stop();
             callStatusShow.setText("通话已连接");
+            checkStream.setVisibility(View.VISIBLE);
             // 开始录音
             AudioRecorder.getInstance().startRecord();
         }else if(callReplyModel.type == ControlProtocol.HANG){
@@ -222,9 +228,18 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
                 ControlProtocolManager.ACTIVITY_CHANNEL.writeAndFlush(protocol);
                 mediaPlayer.stop();
                 callStatusShow.setText("通话已连接");
+                callStatusShow.setVisibility(View.VISIBLE);
                 acceptCall.setVisibility(View.GONE);
+                checkStream.setVisibility(View.VISIBLE);
                 AudioRecorder.getInstance().startRecord();
                 break;
+            case R.id.check_stream:
+                if(checkStream.getText().toString().equals("免提")){
+                    checkStream.setText("听筒");
+                    AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_MUSIC);
+                } else{
+                    checkStream.setText("免提");
+                }
         }
     }
 }

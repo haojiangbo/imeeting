@@ -64,6 +64,21 @@
             android:text="接听"
             ></Button>
 
+
+        <Button
+            android:id="@+id/check_stream"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/heise"
+            android:onClick="onClick"
+            android:drawableTop="@drawable/volume"
+            android:textColor="@color/white"
+            android:visibility="gone"
+            android:text="免提"
+            ></Button>
+
+
         <Button
             android:id="@+id/hang_call"
             android:layout_width="0dp"
