@@ -35,35 +35,30 @@ public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         DatagramPacket datagramPacket = (DatagramPacket) msg;
-        StringBuilder stringBuilder = new StringBuilder();
+       /* StringBuilder stringBuilder = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(stringBuilder, datagramPacket.content());
-        /*totalByte += datagramPacket.content().readableBytes();
-        log.info(">>> ip >>> {} byteLen = {} totalLen = {}  \n  {}",
+        log.info(">>> ip >>> {} \n  {}",
                 datagramPacket.sender(),
-                datagramPacket.content().readableBytes(),
-                totalByte,
                 stringBuilder.toString());*/
-
-
+        int totalSize = datagramPacket.content().readableBytes();
         MediaDataProtocol protocol = MediaDataProtocol.byteBufToMediaDataProtocol(datagramPacket.content());
         ReferenceCountUtil.release(msg);
         String number = new String(protocol.number);
         switch (protocol.type) {
             case MediaDataProtocol.PING:
                 InetSocketAddress address  =  datagramPacket.sender();
-                log.error("ping message number = {}", number);
+                log.info("ping message number = {}", number);
+                // todo 此处未做删除的操作,会缓存一些无用数据
                 CallNumberAndChannelMapping.UDP_NUMBER_CHANNEL_MAPPING.put(number,address);
                 break;
             case MediaDataProtocol.VIDEO_DATA:
                 break;
             case MediaDataProtocol.AUDIO_DATA:
-                log.info(">>> ip >>> {} \n  {}",
+                log.info("ip {} 数据长度 {} 负载大小 {}",
                         datagramPacket.sender(),
-                        stringBuilder.toString());
+                        totalSize,protocol.dataSize);
                 InetSocketAddress ar =  CallNumberAndChannelMapping.UDP_NUMBER_CHANNEL_MAPPING.get(number);
                 if(null != ar){
-                   /* ByteBuf byteBuf =  ctx.alloc().buffer(protocol.dataSize);
-                    byteBuf.writeBytes(protocol.data);*/
                     ctx.writeAndFlush(new DatagramPacket(
                             MediaDataProtocol.
                                     mediaDataProtocolToByteBuf(ctx.channel(),protocol)

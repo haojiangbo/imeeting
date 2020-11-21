@@ -34,7 +34,6 @@ public class TcpServerApp {
                         ch.pipeline().addLast(new ControProtocolHander());
                     }
                 })
-                // 设置tcp缓冲区
                 .option(ChannelOption.SO_BACKLOG, 1024)
                 .bind(port).addListener((ChannelFutureListener) future -> {
             if(future.isSuccess()){

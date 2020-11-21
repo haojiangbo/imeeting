@@ -40,25 +40,18 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
                 }
                 break;
             case ControlProtocol.CALL:
-                callMessageHander(ctx, protocol, payLaod);
+                forwordMessage(ctx, protocol, payLaod);
                 break;
             case ControlProtocol.CALL_REPLY:
-                Pod pod = JSONObject.parseObject(payLaod, Pod.class);
-                Channel targetChannel = CallNumberAndChannelMapping.NUMBER_CHANNEL_MAPPING.get(pod.getDst());
-                if (null != targetChannel) {
-                    if (!targetChannel.isActive()) {
-                        CallNumberAndChannelMapping.NUMBER_CHANNEL_MAPPING.remove(pod.getDst());
-                        return;
-                    }
-                    targetChannel.writeAndFlush(protocol);
-                }
+                forwordMessage(ctx, protocol, payLaod);
                 break;
             case ControlProtocol.HANG:
+                forwordMessage(ctx, protocol, payLaod);
                 break;
         }
     }
 
-    private void callMessageHander(ChannelHandlerContext ctx, ControlProtocol protocol, String payLaod) {
+    private void forwordMessage(ChannelHandlerContext ctx, ControlProtocol protocol, String payLaod) {
         Pod pod = JSONObject.parseObject(payLaod, Pod.class);
         Channel targetChannel = CallNumberAndChannelMapping.NUMBER_CHANNEL_MAPPING.get(pod.getDst());
         if (null != targetChannel) {
@@ -68,7 +61,7 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
             }
             targetChannel.writeAndFlush(protocol);
         }
-        log.info("channel={},CALL = {}", ctx.channel(), payLaod);
+        log.info("channel={},payload = {}", ctx.channel(), payLaod);
     }
 
     @Override
