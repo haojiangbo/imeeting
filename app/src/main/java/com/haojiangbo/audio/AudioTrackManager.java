@@ -68,7 +68,7 @@ public class AudioTrackManager {
         if(AudioRecorder.audioSessionId != -1){
             mAudioTrack = new AudioTrack(streamType, mSampleRateInHz,mChannelConfig,
                     mAudioFormat,mMinBufferSize,mMode,AudioRecorder.audioSessionId);
-            initAEC();
+            //initAEC();
         }else{
             mAudioTrack = new AudioTrack(streamType, mSampleRateInHz,mChannelConfig,
                     mAudioFormat,mMinBufferSize,mMode);

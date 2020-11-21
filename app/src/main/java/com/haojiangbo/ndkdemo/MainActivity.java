@@ -23,7 +23,9 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSONObject;
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
+import com.haojiangbo.camera.CameraActivity;
 import com.haojiangbo.eventbus.MessageModel;
+import com.haojiangbo.ffmpeg.VideoEncode;
 import com.haojiangbo.net.MediaProtocolManager;
 import com.haojiangbo.net.protocol.ControlProtocol;
 import com.haojiangbo.net.protocol.Pod;
@@ -155,6 +157,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startAudioPlay();
         // 初始化网络配置
         initNetworkConfig();
+
+        Intent intent = new Intent(this,CameraActivity.class);
+        startActivity(intent);
+        /*VideoEncode videoEncode = new VideoEncode();
+        videoEncode.initContext();*/
     }
 
     @Override
@@ -299,7 +306,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
-            Manifest.permission.RECORD_AUDIO
+            Manifest.permission.RECORD_AUDIO,
+            Manifest.permission.CAMERA
     };
     /* Manifest.permission.CAMERA,
     Manifest.permission.RECORD_AUDIO,

@@ -48,6 +48,7 @@ add_library( # Sets the name of the library.
         log/Hlog.h
         audio/AudioEncode.cpp
         audio/AudioDecode.cpp
+        video/VideoEncode.cpp
         )
 
 
