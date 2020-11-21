@@ -8,12 +8,12 @@
     tools:context=".Call">
 
     <ImageView
-        android:layout_width="wrap_content"
-        android:layout_marginTop="100dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="150dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/user"
-        android:layout_height="wrap_content">
-
+        >
     </ImageView>
 
 
@@ -24,6 +24,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="300dp"
         android:textColor="@color/baise"
+        android:textSize="15dp"
         android:text="号码：123456"
         >
     </TextView>
@@ -34,6 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
+        android:textSize="15dp"
         android:textColor="@color/baise"
         android:text="正在呼叫..."
         >

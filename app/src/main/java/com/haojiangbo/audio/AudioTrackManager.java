@@ -4,6 +4,8 @@ import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioRecord;
 import android.media.AudioTrack;
+import android.media.audiofx.AcousticEchoCanceler;
+import android.util.Log;
 
 /**
  * 回音消除
@@ -31,7 +33,7 @@ public class AudioTrackManager {
     //STREAM的意思是由用户在应用程序通过write方式把数据一次一次得写到audiotrack中。这个和我们在socket中发送数据一样，
     // 应用层从某个地方获取数据，例如通过编解码得到PCM数据，然后write到audiotrack。
     private static int mMode = AudioTrack.MODE_STREAM;
-
+    private AcousticEchoCanceler acousticEchoCanceler;
 
     public AudioTrackManager() {
         initData();
@@ -42,8 +44,29 @@ public class AudioTrackManager {
         mMinBufferSize = AudioTrack.getMinBufferSize(mSampleRateInHz,mChannelConfig, mAudioFormat);//计算最小缓冲区
         //注意，按照数字音频的知识，这个算出来的是一秒钟buffer的大小。
         //创建AudioTrack
-        mAudioTrack = new AudioTrack(mStreamType, mSampleRateInHz,mChannelConfig,
-                mAudioFormat,mMinBufferSize,mMode);
+        if(AudioRecorder.audioSessionId != -1){
+            mAudioTrack = new AudioTrack(mStreamType, mSampleRateInHz,mChannelConfig,
+                    mAudioFormat,mMinBufferSize,mMode,AudioRecorder.audioSessionId);
+            initAEC();
+        }else{
+            mAudioTrack = new AudioTrack(mStreamType, mSampleRateInHz,mChannelConfig,
+                    mAudioFormat,mMinBufferSize,mMode);
+        }
+
+    }
+
+    private void initAEC() {
+        if (AcousticEchoCanceler.isAvailable()) {
+            if (acousticEchoCanceler == null) {
+                acousticEchoCanceler = AcousticEchoCanceler.create(AudioRecorder.audioSessionId);
+                Log.d("initAEC", "initAEC: ---->" + acousticEchoCanceler + "\t" + AudioRecorder.audioSessionId);
+                if (acousticEchoCanceler == null) {
+                    Log.e("initAEC", "initAEC: ----->AcousticEchoCanceler create fail.");
+                } else {
+                    acousticEchoCanceler.setEnabled(true);
+                }
+            }
+        }
     }
 
 

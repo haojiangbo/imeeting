@@ -55,6 +55,7 @@ public class AudioRecorder {
     private List<String> filesName = new ArrayList<>();
     // 文件输出测试
     private OutputStream outputStream;
+    public static volatile  int  audioSessionId = -1;
 
 
     /**
@@ -80,6 +81,7 @@ public class AudioRecorder {
         bufferSizeInBytes = 2304; /*AudioRecord.getMinBufferSize(AUDIO_SAMPLE_RATE,
                 AUDIO_CHANNEL, AUDIO_ENCODING);*/
         audioRecord = new AudioRecord(AUDIO_INPUT, AUDIO_SAMPLE_RATE, AUDIO_CHANNEL, AUDIO_ENCODING, bufferSizeInBytes);
+        audioSessionId = audioRecord.getAudioSessionId();
     }
 
 
@@ -146,7 +148,7 @@ public class AudioRecorder {
 
                try {
                    //outputStream.write(converData,0,converData.length);
-                   Thread.sleep(15);
+                   Thread.sleep(10);
                } catch (Exception e) {
                    e.printStackTrace();
                }

@@ -75,7 +75,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener {
             ToastUtils.showToastShort("网络故障,请重新拨打");
             this.finish();
         }
-        numberShowText.setText("号码："+dst);
+        numberShowText.setText("呼叫号码："+dst);
         // 代表是发送方，拨打电话
         if(type == Call.attack){
             // 播放音乐

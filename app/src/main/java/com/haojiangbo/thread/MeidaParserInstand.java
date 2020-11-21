@@ -36,6 +36,7 @@ public class MeidaParserInstand implements Runnable {
                    byteBuf.readBytes(bytes);
                   /* // 转换协议
                    MediaDataProtocol protocol =   MediaDataProtocol.byteBufToMediaDataProtocol(byteBuf);*/
+                   Log.e("负载大小>>",bytes.length + ">>>>");
                    byte [] converData =  decode.decodeFrame(bytes);
                    if(converData != null){
                        Log.e("解析后的数据",">>>>>"+converData.length);
