@@ -1,5 +1,7 @@
 package com.haojiangbo.net.protocol;
 
+import java.io.Serializable;
+
 /**
  * 该协议使用TCP传输
  * 用于控制，呼叫，接听，挂断等操作
@@ -12,7 +14,7 @@ package com.haojiangbo.net.protocol;
  * @date 2020/11/19
  */
 
-public class ControlProtocol {
+public class ControlProtocol implements Serializable {
     //////////////// 控制位标记 ////////////////////////
     // 呼叫
     public static final byte CALL = 1;

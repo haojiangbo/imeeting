@@ -32,9 +32,11 @@ public class ControProtocolHander  extends ChannelInboundHandlerAdapter {
                 break;
             // 接收到对方的回复消息
             case ControlProtocol.CALL_REPLY:
-                EventBus.getDefault().post(new CallReplyModel(protocol));
+                EventBus.getDefault().post(new CallReplyModel(ControlProtocol.CALL_REPLY,protocol));
                 break;
             case ControlProtocol.HANG:
+                Log.e("net hang",">>>>>收到挂断消息");
+                EventBus.getDefault().post(new CallReplyModel(ControlProtocol.HANG,protocol));
                 break;
         }
     }
@@ -51,4 +53,7 @@ public class ControProtocolHander  extends ChannelInboundHandlerAdapter {
         MainActivity.TARGET_NUMBER = tmpSrc;
         EventBus.getDefault().post(new MessageModel(MessageModel.CALL,protocol,ctx.channel()));
     }
+
+
+
 }

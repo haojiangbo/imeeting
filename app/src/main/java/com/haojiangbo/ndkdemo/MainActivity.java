@@ -91,6 +91,24 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
  * 编解码  实例代码 都在 github上了
  * https://github.com/FFmpeg/FFmpeg/tree/master/doc/examples
  *
+ *
+ *  操作流程
+ *     发送端
+ *     MainActivity 操作键盘，拨打电话
+ *     点击 CALL 之后 viewHander 打开 Call 这个 activity
+ *     Call 这个 activity 调用 sendCallMessage 发送 一个 call 类型的数据包
+ *     然后等待接收端反馈
+ *     收到 CALL_REPLY 的数据 Call Activity的enventBus处理器会被触发
+ *     然后打开录音发送数据
+ *
+ *     接收端
+ *     收到call类型的数据包之后
+ *     MainActivity 的 eventBus处理器会收到一个call类型的消息
+ *     然后回复一个 CALL_REPLY 类型的消息 代表通话成功接通
+ *     .... 此处缺少步骤
+ *
+ *
+ *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
     // 自己的号码
@@ -165,12 +183,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         ParserMediaProtoThreadPool.exec(new MeidaParserInstand());
     }
 
-
+    /**
+     * 收到呼叫消息之后，需要做一个接通的操作
+     * @param message
+     */
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void mssageEventBus(final MessageModel message)  {
-        ToastUtils.showToastShort("收到呼叫消息");
-        message.channel.writeAndFlush(message.payLoad);
-        AudioRecorder.getInstance().startRecord();
+        //ToastUtils.showToastShort("收到呼叫消息");
+        ControlProtocol protocol = (ControlProtocol) message.payLoad;
+        Pod pod = JSONObject.parseObject(new String(protocol.data),Pod.class);
+        Intent call =  new Intent(this,Call.class);
+        call.putExtra("src",pod.getSrc());
+        call.putExtra("dst",pod.getDst());
+        call.putExtra("type",Call.accept);
+        Bundle bundle = new Bundle();
+        bundle.putSerializable("protocol",protocol);
+        call.putExtra("protocol",bundle);
+        startActivity(call);
     }
 
 
@@ -216,6 +245,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Intent call =  new Intent(this,Call.class);
                     call.putExtra("src",MainActivity.CALL_NUMBER);
                     call.putExtra("dst",result);
+                    call.putExtra("type",Call.attack);
                     startActivity(call);
                     break;
                 case "DEL":

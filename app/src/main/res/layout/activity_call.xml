@@ -7,6 +7,15 @@
     android:background="@color/heise"
     tools:context=".Call">
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_marginTop="100dp"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/user"
+        android:layout_height="wrap_content">
+
+    </ImageView>
+
 
     <TextView
         android:id="@+id/number_show_text"
@@ -39,12 +48,31 @@
         android:layout_marginBottom="100dp"
         android:gravity="center"
         android:layout_height="wrap_content">
-        <ImageButton
-            android:layout_width="wrap_content"
+
+
+        <Button
+            android:id="@+id/accept_call"
+            android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:src="@drawable/close_call"
             android:background="@color/heise"
-            ></ImageButton>
+            android:onClick="onClick"
+            android:drawableTop="@drawable/accept"
+            android:textColor="@color/white"
+            android:text="接听"
+            ></Button>
+
+        <Button
+            android:id="@+id/hang_call"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:background="@color/heise"
+            android:onClick="onClick"
+            android:drawableTop="@drawable/close_call"
+            android:textColor="@color/white"
+            android:text="挂断"
+            ></Button>
     </LinearLayout>
 
 

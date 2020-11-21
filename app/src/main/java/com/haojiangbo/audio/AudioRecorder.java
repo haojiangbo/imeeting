@@ -143,12 +143,13 @@ public class AudioRecorder {
                            mediaDataProtocol),new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
                    MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
                }
-              /* try {
-                   outputStream.write(converData,0,converData.length);
+
+               try {
+                   //outputStream.write(converData,0,converData.length);
                    Thread.sleep(15);
                } catch (Exception e) {
                    e.printStackTrace();
-               }*/
+               }
            }
            audioEncode.freeContext();
        }).start();

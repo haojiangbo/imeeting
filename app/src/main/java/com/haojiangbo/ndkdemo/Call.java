@@ -9,6 +9,9 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.haojiangbo.application.MyApplication;
@@ -32,46 +35,77 @@ import java.util.UUID;
  * 切换播放模式
  * https://blog.csdn.net/u010936731/article/details/70599482
  */
-public class Call extends AppCompatActivity {
+public class Call extends AppCompatActivity implements View.OnClickListener {
+    // 发送
+    public static final byte attack = 1;
+    // 接受
+    public static final byte accept = 2;
+
+
     private  volatile int runloding = 1;
     MediaPlayer mediaPlayer = null;
     TextView numberShowText,callStatusShow;
+    String src,dst,key;
+    Button acceptCall,hangCall;
+    byte type = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_call);  ActionBar actionBar = getSupportActionBar();
+        setContentView(R.layout.activity_call);
+        ActionBar actionBar = getSupportActionBar();
         if(null !=  actionBar){
             actionBar.hide();
         }
+        // 初始化
+        EventBus.getDefault().register(this);
         StatusBarColorUtils.setBarColor(this,R.color.heise,false);
+        numberShowText = findViewById(R.id.number_show_text);
+        callStatusShow = findViewById(R.id.call_status_show);
+        acceptCall  = findViewById(R.id.accept_call);
+        hangCall = findViewById(R.id.hang_call);
+
+
         Intent intent =  getIntent();
-        String src = intent.getStringExtra("src");
-        String dst = intent.getStringExtra("dst");
+        src = intent.getStringExtra("src");
+        dst = intent.getStringExtra("dst");
+        key = UUID.randomUUID().toString();
+        type = intent.getByteExtra("type", (byte) (-1 & 0xFF));
         MainActivity.TARGET_NUMBER = dst;
-        String key = UUID.randomUUID().toString();
         if(null == ControlProtocolManager.ACTIVITY_CHANNEL || !ControlProtocolManager.ACTIVITY_CHANNEL.isActive()){
             ToastUtils.showToastShort("网络故障,请重新拨打");
             this.finish();
         }
-        EventBus.getDefault().register(this);
-        numberShowText = findViewById(R.id.number_show_text);
-        callStatusShow = findViewById(R.id.call_status_show);
         numberShowText.setText("号码："+dst);
-        // 播放音乐
-        mediaPalay();
-        // 呼叫loding
-        initLoding();
-        // 发送呼叫消息
-        sendCallMessage(src, dst, key);
+        // 代表是发送方，拨打电话
+        if(type == Call.attack){
+            // 播放音乐
+            mediaPalay();
+            // 呼叫loding
+            initLoding();
+            // 发送呼叫消息
+            sendCallMessage(src, dst, key);
+            acceptCall.setVisibility(View.GONE);
+        }else if(type == Call.accept){
+            // 播放音乐
+            mediaPalay();
+            numberShowText.setText("来电号码："+dst);
+            callStatusShow.setVisibility(View.GONE);
+        }
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void mssageEventBus(final CallReplyModel callReplyModel)  {
-        ToastUtils.showToastShort("CallReply收到消息");
-        runloding = 0;
-        mediaPlayer.stop();
-        callStatusShow.setText("通话已连接");
-        AudioRecorder.getInstance().startRecord();
+        //ToastUtils.showToastShort("CallReply收到消息");
+        if(callReplyModel.type == ControlProtocol.CALL_REPLY){
+            runloding = 0;
+            mediaPlayer.stop();
+            callStatusShow.setText("通话已连接");
+            // 开始录音
+            AudioRecorder.getInstance().startRecord();
+        }else if(callReplyModel.type == ControlProtocol.HANG){
+            ToastUtils.showToastShort("通话已挂断");
+            this.finish();
+        }
     }
 
 
@@ -127,7 +161,7 @@ public class Call extends AppCompatActivity {
 
 
     /**
-     * 发送消息
+     * 发送呼叫消息消息
      * @param src
      * @param dst
      * @param key
@@ -145,13 +179,52 @@ public class Call extends AppCompatActivity {
         ControlProtocolManager.ACTIVITY_CHANNEL.writeAndFlush(protocol);
     }
 
-
+    // 挂断通话 发送挂断消息
+    private void hangCall(){
+        runloding = 0;
+        mediaPlayer.stop();
+        try {
+            AudioRecorder.getInstance().stopRecord();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        String session = ControlProtocolManager.ACTIVITY_CHANNEL.attr(NettyKeyConfig.SESSION_KEY).get();
+        byte [] sesbyteArray =  session.getBytes();
+        Pod pod = new Pod(src,dst,key);
+        byte[] data = pod.toString().getBytes();
+        ControlProtocol controlProtocol =  new ControlProtocol();
+        controlProtocol.flag = ControlProtocol.HANG;
+        controlProtocol.sessionSize = (byte) sesbyteArray.length;
+        controlProtocol.session = sesbyteArray;
+        controlProtocol.dataSize = data.length;
+        controlProtocol.data = data;
+        ControlProtocolManager.ACTIVITY_CHANNEL.writeAndFlush(controlProtocol);
+        this.finish();
+    }
 
 
     @Override
     protected void onDestroy() {
-        mediaPlayer.stop();
+        hangCall();
         EventBus.getDefault().unregister(this);
         super.onDestroy();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()){
+            case R.id.hang_call:
+                hangCall();
+                break;
+            case R.id.accept_call:
+                Bundle  bundle = getIntent().getBundleExtra("protocol");
+                ControlProtocol protocol = (ControlProtocol) bundle.getSerializable("protocol");
+                ControlProtocolManager.ACTIVITY_CHANNEL.writeAndFlush(protocol);
+                mediaPlayer.stop();
+                callStatusShow.setText("通话已连接");
+                acceptCall.setVisibility(View.GONE);
+                AudioRecorder.getInstance().startRecord();
+                break;
+        }
     }
 }
