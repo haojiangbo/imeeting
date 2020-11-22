@@ -36,13 +36,12 @@ namespace VideoDecode {
     AVPacket *pkt;
     JtoolUtils jtoolUtils;
     struct SwsContext *imgConvertCtx = NULL;
-    int defalutWidth = 1920;
-    int defaultHeight = 1080;
+    int defalutWidth = 640;
+    int defaultHeight = 960;
     AVPixelFormat converFormat = AV_PIX_FMT_RGBA;
 
     int  decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt) {
         int ret;
-
         ret = avcodec_send_packet(dec_ctx, pkt);
         if (ret < 0) {
             fprintf(stderr, "Error sending a packet for decoding\n");
@@ -168,6 +167,11 @@ JNIEXPORT void JNICALL
 Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jobject m_surface,
                                                    jbyteArray bytes) {
     char *dataBuff = VideoDecode::jtoolUtils.jarray2charponit(env, bytes);
+    //char *tmpDataBuff = dataBuff;
+    //dataBuff = (char *)malloc(VideoDecode::jtoolUtils.charLen + 64);
+    //memcpy(dataBuff,tmpDataBuff,VideoDecode::jtoolUtils.charLen);
+    //memset(dataBuff+VideoDecode::jtoolUtils.charLen,0,64);
+    //free(tmpDataBuff);
     int data_size = VideoDecode::jtoolUtils.charLen;
     uint8_t *data = (uint8_t *)dataBuff;
     int ret  = 0;

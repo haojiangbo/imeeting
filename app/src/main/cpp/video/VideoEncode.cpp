@@ -6,6 +6,9 @@
 #include "stdio.h"
 #include "JtoolUtils.h"
 #include "log/Hlog.h"
+
+jbyteArray encode(const JNIEnv *env);
+
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -19,6 +22,8 @@ extern "C" {
 #include <libavdevice/avdevice.h>
 }
 
+
+
 namespace VideoEncode {
     char * codeName = "mpeg1video";
     const AVCodec *codec;
@@ -30,17 +35,43 @@ namespace VideoEncode {
 }
 
 
+jbyteArray encode(JNIEnv *env) {
+    int ret = avcodec_send_frame(VideoEncode::c, VideoEncode::frame);
+    if (ret < 0) {
+        ALOGE( "Error sending a frame for encoding\n");
+        return NULL;
+    }
+
+    while (ret >= 0) {
+        ret = avcodec_receive_packet(VideoEncode::c, VideoEncode::pkt);
+        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
+            return NULL;
+        else if (ret < 0) {
+            ALOGE("Error during encoding\n");
+            return NULL;
+        }
+        /*printf("Write packet %3"" (size=%5d)\n", pkt->pts, pkt->size);
+        fwrite(pkt->data, 1, pkt->size, outfile);*/
+        char * resultBuff = (char *)malloc(VideoEncode::pkt->size);
+        VideoEncode::jtoolUtils.charLen = VideoEncode::pkt->size;
+        memcpy(resultBuff,VideoEncode::pkt->data,VideoEncode::pkt->size);
+        av_packet_unref(VideoEncode::pkt);
+        return VideoEncode::jtoolUtils.charpoint2jarray(env,resultBuff);
+    }
+}
+
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     ALOGE("init videEncode ...");
     /* find the mpeg1video encoder */
-    VideoEncode::codec = avcodec_find_encoder_by_name(VideoEncode::codeName);
+   VideoEncode::codec = avcodec_find_encoder_by_name(VideoEncode::codeName);
+    // VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
     if (!VideoEncode::codec) {
         ALOGE("Codec '%s' not found\n", VideoEncode::codeName);
         return;
     }
-    VideoEncode::c = avcodec_alloc_context3( VideoEncode::codec);
+    VideoEncode::c = avcodec_alloc_context3(VideoEncode::codec);
     if (! VideoEncode::c) {
         ALOGE( "Could not allocate video codec context\n");
         return;
@@ -54,8 +85,8 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     /* put sample parameters */
     VideoEncode::c->bit_rate = 400000;
     /* resolution must be a multiple of two */
-    VideoEncode::c->width = 1920;
-    VideoEncode::c->height = 1080;
+    VideoEncode::c->width = 640;
+    VideoEncode::c->height = 960;
     /* frames per second */
     VideoEncode::c->time_base = (AVRational){1, 25};
     VideoEncode::c->framerate = (AVRational){25, 1};
@@ -106,30 +137,10 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
 
     char * data =  VideoEncode::jtoolUtils.jarray2charponit(env,bytes);
     memcpy(VideoEncode::frame->data[0],data, VideoEncode::jtoolUtils.charLen);
-    //VideoEncode::frame->pts = VideoEncode::pts;
+   /* VideoEncode::frame->pts = VideoEncode::pts;
+    VideoEncode::pts++;*/
     free(data);
-    int ret = avcodec_send_frame(VideoEncode::c, VideoEncode::frame);
-    if (ret < 0) {
-        fprintf(stderr, "Error sending a frame for encoding\n");
-        exit(1);
-    }
-
-    while (ret >= 0) {
-        ret = avcodec_receive_packet(VideoEncode::c, VideoEncode::pkt);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-            return NULL;
-        else if (ret < 0) {
-            fprintf(stderr, "Error during encoding\n");
-            exit(1);
-        }
-        /*printf("Write packet %3"" (size=%5d)\n", pkt->pts, pkt->size);
-        fwrite(pkt->data, 1, pkt->size, outfile);*/
-        char * resultBuff = (char *)malloc(VideoEncode::pkt->size);
-        VideoEncode::jtoolUtils.charLen = VideoEncode::pkt->size;
-        memcpy(resultBuff,VideoEncode::pkt->data,VideoEncode::pkt->size);
-        av_packet_unref(VideoEncode::pkt);
-        return VideoEncode::jtoolUtils.charpoint2jarray(env,resultBuff);
-    }
+    return encode(env);
 }
 
 

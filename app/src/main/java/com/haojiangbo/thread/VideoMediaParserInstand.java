@@ -43,30 +43,7 @@ public class VideoMediaParserInstand implements Runnable{
                     Log.e("video_负载大小>>",bytes.length + ">>>>");
                     //byte [] b = videoDecode.decodeFrame(bytes);
                     videoDecode.drawSurface(CameraActivity.videoSurface.mSurface,bytes);
-                    /*if(null != b){
-                        Log.e("get frame",b.length+">>>"+b[b.length-1]);
-                        Canvas mCanvas = null;
-                        try{
-                            //锁定画布并返回画布对象
-                            mCanvas=CameraActivity.videoSurface.getHolder().lockCanvas();
-                            mCanvas.drawBitmap(byteToBitmap(b), 0, 0, null);
-                            Paint p = new Paint();
-                            p.setColor(Color.RED);// 设置红色
 
-                            mCanvas.drawText("画圆：", 10, 20, p);// 画文本
-                            mCanvas.drawCircle(60, 20, 10, p);// 小圆
-                            p.setAntiAlias(true);// 设置画笔的锯齿效果。 true是去除，大家一看效果就明白了
-                            mCanvas.drawCircle(120, 20, 20, p);// 大圆
-
-
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }finally {
-                            //当画布内容不为空时，才post，避免出现黑屏的情况。
-                            if(mCanvas!=null)
-                                CameraActivity.videoSurface.getHolder().unlockCanvasAndPost(mCanvas);
-                        }
-                    }*/
                     ReferenceCountUtil.release(byteBuf);
                 }
             } catch (InterruptedException e) {

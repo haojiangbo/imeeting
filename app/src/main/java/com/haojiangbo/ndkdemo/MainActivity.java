@@ -160,11 +160,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startMediaPlay();
         // 初始化网络配置
         initNetworkConfig();
-
-       /* Intent intent = new Intent(this,CameraActivity.class);
+        // 测试代码，视频传输
+        /*Intent intent = new Intent(this,CameraActivity.class);
         startActivity(intent);*/
-        /*VideoEncode videoEncode = new VideoEncode();
-        videoEncode.initContext();*/
     }
 
     @Override
