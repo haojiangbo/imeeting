@@ -52,18 +52,15 @@ public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
                 CallNumberAndChannelMapping.UDP_NUMBER_CHANNEL_MAPPING.put(number,address);
                 break;
             case MediaDataProtocol.VIDEO_DATA:
-                break;
-            case MediaDataProtocol.AUDIO_DATA:
-                log.info("ip {} 数据长度 {} 负载大小 {}",
+                /*log.info("ip {} 数据长度 {} 负载大小 {}",
                         datagramPacket.sender(),
                         totalSize,protocol.dataSize);
-                InetSocketAddress ar =  CallNumberAndChannelMapping.UDP_NUMBER_CHANNEL_MAPPING.get(number);
-                if(null != ar){
-                    ctx.writeAndFlush(new DatagramPacket(
-                            MediaDataProtocol.
-                                    mediaDataProtocolToByteBuf(ctx.channel(),protocol)
-                            , ar));
-                }
+                ctx.writeAndFlush(new DatagramPacket( MediaDataProtocol.
+                        mediaDataProtocolToByteBuf(ctx.channel(),protocol),new InetSocketAddress("127.0.0.1", 10089)));*/
+                mediaProtocolForword(ctx, datagramPacket, totalSize, protocol, number);
+                break;
+            case MediaDataProtocol.AUDIO_DATA:
+                mediaProtocolForword(ctx, datagramPacket, totalSize, protocol, number);
                 break;
         }
 
@@ -79,5 +76,18 @@ public class UdpServerMessageReadHander extends ChannelInboundHandlerAdapter {
         } catch (Exception e) {
             e.printStackTrace();
         }*/
+    }
+
+    private void mediaProtocolForword(ChannelHandlerContext ctx, DatagramPacket datagramPacket, int totalSize, MediaDataProtocol protocol, String number) {
+        log.info("ip {} 数据长度 {} 负载大小 {}",
+                datagramPacket.sender(),
+                totalSize,protocol.dataSize);
+        InetSocketAddress ar =  CallNumberAndChannelMapping.UDP_NUMBER_CHANNEL_MAPPING.get(number);
+        if(null != ar){
+            ctx.writeAndFlush(new DatagramPacket(
+                    MediaDataProtocol.
+                            mediaDataProtocolToByteBuf(ctx.channel(),protocol)
+                    , ar));
+        }
     }
 }
