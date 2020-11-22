@@ -20,8 +20,8 @@ public class MediaProtocolHander  extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         DatagramPacket datagramPacket = (DatagramPacket) msg;
-        StringBuilder stringBuffer = new StringBuilder();
-        ByteBufUtil.appendPrettyHexDump(stringBuffer,datagramPacket.content());
+       /* StringBuilder stringBuffer = new StringBuilder();
+        ByteBufUtil.appendPrettyHexDump(stringBuffer,datagramPacket.content());*/
         //Log.e("HJB",stringBuffer.toString());
         Log.e("数据大小>>",datagramPacket.content().readableBytes() + ">>>>");
         byte type = datagramPacket.content().readByte();

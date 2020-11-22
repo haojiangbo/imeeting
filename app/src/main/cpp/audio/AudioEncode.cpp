@@ -76,6 +76,7 @@ Java_com_haojiangbo_ffmpeg_AudioEncode_initContext(JNIEnv *env, jobject thiz) {
         ALOGE("Could not allocate audio data buffers\n");
         return;
     }
+    ALOGE("audio encode ok\n");
 }
 
 

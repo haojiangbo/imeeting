@@ -123,6 +123,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static String CALL_NUMBER = null;
     // 对方的号码
     public static String TARGET_NUMBER = null;
+    ControlProtocolManager controlProtocolManager =  new ControlProtocolManager();
+    MediaProtocolManager mediaProtocolManager = new MediaProtocolManager();
 
     // 案件缓存
     private static List<String> KEY_WORD_CATCH =  new ArrayList<>(6);
@@ -159,8 +161,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // 初始化网络配置
         initNetworkConfig();
 
-        Intent intent = new Intent(this,CameraActivity.class);
-        startActivity(intent);
+       /* Intent intent = new Intent(this,CameraActivity.class);
+        startActivity(intent);*/
         /*VideoEncode videoEncode = new VideoEncode();
         videoEncode.initContext();*/
     }
@@ -174,11 +176,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initNetworkConfig(){
         // tcp初始化
-        ControlProtocolManager controlProtocolManager =  new ControlProtocolManager();
+
         controlProtocolManager.start();
 
         // udp初始化
-        MediaProtocolManager mediaProtocolManager = new MediaProtocolManager();
+
         mediaProtocolManager.start();
     }
 
@@ -198,8 +200,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //Intent intent = new Intent(this,AudioPalyService.class);
         //startService(intent);
         // 启动接受音频数据的队列
-        ParserMediaProtoThreadPool.exec(new MeidaParserInstand());
-        ParserMediaProtoThreadPool.exec(new VideoMediaParserInstand());
+        new Thread(new MeidaParserInstand()).start();
+        new Thread(new VideoMediaParserInstand()).start();
+       /* ParserMediaProtoThreadPool.exec();
+        ParserMediaProtoThreadPool.exec(new VideoMediaParserInstand());*/
     }
 
     /**
@@ -297,6 +301,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        mediaProtocolManager.stop();
+        controlProtocolManager.stop();
         EventBus.getDefault().unregister(this);
     }
 

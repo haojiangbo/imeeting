@@ -60,7 +60,7 @@ public class AudioTrackManager {
         initData(mStreamType);
     }
 
-    private void initData(int streamType){
+    private void  initData(int streamType){
         //根据采样率，采样精度，单双声道来得到frame的大小。
         mMinBufferSize = AudioTrack.getMinBufferSize(mSampleRateInHz,mChannelConfig, mAudioFormat);//计算最小缓冲区
         //注意，按照数字音频的知识，这个算出来的是一秒钟buffer的大小。
@@ -80,7 +80,7 @@ public class AudioTrackManager {
                 , AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND) ;
         int current = audioManager.getStreamVolume(AudioManager.STREAM_SYSTEM);
         audioManager.adjustVolume(AudioManager.ADJUST_RAISE, AudioManager.FLAG_PLAY_SOUND);*/
-        //mAudioTrack.setVolume(0.9f);
+        mAudioTrack.setVolume(0.9f);
     }
 
     /**

@@ -159,18 +159,7 @@ public class AudioRecorder {
        }).start();
     }
 
-    /**
-     * 暂停录音
-     */
-    public void pauseRecord() {
-        Log.d("AudioRecorder", "===pauseRecord===");
-        if (status != Status.STATUS_START) {
-            throw new IllegalStateException("没有在录音");
-        } else {
-            audioRecord.stop();
-            status = Status.STATUS_PAUSE;
-        }
-    }
+
 
     /**
      * 停止录音

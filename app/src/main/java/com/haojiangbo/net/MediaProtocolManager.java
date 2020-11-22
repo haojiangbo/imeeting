@@ -35,5 +35,7 @@ public class MediaProtocolManager {
         CHANNEL =  bootstrap.bind(NettyKeyConfig.getPORT()).channel();
     }
 
-
+    public void stop(){
+        workerGroup.shutdownGracefully();
+    }
 }

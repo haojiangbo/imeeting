@@ -274,7 +274,9 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         EventBus.getDefault().unregister(this);
         sm.unregisterListener(this);
         if(localWakeLock != null){
-            localWakeLock.release();//释放电源锁，如果不释放，finish这个acitivity后仍然会有自动锁屏的效果，不信可以试一试
+            try {
+                localWakeLock.release();
+            }catch (Exception e){}
         }
         super.onDestroy();
     }

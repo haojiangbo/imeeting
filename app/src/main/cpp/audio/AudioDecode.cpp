@@ -62,6 +62,7 @@ Java_com_haojiangbo_ffmpeg_AudioDecode_initContext(JNIEnv *env, jobject thiz) {
     myDecode::decoded_frame = av_frame_alloc();
     // 创建一个包
     myDecode::pkt = av_packet_alloc();
+    ALOGE("audio decode ok\n");
 }
 
 extern "C"

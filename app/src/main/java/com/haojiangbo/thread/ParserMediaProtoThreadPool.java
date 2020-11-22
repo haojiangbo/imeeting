@@ -7,7 +7,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ParserMediaProtoThreadPool {
 
-    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(2, 5, 100, TimeUnit.MILLISECONDS,
+    private static final ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 10, 100, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue(3));
 
 
