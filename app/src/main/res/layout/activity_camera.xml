@@ -11,7 +11,7 @@
     <SurfaceView
         android:id="@+id/surface_view_camera2_activity"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="600dp" />
 
     <ImageView
         android:id="@+id/iv_show_camera2_activity"
@@ -21,5 +21,16 @@
         android:layout_centerInParent="true"
         android:scaleType="centerCrop" />
 
+
+    <com.haojiangbo.widget.VideoSurface
+        android:id="@+id/my_video_surface"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        >
+
+    </com.haojiangbo.widget.VideoSurface>
 
 </RelativeLayout>

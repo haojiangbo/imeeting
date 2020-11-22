@@ -3,7 +3,8 @@ package com.haojiangbo.net.config;
 import io.netty.util.AttributeKey;
 
 public class NettyKeyConfig {
-    private static String HOST = "yishoutong.hbweiyinqing.cn";
+    private static String HOST = "192.168.43.184";
+    // 192.168.43.184 yishoutong.hbweiyinqing.cn
     private static int PORT = 10086;
     public static final AttributeKey<String> SESSION_KEY =  AttributeKey.newInstance("SESSION_KEY");
 

@@ -4,6 +4,7 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import io.netty.channel.socket.DatagramPacket;
 
 import android.Manifest;
 import android.content.Context;
@@ -37,14 +38,20 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.haojiangbo.ffmpeg.VideoEncode;
+import com.haojiangbo.ndkdemo.MainActivity;
 import com.haojiangbo.ndkdemo.R;
+import com.haojiangbo.net.MediaProtocolManager;
+import com.haojiangbo.net.config.NettyKeyConfig;
+import com.haojiangbo.net.protocol.MediaDataProtocol;
 import com.haojiangbo.utils.android.StatusBarColorUtils;
+import com.haojiangbo.widget.VideoSurface;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.util.Arrays;
 
@@ -82,6 +89,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private ImageReader mImageReader;
     private CameraCaptureSession mCameraCaptureSession;
     private CameraDevice mCameraDevice;
+    public static  VideoSurface videoSurface;
 
 
     // 视频解码器
@@ -96,6 +104,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         if(actionBar != null){
             actionBar.hide();
         }
+        videoSurface = findViewById(R.id.my_video_surface);
         videoEncode.initContext();
         StatusBarColorUtils.setBarColor(this,R.color.heise,false);
         initView();
@@ -179,11 +188,26 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 byte [] converData =  videoEncode.encodeFrame(data);
                 if(null != converData){
                     Log.e("编码前数据","编码前大小"+oldDataLen + "编码后数据大小"+converData.length);
-                    try {
+                    /*try {
                         outputStream.write(converData);
                     } catch (IOException e) {
                         e.printStackTrace();
-                    }
+                    }*/
+
+
+                    MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
+                    mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;
+                    mediaDataProtocol.number = MainActivity.CALL_NUMBER.getBytes();
+                    mediaDataProtocol.dataSize = converData.length;
+                    mediaDataProtocol.data = converData;
+
+                    //发送音频数据
+                    DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol
+                            .mediaDataProtocolToByteBuf(MediaProtocolManager.CHANNEL,
+                                    mediaDataProtocol),new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
+                    MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
+
+
                 }
                 image.close();
             }

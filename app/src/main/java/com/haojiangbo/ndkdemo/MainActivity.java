@@ -34,6 +34,7 @@ import com.haojiangbo.service.AudioPalyService;
 import com.haojiangbo.storage.NumberStorageManager;
 import com.haojiangbo.thread.MeidaParserInstand;
 import com.haojiangbo.thread.ParserMediaProtoThreadPool;
+import com.haojiangbo.thread.VideoMediaParserInstand;
 import com.haojiangbo.utils.ToastUtils;
 import com.haojiangbo.utils.aes.AesEncodeUtil;
 import com.haojiangbo.utils.android.StatusBarColorUtils;
@@ -153,8 +154,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         // 初始化音频录制
         initAudioRecorder();
-        // 开启音频播放
-        startAudioPlay();
+        // 开启媒体播放
+        startMediaPlay();
         // 初始化网络配置
         initNetworkConfig();
 
@@ -193,11 +194,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void initAudioRecorder() {
         AudioRecorder.getInstance().createDefaultAudio();
     }
-    private void startAudioPlay(){
+    private void startMediaPlay(){
         //Intent intent = new Intent(this,AudioPalyService.class);
         //startService(intent);
         // 启动接受音频数据的队列
         ParserMediaProtoThreadPool.exec(new MeidaParserInstand());
+        ParserMediaProtoThreadPool.exec(new VideoMediaParserInstand());
     }
 
     /**

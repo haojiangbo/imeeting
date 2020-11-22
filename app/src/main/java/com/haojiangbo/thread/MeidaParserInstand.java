@@ -31,7 +31,7 @@ public class MeidaParserInstand implements Runnable {
             try {
                ByteBuf byteBuf =  MEDIA_DATA_QUEUE.take();
                if(byteBuf.readableBytes() > 0){
-                   byteBuf.readBytes(11);
+                   byteBuf.readBytes(10);
                    byte [] bytes = new byte[byteBuf.readableBytes()];
                    byteBuf.readBytes(bytes);
                   /* // 转换协议

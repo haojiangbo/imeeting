@@ -26,6 +26,7 @@ namespace VideoEncode {
     AVFrame *frame;
     AVPacket *pkt;
     JtoolUtils jtoolUtils;
+    int pts = 0;
 }
 
 
@@ -105,6 +106,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
 
     char * data =  VideoEncode::jtoolUtils.jarray2charponit(env,bytes);
     memcpy(VideoEncode::frame->data[0],data, VideoEncode::jtoolUtils.charLen);
+    //VideoEncode::frame->pts = VideoEncode::pts;
     free(data);
     int ret = avcodec_send_frame(VideoEncode::c, VideoEncode::frame);
     if (ret < 0) {
