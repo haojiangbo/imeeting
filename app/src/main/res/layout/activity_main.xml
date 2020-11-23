@@ -7,6 +7,18 @@
     android:background="@color/white"
     tools:context=".MainActivity">
 
+
+    <Button
+        android:id="@+id/open_video_test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="打开视频"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentLeft="true"
+        android:layout_marginTop="20dp"
+        android:onClick="onClick"
+        ></Button>
+
     <TextView
         android:visibility="gone"
         android:id="@+id/message"

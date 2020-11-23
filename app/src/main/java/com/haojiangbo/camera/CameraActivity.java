@@ -159,8 +159,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         handlerThread.start();
         childHandler = new Handler(handlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
-        mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT;//后摄像头
-        mImageReader = ImageReader.newInstance(1920, 1080, ImageFormat.YUV_420_888,10);
+        //后摄像头
+        mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT;
+        mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888,10);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
             @Override
             public void onImageAvailable(ImageReader reader) {
@@ -187,8 +188,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 // U和V分量的计算方式 每4个Y分量采集1个 U / V 分量
                 // 所以他们占用的内存大小就是 1920 / 4 * 1080 = 1036780;
                 // 但为什么显示的是 1036799 呢 因为 pixelStride = 2 最后一个字节省略掉了
-                Rect crop = new Rect(10,10,650,970);
-                image.setCropRect(crop);
+               /* Rect crop = new Rect(10,10,650,970);*/
+                //image.setCropRect(crop);
                 byte [] data =  getDataFromImage(image,COLOR_FormatI420);
                 //byte [] data =  ImageUtil.getBytesFromImageAsType(image,ImageUtil.YUV420P);
                 int oldDataLen = data.length;
@@ -216,11 +217,11 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private void sendPacketMessage(int oldDataLen, byte[] converData) {
         if(null != converData){
             Log.e("编码前数据","编码前大小"+oldDataLen + "编码后数据大小"+converData.length);
-           /* try {
+            try {
                 outputStream.write(converData);
             } catch (IOException e) {
                 e.printStackTrace();
-            }*/
+            }
 
 
             MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();

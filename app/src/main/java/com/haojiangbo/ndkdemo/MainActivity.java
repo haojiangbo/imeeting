@@ -160,9 +160,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startMediaPlay();
         // 初始化网络配置
         initNetworkConfig();
-        // 测试代码，视频传输
-        /*Intent intent = new Intent(this,CameraActivity.class);
-        startActivity(intent);*/
     }
 
     @Override
@@ -245,6 +242,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.register_number:
                 Intent intent = new Intent(this,RigisterNumber.class);
                 startActivity(intent);
+                break;
+            case R.id.open_video_test:
+                Intent intentv = new Intent(this,CameraActivity.class);
+                startActivity(intentv);
                 break;
             default:
                 viewHander(v);

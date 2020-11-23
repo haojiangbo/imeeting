@@ -86,7 +86,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     VideoEncode::c->bit_rate = 400000;
     /* resolution must be a multiple of two */
     VideoEncode::c->width = 640;
-    VideoEncode::c->height = 960;
+    VideoEncode::c->height = 480;
     /* frames per second */
     VideoEncode::c->time_base = (AVRational){1, 25};
     VideoEncode::c->framerate = (AVRational){25, 1};

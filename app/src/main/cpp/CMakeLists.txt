@@ -53,6 +53,8 @@ add_library( # Sets the name of the library.
         audio/AudioDecode.cpp
         video/VideoEncode.cpp
         video/VideoDecode.cpp
+        utils/ByteBuf.h
+        utils/ByteBuf.cpp
         )
 
 
