@@ -70,12 +70,12 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
     private static final SparseIntArray ORIENTATIONS = new SparseIntArray();
 
     ///为了使照片竖直显示
-    /*static {
+    static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
         ORIENTATIONS.append(Surface.ROTATION_90, 0);
         ORIENTATIONS.append(Surface.ROTATION_180, 270);
         ORIENTATIONS.append(Surface.ROTATION_270, 180);
-    }*/
+    }
 
     private SurfaceView mSurfaceView;
     private SurfaceHolder mSurfaceHolder;

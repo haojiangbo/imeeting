@@ -7,6 +7,16 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+/**
+ *
+ * 参考netty的ByteBuf使用方法
+ * 实现的
+ * 原先是C语言版本的
+ * 在内网穿透的项目里
+ * 又挪过来了  - -!
+ * @anchor 郝江波
+ *
+ */
 struct ByteBuf {
     int readIndex;
     int writeIndex;

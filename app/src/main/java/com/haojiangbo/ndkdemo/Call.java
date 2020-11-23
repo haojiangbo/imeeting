@@ -1,45 +1,73 @@
 package com.haojiangbo.ndkdemo;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import io.netty.channel.socket.DatagramPacket;
+import io.netty.util.internal.StringUtil;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.ImageFormat;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorListener;
 import android.hardware.SensorManager;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCaptureSession;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraDevice;
+import android.hardware.camera2.CameraManager;
+import android.hardware.camera2.CaptureRequest;
 import android.media.AudioManager;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
 import com.haojiangbo.audio.AudioTrackManager;
+import com.haojiangbo.camera.CameraActivity;
 import com.haojiangbo.eventbus.CallReplyModel;
 import com.haojiangbo.eventbus.MessageModel;
+import com.haojiangbo.ffmpeg.VideoEncode;
+import com.haojiangbo.net.MediaProtocolManager;
 import com.haojiangbo.net.config.NettyKeyConfig;
 import com.haojiangbo.net.protocol.ControlProtocol;
+import com.haojiangbo.net.protocol.MediaDataProtocol;
 import com.haojiangbo.net.protocol.Pod;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
+import com.haojiangbo.utils.ImageUtil;
 import com.haojiangbo.utils.ToastUtils;
 import com.haojiangbo.utils.android.StatusBarColorUtils;
+import com.haojiangbo.widget.VideoSurface;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.util.Arrays;
 import java.util.UUID;
 
@@ -59,11 +87,29 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
     Button acceptCall,hangCall,checkStream;
     byte type = 0;
 
+
+    //////////////////////////////////////////// videoSurface ////////////////////////////////
+    private VideoSurface videoSurface;
+    private SurfaceHolder mSurfaceHolder;
+    public static  VideoSurface myVideoSurface;
+    private CameraManager mCameraManager;//摄像头管理器
+    private Handler childHandler, mainHandler;
+    private String mCameraID;//摄像头Id 0 为后  1 为前
+    private ImageReader mImageReader;
+    private CameraCaptureSession mCameraCaptureSession;
+    private CameraDevice mCameraDevice;
+    // 视频解码器
+    VideoEncode videoEncode = new VideoEncode();
+    //////////////////////////////////////////// videoSurface ////////////////////////////////
+
+
+
     // 电源管理对象
     // 屏幕开关
     private PowerManager localPowerManager = null;// 电源管理对象
     private PowerManager.WakeLock localWakeLock = null;// 电源锁
     public SensorManager sm;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +119,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         if(null !=  actionBar){
             actionBar.hide();
         }
+        videoEncode.initContext();
         // 初始化
         EventBus.getDefault().register(this);
         StatusBarColorUtils.setBarColor(this,R.color.heise,false);
@@ -81,7 +128,8 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         acceptCall  = findViewById(R.id.accept_call);
         hangCall = findViewById(R.id.hang_call);
         checkStream = findViewById(R.id.check_stream);
-
+        videoSurface = findViewById(R.id.call_video_surface);
+        myVideoSurface = findViewById(R.id.my_surface_show);
         // 切换音频流到耳机
         AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
 
@@ -114,9 +162,10 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         }
         // 保持屏幕常量
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
         //初始化距离传感器
         initRangeSensor();
+        //初始化视频
+        initVideoConfig();
     }
 
 
@@ -184,7 +233,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
                             i = 0;
                         }
                         totalNumber += 500;
-                        if(totalNumber >= 1000 * 10){
+                        if(totalNumber >= 1000 * 60){
                             runloding = 0;
                             runOnUiThread(() -> {
                                 ToastUtils.showToastLong("对方无人接听");
@@ -278,6 +327,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
                 localWakeLock.release();
             }catch (Exception e){}
         }
+        videoEncode.freeContext();
         super.onDestroy();
     }
 
@@ -330,6 +380,159 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         }
     }
 
+
+    /**
+     * 视频参数配置
+     */
+    private void initVideoConfig() {
+        videoSurface.setOnClickListener(this);
+        mSurfaceHolder = videoSurface.getHolder();
+        mSurfaceHolder.setKeepScreenOn(true);
+        // mSurfaceView添加回调
+        mSurfaceHolder.addCallback(new SurfaceHolder.Callback() {
+            @Override
+            public void surfaceCreated(SurfaceHolder holder) {
+                //SurfaceView创建
+                // 初始化Camera
+                initCamera2();
+            }
+
+            @Override
+            public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+            }
+
+            @Override
+            public void surfaceDestroyed(SurfaceHolder holder) { //SurfaceView销毁
+                // 释放Camera资源
+                if (null != mCameraDevice) {
+                    mCameraDevice.close();
+                    Call.this.mCameraDevice = null;
+                }
+            }
+        });
+    }
+
+
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void initCamera2() {
+        HandlerThread handlerThread = new HandlerThread("Camera2");
+        handlerThread.start();
+        childHandler = new Handler(handlerThread.getLooper());
+        mainHandler = new Handler(getMainLooper());
+        //后摄像头
+        mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT;
+        mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888,10);
+        mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
+            @Override
+            public void onImageAvailable(ImageReader reader) {
+                Image image = reader.acquireNextImage();
+                byte [] data =ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
+                //byte [] data =  ImageUtil.getBytesFromImageAsType(image,ImageUtil.YUV420P);
+                int oldDataLen = data.length;
+                byte [] converData =  videoEncode.encodeFrame(data);
+                // 发送数据
+                sendPacketMessage(oldDataLen, converData);
+                image.close();
+            }
+        }, childHandler);
+        //获取摄像头管理
+        mCameraManager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+        try {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            //打开摄像头
+            mCameraManager.openCamera(mCameraID, stateCallback, mainHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 摄像头创建监听
+     */
+    private CameraDevice.StateCallback stateCallback = new CameraDevice.StateCallback() {
+        @Override
+        public void onOpened(CameraDevice camera) {//打开摄像头
+            mCameraDevice = camera;
+            //开启预览
+            takePreview();
+        }
+
+        @Override
+        public void onDisconnected(CameraDevice camera) {//关闭摄像头
+            if (null != mCameraDevice) {
+                mCameraDevice.close();
+                Call.this.mCameraDevice = null;
+            }
+        }
+
+        @Override
+        public void onError(CameraDevice camera, int error) {//发生错误
+            Toast.makeText(Call.this, "摄像头开启失败", Toast.LENGTH_SHORT).show();
+        }
+    };
+
+    /**
+     * 开始预览
+     */
+    private void takePreview() {
+        try {
+            // 创建预览需要的CaptureRequest.Builder
+            final CaptureRequest.Builder previewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            // 将SurfaceView的surface作为CaptureRequest.Builder的目标
+            previewRequestBuilder.addTarget(mSurfaceHolder.getSurface());
+            // todo 设置实时帧数据接收
+            previewRequestBuilder.addTarget(mImageReader.getSurface());
+            // 创建CameraCaptureSession，该对象负责管理处理预览请求和拍照请求
+            mCameraDevice.createCaptureSession(Arrays.asList(mSurfaceHolder.getSurface(), mImageReader.getSurface()), new CameraCaptureSession.StateCallback() // ③
+            {
+                @Override
+                public void onConfigured(CameraCaptureSession cameraCaptureSession) {
+                    if (null == mCameraDevice) return;
+                    // 当摄像头已经准备好时，开始显示预览
+                    mCameraCaptureSession = cameraCaptureSession;
+                    try {
+                        // 自动对焦
+                        previewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
+                        // 打开闪光灯
+                        previewRequestBuilder.set(CaptureRequest.CONTROL_AE_MODE, CaptureRequest.CONTROL_AE_MODE_ON_AUTO_FLASH);
+                        // 显示预览
+                        CaptureRequest previewRequest = previewRequestBuilder.build();
+                        mCameraCaptureSession.setRepeatingRequest(previewRequest, null, childHandler);
+                    } catch (CameraAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onConfigureFailed(CameraCaptureSession cameraCaptureSession) {
+                    Toast.makeText(Call.this, "配置失败", Toast.LENGTH_SHORT).show();
+                }
+            }, childHandler);
+        } catch (CameraAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void sendPacketMessage(int oldDataLen, byte[] converData) {
+        if(StringUtil.isNullOrEmpty(MainActivity.TARGET_NUMBER)){
+            return;
+        }
+        if(null != converData){
+            MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
+            mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;
+            mediaDataProtocol.number = MainActivity.TARGET_NUMBER.getBytes();
+            mediaDataProtocol.dataSize = converData.length;
+            mediaDataProtocol.data = converData;
+            //发送视频数据
+            DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol
+                    .mediaDataProtocolToByteBuf(MediaProtocolManager.CHANNEL,
+                            mediaDataProtocol),new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
+            MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
+        }
+    }
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
         Log.e("onAccuracyChanged", ">>>>>>"+accuracy);

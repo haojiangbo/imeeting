@@ -9,6 +9,7 @@ import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.camera.CameraActivity;
 import com.haojiangbo.ffmpeg.AudioDecode;
 import com.haojiangbo.ffmpeg.VideoDecode;
+import com.haojiangbo.ndkdemo.Call;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,7 +43,7 @@ public class VideoMediaParserInstand implements Runnable{
                     byteBuf.readBytes(bytes);
                     Log.e("video_负载大小>>",bytes.length + ">>>>");
                     //byte [] b = videoDecode.decodeFrame(bytes);
-                    videoDecode.drawSurface(CameraActivity.videoSurface.mSurface,bytes);
+                    videoDecode.drawSurface(Call.myVideoSurface.mSurface,bytes);
 
                     ReferenceCountUtil.release(byteBuf);
                 }

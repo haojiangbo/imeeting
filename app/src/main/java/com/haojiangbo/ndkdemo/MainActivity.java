@@ -160,12 +160,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startMediaPlay();
         // 初始化网络配置
         initNetworkConfig();
+
+        initConfigInfo();
     }
 
     @Override
     protected void onStart() {
         // 获取配置信息
-        initConfigInfo();
         super.onStart();
     }
 

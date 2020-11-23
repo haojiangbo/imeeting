@@ -88,7 +88,7 @@ Java_com_haojiangbo_ffmpeg_AudioEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
     char * data =  jtoolUtils.jarray2charponit(env,bytes);
     // 指针拷贝 用于后面的内存释放
     char * freeDataPoint = data;
-    ALOGE("111111 inputDataLen = %d,  nb_samples = %d ",jtoolUtils.charLen,frame->nb_samples);
+    //ALOGE("111111 inputDataLen = %d,  nb_samples = %d ",jtoolUtils.charLen,frame->nb_samples);
     int srcLen = jtoolUtils.charLen;
     int totalSamples = jtoolUtils.charLen;
     int constSamplesLen = frame->nb_samples;
@@ -115,7 +115,7 @@ Java_com_haojiangbo_ffmpeg_AudioEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
             ALOGE("Error sending the frame to the encoder %s\n ",ret);
             continue;
         }
-        ALOGE("222222 inputDataLen = %d,  nb_samples = %d ",jtoolUtils.charLen,frame->nb_samples);
+        //ALOGE("222222 inputDataLen = %d,  nb_samples = %d ",jtoolUtils.charLen,frame->nb_samples);
         while (ret >= 0) {
             ret = avcodec_receive_packet(c, pkt);
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)

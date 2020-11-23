@@ -7,6 +7,12 @@
     android:background="@color/heise"
     tools:context=".Call">
 
+    <com.haojiangbo.widget.VideoSurface
+        android:id="@+id/my_surface_show"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </com.haojiangbo.widget.VideoSurface>
+
     <ImageView
         android:layout_width="100dp"
         android:layout_height="100dp"
@@ -57,8 +63,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:background="@color/heise"
             android:onClick="onClick"
+            android:background="#00000000"
             android:drawableTop="@drawable/accept"
             android:textColor="@color/white"
             android:text="接听"
@@ -70,8 +76,8 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:background="@color/heise"
             android:onClick="onClick"
+            android:background="#00000000"
             android:drawableTop="@drawable/volume"
             android:textColor="@color/white"
             android:visibility="gone"
@@ -84,7 +90,7 @@
             android:layout_width="0dp"
             android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:background="@color/heise"
+            android:background="#00000000"
             android:onClick="onClick"
             android:drawableTop="@drawable/close_call"
             android:textColor="@color/white"
@@ -92,5 +98,14 @@
             ></Button>
     </LinearLayout>
 
+
+
+    <com.haojiangbo.widget.VideoSurface
+        android:id="@+id/call_video_surface"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_width="100dp"
+        android:layout_height="170dp"
+        />
 
 </RelativeLayout>
