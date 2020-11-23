@@ -529,7 +529,11 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
                 return;
             }
             mediaDataProtocol.number = MainActivity.TARGET_NUMBER.getBytes();
-            mediaDataProtocol.dataSize = converData.length;
+            // 高位1字节 表示摄像头的正反
+            int  camareType = cameraIndex << 24;
+            // 服务端最大接受65535个字节 2 位足够表示了
+            int dataSizeBit = converData.length & 0xFFFF;
+            mediaDataProtocol.dataSize = camareType | dataSizeBit;
             mediaDataProtocol.data = converData;
             //发送视频数据
             DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol

@@ -38,12 +38,17 @@ public class VideoMediaParserInstand implements Runnable{
             try {
                 ByteBuf byteBuf =  MEDIA_DATA_QUEUE.take();
                 if(byteBuf.readableBytes() > 0){
-                    byteBuf.readBytes(10);
+                    byteBuf.readBytes(6);
+                    int cameraType = byteBuf.readByte();
+                    int totalDataSize =
+                            byteBuf.readByte() << 16
+                                    | byteBuf.readByte() << 8
+                                    | byteBuf.readByte();
                     byte [] bytes = new byte[byteBuf.readableBytes()];
                     byteBuf.readBytes(bytes);
-                    Log.e("video_负载大小>>",bytes.length + ">>>>");
+                    Log.e("video_负载大小>>",bytes.length + ">>>> n >>"+totalDataSize);
                     //byte [] b = videoDecode.decodeFrame(bytes);
-                    videoDecode.drawSurface(Call.myVideoSurface.mSurface,bytes,Call.cameraIndex);
+                    videoDecode.drawSurface(Call.myVideoSurface.mSurface,bytes,cameraType);
                     //videoDecode.drawSurface(CameraActivity.videoSurface.mSurface,bytes);
                     ReferenceCountUtil.release(byteBuf);
                 }

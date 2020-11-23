@@ -41,7 +41,12 @@ public class MediaDataProtocol {
         byteBuf.readBytes(number);
         protocol.number = number;
         protocol.dataSize = byteBuf.readInt();
-        byte data[] = new byte[protocol.dataSize];
+        // 取出 int 2 个 低字节 得到数据总大小
+        int dataSize =
+                ((protocol.dataSize & 0xffff) >>> 8) << 8
+                        |
+                        (protocol.dataSize & 0xff);
+        byte data[] = new byte[dataSize];
         byteBuf.readBytes(data);
         protocol.data = data;
         return  protocol;
