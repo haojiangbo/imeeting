@@ -96,7 +96,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
     private Handler childHandler, mainHandler;
     public  String mCameraID;
     //摄像头Id 0 为后  1 为前
-    public static int  cameraIndex = 0;
+    public static int  cameraIndex = 1;
     private ImageReader mImageReader;
     private CameraCaptureSession mCameraCaptureSession;
     private CameraDevice mCameraDevice;
