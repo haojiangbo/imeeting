@@ -421,7 +421,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         childHandler = new Handler(handlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
         //后摄像头
-        mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT;
+        mCameraID = "" + 1;
         mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888,10);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
             @Override
@@ -523,6 +523,9 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         if(null != converData){
             MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
             mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;
+            if(StringUtil.isNullOrEmpty(MainActivity.TARGET_NUMBER)){
+                return;
+            }
             mediaDataProtocol.number = MainActivity.TARGET_NUMBER.getBytes();
             mediaDataProtocol.dataSize = converData.length;
             mediaDataProtocol.data = converData;

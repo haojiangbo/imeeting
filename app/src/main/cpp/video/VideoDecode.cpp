@@ -42,6 +42,25 @@ namespace VideoDecode {
     ByteBuf *byteBuf;
     int totalCatch = 0;
 
+    char * rotate90(int width, int height) {
+        char *resultBuff = (char *) malloc(VideoDecode::rgbaBuffSize);
+        int x = 0;
+        int y = 0;
+        int posR = 0;
+        int posS = 0;
+        for (x = 0; x < width; x++) {
+            for (y = height - 1; y >= 0; y--) {
+                posS = (y * width + x) * 4;
+                resultBuff[posR + 0] = VideoDecode::rgbaFrame->data[0][posS + 0];// R
+                resultBuff[posR + 1] = VideoDecode::rgbaFrame->data[0][posS + 1];// G
+                resultBuff[posR + 2] = VideoDecode::rgbaFrame->data[0][posS + 2];// B
+                resultBuff[posR + 3] = VideoDecode::rgbaFrame->data[0][posS + 3];// A
+                posR += 4;
+            }
+        }
+        return resultBuff;
+    }
+
     int decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt) {
         int ret;
         ret = avcodec_send_packet(dec_ctx, pkt);
@@ -223,6 +242,14 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
                     // get video width , height
                     int videoWidth = VideoDecode::c->width;
                     int videoHeight = VideoDecode::c->height;
+                    int is90 = 0;
+                    if(is90 == 1){
+                        // 图像要经过一个旋转 640 * 480 旋转 90° 变成 480 * 640
+                         videoWidth = VideoDecode::c->height;
+                         videoHeight = VideoDecode::c->width;
+                    }
+
+
                     // 设置native window的buffer大小,可自动拉伸
                     ALOGI("set native window");
                     ANativeWindow_setBuffersGeometry(nativeWindow, videoWidth, videoHeight,
@@ -232,13 +259,29 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
                     ANativeWindow_lock(nativeWindow, &windowBuffer, NULL);
                     // 获取stride  绘制图像
                     uint8_t *dst = (uint8_t *) windowBuffer.bits;
-                    uint8_t *src = VideoDecode::rgbaFrame->data[0];
-                    int dstStride = windowBuffer.stride * 4;
-                    int srcStride = VideoDecode::rgbaFrame->linesize[0];
-                    // 由于window的stride和帧的stride不同,因此需要逐行复制
-                    for (int i = 0; i < videoHeight; i++) {
-                        memcpy(dst + i * dstStride, src + i * srcStride, srcStride);
+                    // 此处拿到的frame是经过转换的
+                    uint8_t *src = NULL;
+                    if(is90 == 1){
+                        uint8_t  *tmpRotate =  (uint8_t *)VideoDecode::rotate90(VideoDecode::defalutWidth,VideoDecode::defaultHeight);
+                        src = tmpRotate;
+                        int dstStride = windowBuffer.stride * 4;
+                        // 步幅由 480 * 4 转成 640 * 4;
+                        int srcStride = videoWidth * 4;
+                        // 由于window的stride和帧的stride不同,因此需要逐行复制
+                        for (int i = 0; i < videoHeight; i++) {
+                            memcpy(dst + i * dstStride, src + i * srcStride, srcStride);
+                        }
+                        free(tmpRotate);
+                    }else{
+                        src = VideoDecode::rgbaFrame->data[0];
+                        int dstStride = windowBuffer.stride * 4;
+                        int srcStride = VideoDecode::rgbaFrame->linesize[0];
+                        for (int i = 0; i < videoHeight; i++) {
+                            memcpy(dst + i * dstStride, src + i * srcStride, srcStride);
+                        }
                     }
+
+
                     ANativeWindow_unlockAndPost(nativeWindow);
                     ANativeWindow_release(nativeWindow);
                     continue;
