@@ -94,7 +94,9 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
     public static  VideoSurface myVideoSurface;
     private CameraManager mCameraManager;//摄像头管理器
     private Handler childHandler, mainHandler;
-    private String mCameraID;//摄像头Id 0 为后  1 为前
+    public  String mCameraID;
+    //摄像头Id 0 为后  1 为前
+    public static int  cameraIndex = 0;
     private ImageReader mImageReader;
     private CameraCaptureSession mCameraCaptureSession;
     private CameraDevice mCameraDevice;
@@ -421,7 +423,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         childHandler = new Handler(handlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
         //后摄像头
-        mCameraID = "" + 1;
+        mCameraID = "" + cameraIndex;
         mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888,10);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
             @Override

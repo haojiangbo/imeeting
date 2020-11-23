@@ -17,6 +17,6 @@ public class VideoDecode implements Codec {
     @Override
     public native void freeContext() ;
 
-    public native void drawSurface(Surface mSurface,byte[] bytes);
+    public native void drawSurface(Surface mSurface,byte[] bytes,int camera);
 
 }

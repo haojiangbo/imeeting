@@ -42,13 +42,37 @@ namespace VideoDecode {
     ByteBuf *byteBuf;
     int totalCatch = 0;
 
-    char * rotate90(int width, int height) {
+    char * rotate90Clockwise(int width, int height) {
         char *resultBuff = (char *) malloc(VideoDecode::rgbaBuffSize);
         int x = 0;
         int y = 0;
         int posR = 0;
         int posS = 0;
         for (x = 0; x < width; x++) {
+            for (y = height - 1; y >= 0; y--) {
+                posS = (y * width + x) * 4;
+                resultBuff[posR + 0] = VideoDecode::rgbaFrame->data[0][posS + 0];// R
+                resultBuff[posR + 1] = VideoDecode::rgbaFrame->data[0][posS + 1];// G
+                resultBuff[posR + 2] = VideoDecode::rgbaFrame->data[0][posS + 2];// B
+                resultBuff[posR + 3] = VideoDecode::rgbaFrame->data[0][posS + 3];// A
+                posR += 4;
+            }
+        }
+        return resultBuff;
+    }
+    /**
+     * 逆时针
+     * @param width
+     * @param height
+     * @return
+     */
+    char * rotate90Anticlockwise(int width, int height) {
+        char *resultBuff = (char *) malloc(VideoDecode::rgbaBuffSize);
+        int x = 0;
+        int y = 0;
+        int posR = 0;
+        int posS = 0;
+        for (x = width-1; x >= 0; x--) {
             for (y = height - 1; y >= 0; y--) {
                 posS = (y * width + x) * 4;
                 resultBuff[posR + 0] = VideoDecode::rgbaFrame->data[0][posS + 0];// R
@@ -210,7 +234,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
 extern "C"
 JNIEXPORT void JNICALL
 Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jobject m_surface,
-                                                   jbyteArray bytes) {
+                                                   jbyteArray bytes,int camera) {
     char *dataBuff = VideoDecode::jtoolUtils.jarray2charponit(env, bytes);
     int data_size = VideoDecode::jtoolUtils.charLen;
     byteBufWrite(VideoDecode::byteBuf, ((char *) dataBuff), data_size);
@@ -242,7 +266,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
                     // get video width , height
                     int videoWidth = VideoDecode::c->width;
                     int videoHeight = VideoDecode::c->height;
-                    int is90 = 0;
+                    int is90 = 1;
                     if(is90 == 1){
                         // 图像要经过一个旋转 640 * 480 旋转 90° 变成 480 * 640
                          videoWidth = VideoDecode::c->height;
@@ -262,7 +286,14 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
                     // 此处拿到的frame是经过转换的
                     uint8_t *src = NULL;
                     if(is90 == 1){
-                        uint8_t  *tmpRotate =  (uint8_t *)VideoDecode::rotate90(VideoDecode::defalutWidth,VideoDecode::defaultHeight);
+                        //uint8_t  *tmpRotate =  (uint8_t *)VideoDecode::rotate90Clockwise(VideoDecode::defalutWidth,VideoDecode::defaultHeight);
+                        // 逆时针
+                        uint8_t  *tmpRotate = NULL;
+                        if(camera == 0){
+                            tmpRotate =  (uint8_t *)VideoDecode::rotate90Clockwise(VideoDecode::defalutWidth,VideoDecode::defaultHeight);
+                        }else{
+                            tmpRotate =  (uint8_t *)VideoDecode::rotate90Anticlockwise(VideoDecode::defalutWidth,VideoDecode::defaultHeight);
+                        }
                         src = tmpRotate;
                         int dstStride = windowBuffer.stride * 4;
                         // 步幅由 480 * 4 转成 640 * 4;
