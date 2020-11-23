@@ -25,7 +25,10 @@ public class MediaDataProtocol {
     public byte type;
     // 电话号码
     public byte[] number;
-    // 方便以后扩展的字段
+    // 方便以后扩展的字段 2020/11/20
+    // datasize占用2个字节,低字节位2字节表示数据大小
+    // 高2位字节 用来表示 摄像头的方向 前摄像头和后摄像头 2020/11/23
+    // 协议设计这种，总是做的时候才能发现坑
     public int dataSize;
     // 数据负载
     public byte[] data;
