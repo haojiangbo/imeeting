@@ -19,6 +19,7 @@
         android:layout_marginTop="150dp"
         android:layout_centerHorizontal="true"
         android:src="@drawable/user"
+        android:visibility="gone"
         >
     </ImageView>
 
@@ -107,5 +108,22 @@
         android:layout_width="100dp"
         android:layout_height="170dp"
         />
+
+
+
+    <Button
+        android:id="@+id/choose_camera_index"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:drawableTop="@drawable/choose_camera"
+        android:text="切换"
+        android:onClick="onClick"
+        android:background="#00000000"
+        android:layout_below="@id/call_video_surface"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="30dp"
+        >
+    </Button>
 
 </RelativeLayout>

@@ -17,6 +17,7 @@
         android:layout_alignParentLeft="true"
         android:layout_marginTop="20dp"
         android:onClick="onClick"
+        android:visibility="gone"
         ></Button>
 
     <TextView

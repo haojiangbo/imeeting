@@ -40,10 +40,11 @@ public class VideoMediaParserInstand implements Runnable{
                 if(byteBuf.readableBytes() > 0){
                     byteBuf.readBytes(6);
                     int cameraType = byteBuf.readByte();
-                    int totalDataSize =
-                            byteBuf.readByte() << 16
-                                    | byteBuf.readByte() << 8
-                                    | byteBuf.readByte();
+                    byteBuf.readByte();
+                    // 注意 & 0xFF 防止高位补1 导致数据不一致
+                    int b = (byteBuf.readByte() & 0xFF) << 8;
+                    int l = byteBuf.readByte() & 0xFF;
+                    int totalDataSize = b | l;
                     byte [] bytes = new byte[byteBuf.readableBytes()];
                     byteBuf.readBytes(bytes);
                     Log.e("video_负载大小>>",bytes.length + ">>>> n >>"+totalDataSize);
