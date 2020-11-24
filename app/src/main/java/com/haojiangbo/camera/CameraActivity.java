@@ -91,7 +91,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     // 视频解码器
     VideoEncode videoEncode = new VideoEncode();
-    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile()+"/callme/test.mp4");
+    File file = new File(Environment.getExternalStorageDirectory().getAbsoluteFile()+"/callme/test3.mp4");
     OutputStream outputStream ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -190,7 +190,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 // 但为什么显示的是 1036799 呢 因为 pixelStride = 2 最后一个字节省略掉了
                /* Rect crop = new Rect(10,10,650,970);*/
                 //image.setCropRect(crop);
-                byte [] data =  getDataFromImage(image,COLOR_FormatI420);
+                byte [] data =  ImageUtil.getDataFromImageByHaojiangbo(image);
                 //byte [] data =  ImageUtil.getBytesFromImageAsType(image,ImageUtil.YUV420P);
                 int oldDataLen = data.length;
                 byte [] converData =  videoEncode.encodeFrame(data);
@@ -216,18 +216,20 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private void sendPacketMessage(int oldDataLen, byte[] converData) {
         if(null != converData){
-            Log.e("编码前数据","编码前大小"+oldDataLen + "编码后数据大小"+converData.length);
             try {
                 outputStream.write(converData);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
-
+            Log.e("编码前数据","编码前大小"+oldDataLen + "编码后数据大小"+converData.length);
             MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
             mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;
             mediaDataProtocol.number = MainActivity.CALL_NUMBER.getBytes();
-            mediaDataProtocol.dataSize = converData.length;
+            // 高位1字节 表示摄像头的正反
+            int camareType = 1 << 24;
+            // 服务端最大接受65535个字节 2 位足够表示了
+            int dataSizeBit = converData.length & 0xFFFF;
+            mediaDataProtocol.dataSize = camareType | dataSizeBit;
             mediaDataProtocol.data = converData;
 
             //发送视频数据

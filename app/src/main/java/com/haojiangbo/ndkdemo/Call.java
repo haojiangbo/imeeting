@@ -365,6 +365,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
                     checkStream.setText("免提");
                     checkStream.setTextColor(getResources().getColor(R.color.white));
                 }
+                break;
             case R.id.choose_camera_index:
                 closeCamera();
                 if(cameraIndex == 1){
@@ -443,8 +444,8 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
             public void onImageAvailable(ImageReader reader) {
                 Image image = reader.acquireNextImage();
                 if(runloding == 0){
-                   byte[] data = ImageUtil.getDataFromImage(image, ImageUtil.COLOR_FormatI420);
-                    //  byte[] data = ImageUtil.getDataFromImageByHaojiangbo(image);
+                    //  byte[] data = ImageUtil.getDataFromImage(image, ImageUtil.COLOR_FormatI420);
+                    byte[] data = ImageUtil.getDataFromImageByHaojiangbo(image);
                     int oldDataLen = data.length;
                     byte[] converData = videoEncode.encodeFrame(data);
                     // 发送数据
