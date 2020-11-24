@@ -353,6 +353,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
                 acceptCall.setVisibility(View.GONE);
                 checkStream.setVisibility(View.VISIBLE);
                 AudioRecorder.getInstance().startRecord();
+                runloding = 0;
                 break;
             case R.id.check_stream:
                 if (checkStream.getText().toString().equals("免提")) {
