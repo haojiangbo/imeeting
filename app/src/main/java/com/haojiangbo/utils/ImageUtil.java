@@ -8,6 +8,8 @@ import android.util.Log;
 
 import java.nio.ByteBuffer;
 
+import io.netty.buffer.ByteBuf;
+
 /**
  *
  * https://blog.csdn.net/chenhande1990chenhan/article/details/88353271
@@ -225,6 +227,42 @@ public class ImageUtil {
         }
         return data;
     }
+
+
+    public static byte[] getDataFromImageByHaojiangbo(Image image) {
+
+        if (!isImageFormatSupported(image)) {
+            throw new RuntimeException("can't convert Image to byte array, format " + image.getFormat());
+        }
+        Rect crop = image.getCropRect();
+        int format = image.getFormat();
+        int width = crop.width();
+        int height = crop.height();
+        Image.Plane[] planes = image.getPlanes();
+        byte[] data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
+        int userIndex = 0;
+        for(int i = 0; i < planes.length; i++){
+            Image.Plane plane = planes[i];
+            ByteBuffer byteBuf =  plane.getBuffer();
+            switch (i){
+                case 0:
+                    byteBuf.get(data,0,width * height);
+                    userIndex += width * height;
+                    break;
+                case 1:
+                case 2:
+                    for(int z = 0; z < width / 2 * height - 1; z += 2){
+                        data [userIndex]  =  byteBuf.get(z);
+                        userIndex ++;
+                    }
+            }
+        }
+        return data;
+    }
+
+
+
+
 
 
 }
