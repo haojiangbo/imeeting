@@ -11,6 +11,19 @@
 ![](./src/main/resources/协议.png)
 
 
+
+
+#客户端代码
+-  [点击此处](https://gitee.com/haojiangbo/venomous_sting/tree/master/multimedia)
+-  注意  使用的是android的分支，后面会预留c++分支代码
+
+##使用教程
+
+改日再更...
+
+
+
 ### 备注
 
-我的代码规范不是很好,望见谅
+代码规范不是很好,望见谅
+
