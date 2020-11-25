@@ -227,7 +227,11 @@ public class ImageUtil {
         return data;
     }
 
-
+    /**
+     * 我认为我的代码是最优的
+     * @param image
+     * @return
+     */
     public static byte[] getDataFromImageByHaojiangbo(Image image) {
 
         if (!isImageFormatSupported(image)) {
@@ -239,20 +243,20 @@ public class ImageUtil {
         int height = crop.height();
         Image.Plane[] planes = image.getPlanes();
         byte[] data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
-        int userIndex = 0;
+        int useIndex = 0;
         for(int i = 0; i < planes.length; i++){
             Image.Plane plane = planes[i];
             ByteBuffer byteBuf =  plane.getBuffer();
             switch (i){
                 case 0:
                     byteBuf.get(data,0,width * height);
-                    userIndex += width * height;
+                    useIndex += width * height;
                     break;
                 case 1:
                 case 2:
                     for(int z = 0; z < width / 2 * height - 1; z += 2){
-                        data [userIndex]  =  byteBuf.get(z);
-                        userIndex ++;
+                        data [useIndex]  =  byteBuf.get(z);
+                        useIndex ++;
                     }
             }
         }
