@@ -49,10 +49,10 @@ public class VideoMediaParserInstand implements Runnable{
                     byteBuf.readBytes(bytes);
                     Log.e("video_负载大小>>",bytes.length + ">>>> n >>"+totalDataSize);
                     //byte [] b = videoDecode.decodeFrame(bytes);
-                    videoDecode.drawSurface(CameraActivity.videoSurface.mSurface,bytes,0);
-                    /*if(null != Call.myVideoSurface && null != Call.myVideoSurface.mSurface){
+                    //videoDecode.drawSurface(CameraActivity.videoSurface.mSurface,bytes,0);
+                    if(null != Call.myVideoSurface && null != Call.myVideoSurface.mSurface){
                        videoDecode.drawSurface(Call.myVideoSurface.mSurface,bytes,cameraType);
-                    }*/
+                    }
                     //videoDecode.drawSurface(CameraActivity.videoSurface.mSurface,bytes);
                     ReferenceCountUtil.release(byteBuf);
                 }

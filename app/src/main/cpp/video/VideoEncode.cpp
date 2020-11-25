@@ -137,7 +137,12 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
 
     char * data =  VideoEncode::jtoolUtils.jarray2charponit(env,bytes);
     memcpy(VideoEncode::frame->data[0],data, VideoEncode::jtoolUtils.charLen);
-   /* VideoEncode::frame->pts = VideoEncode::pts;
+    // https://blog.csdn.net/chinabinlang/article/details/7804808
+    // 向这个博客致敬
+    int size = VideoEncode::c->width * VideoEncode::c->height;
+    VideoEncode::frame->data[1] = VideoEncode::frame->data[0] + size;
+    VideoEncode::frame->data[2] = VideoEncode::frame->data[1] + size / 4;
+    /* VideoEncode::frame->pts = VideoEncode::pts;
     VideoEncode::pts++;*/
     free(data);
     return encode(env);

@@ -161,7 +161,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
         mainHandler = new Handler(getMainLooper());
         //后摄像头
         mCameraID = "" + CameraCharacteristics.LENS_FACING_FRONT;
-        mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888,10);
+        mImageReader = ImageReader.newInstance(640,480 , ImageFormat.YUV_420_888,10);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
             @Override
             public void onImageAvailable(ImageReader reader) {
@@ -190,8 +190,8 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 // 但为什么显示的是 1036799 呢 因为 pixelStride = 2 最后一个字节省略掉了
                /* Rect crop = new Rect(10,10,650,970);*/
                 //image.setCropRect(crop);
-                byte [] data =  ImageUtil.getDataFromImageByHaojiangbo(image);
-                //byte [] data =  ImageUtil.getBytesFromImageAsType(image,ImageUtil.YUV420P);
+                byte [] data =  ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
+                // byte [] data =  ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
                 int oldDataLen = data.length;
                 byte [] converData =  videoEncode.encodeFrame(data);
                 // 发送数据
