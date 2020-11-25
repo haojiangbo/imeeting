@@ -320,6 +320,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
             }
         }
         free(tmpData);
+        clearByteBuf(VideoDecode::byteBuf);
     }
     return;
 }

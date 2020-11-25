@@ -49,73 +49,6 @@ import java.util.List;
 import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 
 /**
- * 安卓 ffmpeg 编译
- *  https://www.jianshu.com/p/0a7f3175c1b9
- *  https://www.jianshu.com/p/276abc1ffbc6
- *  参考代码
- *  https://www.jianshu.com/p/f41cfc337f93
- *
- *  JNI环境参考
- *
- *
- *  编译环境 成功跑通的
- *  https://juejin.im/post/6844903945496690696
- *
- *
- *  代码地址
- * https://github.com/coopsrc/FFPlayerDemo/tree/master/app/src/main/java/cc/dewdrop/ffplayer
- *
- *
- * 安卓如何播放 pcm 数据
- * https://blog.csdn.net/c1392851600/article/details/86532500
- *
- *
- * https://www.jianshu.com/p/0a7f3175c1b9
- *
- *
- * C++ 与 java 方法的互相调用
- * https://blog.csdn.net/xfhy_/article/details/82801706
- *
- * 方法签名
- * https://blog.csdn.net/u011305680/article/details/75000349
- *
- *
- * 关于安卓工具 每次都需要 download maven metadata 的问题
- * 一般都是 gradle 的依赖 有不确定的依赖版本 版本后面带 + 号的
- * 去掉就可以了
- *
- *
- * 不用下载那个，执行这个就ok了；ln -s arm-linux-androideabi-4.9 mipsel-linux-android2年前回复
-    wind 下mklink /j mips64el-linux-android aarch64-linux-android-4.9
- *
- * 样式无法改变的问题
- * https://q.cnblogs.com/q/129915/
- *
- * 编解码  实例代码 都在 github上了
- * https://github.com/FFmpeg/FFmpeg/tree/master/doc/examples
- *
- *
- *  操作流程
- *     发送端
- *     MainActivity 操作键盘，拨打电话
- *     点击 CALL 之后 viewHander 打开 Call 这个 activity
- *     Call 这个 activity 调用 sendCallMessage 发送 一个 call 类型的数据包
- *     然后等待接收端反馈
- *     收到 CALL_REPLY 的数据 Call Activity的enventBus处理器会被触发
- *     然后打开录音发送数据
- *
- *     接收端
- *     收到call类型的数据包之后
- *     MainActivity 的 eventBus处理器会收到一个call类型的消息
- *     然后回复一个 CALL_REPLY 类型的消息 代表通话成功接通
- *     然后 发送 event 到 MainActivity
- *     然后重新打开 Call Activity 进行数据接听
- *
- *      视频通话准备工作
- *      https://www.cnblogs.com/yydcdut/p/3887250.html
- *
- *      // 如何获取yuv数据
- *      https://blog.csdn.net/import_sadaharu/article/details/52744899
  *
  */
 public class MainActivity extends AppCompatActivity implements View.OnClickListener{
@@ -160,13 +93,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startMediaPlay();
         // 初始化网络配置
         initNetworkConfig();
-
-        initConfigInfo();
     }
 
     @Override
     protected void onStart() {
         // 获取配置信息
+        initConfigInfo();
         super.onStart();
     }
 

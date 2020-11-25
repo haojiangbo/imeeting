@@ -59,15 +59,7 @@ public class AudioRecorder {
     private OutputStream outputStream;
     public static volatile  int  audioSessionId = -1;
 
-
-    /**
-     * 类级的内部类，也就是静态类的成员式内部类，该内部类的实例与外部类的实例
-     * 没有绑定关系，而且只有被调用时才会装载，从而实现了延迟加载
-     */
     private static class AudioRecorderHolder {
-        /**
-         * 静态初始化器，由JVM来保证线程安全
-         */
         private static AudioRecorder instance = new  AudioRecorder();
     }
 
@@ -124,17 +116,12 @@ public class AudioRecorder {
            while (status != Status.STATUS_STOP) {
               int readsize = audioRecord.read(audiodata, 0, bufferSizeInBytes);
                totalLen += readsize;
-               Log.e("maoc   data    size>>>>", " >>>"+bufferSizeInBytes);
-               Log.e("read   data    size>>>>", " >>>"+readsize);
                if (AudioRecord.ERROR_INVALID_OPERATION != readsize) {
                    byte [] tmpByte = new byte[readsize];
                    System.arraycopy(audiodata,0,tmpByte,0,readsize);
                    long startTime = System.nanoTime();
                    byte[] converData =  audioEncode.encodeFrame(tmpByte);
-                   Log.e("useTime ",(System.nanoTime() - startTime) + " us ");
 
-                  /* ByteBuf byteBuf =  MediaProtocolManager.CHANNEL.config().getAllocator().directBuffer(converData.length);
-                   byteBuf.writeBytes(converData,0,converData.length);*/
                    MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
                    mediaDataProtocol.type = MediaDataProtocol.AUDIO_DATA;
                    mediaDataProtocol.number = MainActivity.TARGET_NUMBER.getBytes();

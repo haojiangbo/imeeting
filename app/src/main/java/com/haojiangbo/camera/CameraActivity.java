@@ -61,9 +61,13 @@ import java.util.Arrays;
  * https://www.jianshu.com/p/7f766eb2f4e7
  *
  *
+ *
  * 介绍参考
  * https://blog.csdn.net/chenhande1990chenhan/article/details/88353271
-
+ *
+ *
+ * 这个是测试用，就懒得删了
+ *
  */
 public class CameraActivity extends AppCompatActivity implements View.OnClickListener{
 
@@ -166,32 +170,9 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             @Override
             public void onImageAvailable(ImageReader reader) {
                 Image image = reader.acquireNextImage();
-
-                // 其实这地方也不能说难，只是还没有掌握 YUV 的计算方式
-                // YUV420P 占用数据大小 width * heigth * 3 / 2
-                // 数据占用量计算方式
-                // YUV420P 分为 2大阵营
-                // YV12 和 YU12 | NV12 和 NV21
-
-
-                // YU12 和 YV12 格式都属于 YUV 420P 类型，即先存储 Y 分量，再存储 U、V 分量，
-                // 区别在于：YU12 是先 Y 再 U 后 V，而 YV12 是先 Y 再 V 后 U 。 有3个数组
-                // YU 12 又称作 I420 格式
-
-                //NV12 和 NV21 格式都属于 YUV420SP 类型。
-                // NV12 是 IOS 中有的模式 NV21 是安卓中的模式
-                // 它也是先存储了 Y 分量，
-                // 但接下来并不是再存储所有的 U 或者 V 分量，而是把 UV 分量交替连续存储。只有2个数组
-
-
-                // Y 分量 有多少像素就有多少 Y 所以 1920 * 1080 = 2073600;
-                // U和V分量的计算方式 每4个Y分量采集1个 U / V 分量
-                // 所以他们占用的内存大小就是 1920 / 4 * 1080 = 1036780;
-                // 但为什么显示的是 1036799 呢 因为 pixelStride = 2 最后一个字节省略掉了
                /* Rect crop = new Rect(10,10,650,970);*/
                 //image.setCropRect(crop);
                 byte [] data =  ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
-                // byte [] data =  ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
                 int oldDataLen = data.length;
                 byte [] converData =  videoEncode.encodeFrame(data);
                 // 发送数据
