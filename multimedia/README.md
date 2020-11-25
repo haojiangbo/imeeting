@@ -15,7 +15,7 @@
 
 ## 客户端代码
 -  [点击此处](https://gitee.com/haojiangbo/venomous_sting/tree/master/multimedia)
--  注意  使用的是android的分支，后面会预留c++分支代码
+-  注意  使用的是android的分支
 
 ## 使用教程
 
