@@ -18,7 +18,7 @@ public class RuntimeInstance  implements Runnable{
 
     public RuntimeInstance(BaseMysqlPacket packet) {
         this.packet = packet;
-        SQLRouter.setDbPath("E:/work/venomous_sting/proxy/");
+        SQLRouter.setDbPath("D:/work/springCloudOnline/stinger/proxy/");
     }
 
 
