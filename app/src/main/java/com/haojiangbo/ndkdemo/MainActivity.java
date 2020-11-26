@@ -104,11 +104,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void initNetworkConfig(){
         // tcp初始化
-
         controlProtocolManager.start();
 
         // udp初始化
-
         mediaProtocolManager.start();
     }
 
