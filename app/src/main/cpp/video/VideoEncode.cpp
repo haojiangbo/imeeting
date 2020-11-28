@@ -64,8 +64,9 @@ JNIEXPORT void JNICALL
 Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     ALOGE("init videEncode ...");
     /* find the mpeg1video encoder */
-   VideoEncode::codec = avcodec_find_encoder_by_name(VideoEncode::codeName);
-    // VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_MPEG2VIDEO);
+    // VideoEncode::codec = avcodec_find_encoder_by_name(VideoEncode::codeName);
+    //VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_H264);
+    VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_MPEG1VIDEO);
     if (!VideoEncode::codec) {
         ALOGE("Codec '%s' not found\n", VideoEncode::codeName);
         return;
@@ -82,7 +83,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     }
 
     /* put sample parameters */
-    VideoEncode::c->bit_rate = 400000;
+    VideoEncode::c->bit_rate = 460800;
     /* resolution must be a multiple of two */
     VideoEncode::c->width = 640;
     VideoEncode::c->height = 480;
@@ -101,11 +102,15 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     VideoEncode::c->max_b_frames = 1;
     VideoEncode::c->pix_fmt = AV_PIX_FMT_YUV420P;
 
-    if (VideoEncode::codec->id == AV_CODEC_ID_H264){
-        av_opt_set(VideoEncode::c->priv_data, "preset", "slow", 0);
+    // 若是h264编码器，要设置一些参数
+    AVDictionary *param = 0;
+    if (VideoEncode::c->codec_id == AV_CODEC_ID_H264) {
+        // https://www.jianshu.com/p/b46a33dd958d
+        av_dict_set(&param, "preset", "slow", 0);
+        av_dict_set(&param, "tune", "zerolatency", 0);
     }
     /* open it */
-    int  ret = avcodec_open2(VideoEncode::c, VideoEncode::codec, NULL);
+    int  ret = avcodec_open2(VideoEncode::c, VideoEncode::codec, &param);
     if (ret < 0) {
         ALOGE( "Could not open codec: %s\n", av_err2str(ret));
         return;
