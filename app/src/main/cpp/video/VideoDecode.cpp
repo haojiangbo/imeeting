@@ -20,7 +20,6 @@ extern "C" {
 #include <libavutil/samplefmt.h>
 #include "libavutil/imgutils.h"
 #include <libswresample/swresample.h>
-#include <libavdevice/avdevice.h>
 }
 
 

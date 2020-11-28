@@ -63,7 +63,7 @@ include_directories(${CMAKE_SOURCE_DIR} ../jniLibs/includes)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -L${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI} ")
 target_link_libraries( # Specifies the target library.
                        native-lib
-                       avutil avresample swresample swscale avcodec avformat avfilter avdevice
+                       avcodec  avutil swresample  swscale  avformat avfilter
                        ${android-lib}
                        # Links the target library to the log library
                        # included in the NDK.

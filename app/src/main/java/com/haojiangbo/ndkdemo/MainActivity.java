@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Used to load the 'native-lib' library on application startup.
     static {
         // avutil avresample swresample swscale avcodec avformat avfilter avdevice
+        System.loadLibrary("mp3lame");
         System.loadLibrary("native-lib");
     }
 
