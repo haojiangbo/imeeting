@@ -130,7 +130,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_initContext(JNIEnv *env, jobject thiz) {
     }
 
     /* find the MPEG-1 video decoder */
-    VideoDecode::codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
+    VideoDecode::codec = avcodec_find_decoder(AV_CODEC_ID_MPEG4);
     if (!VideoDecode::codec) {
         ALOGE("Codec not found\n");
         return;

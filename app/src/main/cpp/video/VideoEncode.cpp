@@ -66,7 +66,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     /* find the mpeg1video encoder */
     // VideoEncode::codec = avcodec_find_encoder_by_name(VideoEncode::codeName);
     //VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_H264);
-    VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_MPEG1VIDEO);
+    VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_MPEG4);
     if (!VideoEncode::codec) {
         ALOGE("Codec '%s' not found\n", VideoEncode::codeName);
         return;
@@ -83,7 +83,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     }
 
     /* put sample parameters */
-    VideoEncode::c->bit_rate = 460800;
+    VideoEncode::c->bit_rate = 512 * 1000;
     /* resolution must be a multiple of two */
     VideoEncode::c->width = 640;
     VideoEncode::c->height = 480;
