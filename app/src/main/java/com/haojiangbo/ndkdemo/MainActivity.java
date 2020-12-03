@@ -30,6 +30,7 @@ import com.haojiangbo.net.MediaProtocolManager;
 import com.haojiangbo.net.protocol.ControlProtocol;
 import com.haojiangbo.net.protocol.Pod;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
+import com.haojiangbo.screen.ScreenRecordActivity;
 import com.haojiangbo.service.AudioPalyService;
 import com.haojiangbo.storage.NumberStorageManager;
 import com.haojiangbo.thread.MeidaParserInstand;
@@ -178,6 +179,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.open_video_test:
                 Intent intentv = new Intent(this,CameraActivity.class);
                 startActivity(intentv);
+                break;
+            case R.id.open_scrren_test:
+                Intent intentb = new Intent(this, ScreenRecordActivity.class);
+                startActivity(intentb);
                 break;
             default:
                 viewHander(v);
