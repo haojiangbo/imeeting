@@ -9,7 +9,7 @@
 #include "JtoolUtils.h"
 #include "log/Hlog.h"
 #include "utils/ByteBuf.h"
-
+#include "../common/CodecConfig.h"
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -20,7 +20,6 @@ extern "C" {
 #include <libavutil/samplefmt.h>
 #include "libavutil/imgutils.h"
 #include <libswresample/swresample.h>
-#include <libavdevice/avdevice.h>
 }
 
 
@@ -131,7 +130,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_initContext(JNIEnv *env, jobject thiz) {
     }
 
     /* find the MPEG-1 video decoder */
-    VideoDecode::codec = avcodec_find_decoder(AV_CODEC_ID_MPEG1VIDEO);
+    VideoDecode::codec = avcodec_find_decoder(VIDEO_CODE);
     if (!VideoDecode::codec) {
         ALOGE("Codec not found\n");
         return;

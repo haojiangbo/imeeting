@@ -172,11 +172,13 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
                 Image image = reader.acquireNextImage();
                /* Rect crop = new Rect(10,10,650,970);*/
                 //image.setCropRect(crop);
+                long nowTime = System.currentTimeMillis();
                 byte [] data =  ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
                 int oldDataLen = data.length;
                 byte [] converData =  videoEncode.encodeFrame(data);
                 // 发送数据
                 sendPacketMessage(oldDataLen, converData);
+                Log.e("use_time",System.currentTimeMillis() - nowTime+">");
                 image.close();
             }
         }, childHandler);
@@ -197,11 +199,11 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
 
     private void sendPacketMessage(int oldDataLen, byte[] converData) {
         if(null != converData){
-            try {
+            /*try {
                 outputStream.write(converData);
             } catch (IOException e) {
                 e.printStackTrace();
-            }
+            }*/
             Log.e("编码前数据","编码前大小"+oldDataLen + "编码后数据大小"+converData.length);
             MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
             mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;

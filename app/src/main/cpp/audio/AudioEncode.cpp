@@ -6,6 +6,7 @@
 #include "stdio.h"
 #include "JtoolUtils.h"
 #include "log/Hlog.h"
+#include "../common/CodecConfig.h"
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -16,7 +17,6 @@ extern "C" {
 #include <libavutil/samplefmt.h>
 #include "libavutil/imgutils.h"
 #include <libswresample/swresample.h>
-#include <libavdevice/avdevice.h>
 }
 
 
@@ -30,7 +30,7 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_com_haojiangbo_ffmpeg_AudioEncode_initContext(JNIEnv *env, jobject thiz) {
     /* find the MP2 encoder */
-    codec = avcodec_find_encoder(AV_CODEC_ID_MP2);
+    codec = avcodec_find_encoder(AUDIO_CODE);
     if (!codec) {
         ALOGE("Codec not found\n");
         return;
@@ -41,8 +41,9 @@ Java_com_haojiangbo_ffmpeg_AudioEncode_initContext(JNIEnv *env, jobject thiz) {
         return;
     }
     //long byteRate = sample_fmt * mSampleRate * channels / 8;
-    c->bit_rate = 64000  ;
-    /*16位/样本*/
+    // 比特率 用于控制播放的音质
+    c->bit_rate = 64 * 000  ;
+    /*16位/样本 packet格式*/
     c->sample_fmt = AV_SAMPLE_FMT_S16;
     /* select other audio parameters supported by the encoder */
     c->sample_rate    = 44100;

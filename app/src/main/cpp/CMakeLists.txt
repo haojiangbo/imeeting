@@ -36,8 +36,8 @@ find_library(android-lib android)
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-
-
+#aux_source_directory(. MY_DIR_SRCS)
+#add_subdirectory(audio)
 add_library( # Sets the name of the library.
         native-lib
 
@@ -55,6 +55,7 @@ add_library( # Sets the name of the library.
         video/VideoDecode.cpp
         utils/ByteBuf.h
         utils/ByteBuf.cpp
+        common/CodecConfig.h
         )
 
 
@@ -63,7 +64,7 @@ include_directories(${CMAKE_SOURCE_DIR} ../jniLibs/includes)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w -L${CMAKE_SOURCE_DIR}/../jniLibs/${CMAKE_ANDROID_ARCH_ABI} ")
 target_link_libraries( # Specifies the target library.
                        native-lib
-                       avutil avresample swresample swscale avcodec avformat avfilter avdevice
+                       avcodec  avutil swresample  swscale  avformat avfilter
                        ${android-lib}
                        # Links the target library to the log library
                        # included in the NDK.
