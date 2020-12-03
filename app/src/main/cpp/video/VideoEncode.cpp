@@ -6,7 +6,7 @@
 #include "stdio.h"
 #include "JtoolUtils.h"
 #include "log/Hlog.h"
-
+#include "../common/CodecConfig.h"
 jbyteArray encode(const JNIEnv *env);
 
 extern "C" {
@@ -66,7 +66,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
     /* find the mpeg1video encoder */
     // VideoEncode::codec = avcodec_find_encoder_by_name(VideoEncode::codeName);
     //VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_H264);
-    VideoEncode::codec = avcodec_find_encoder(AV_CODEC_ID_MPEG4);
+    VideoEncode::codec = avcodec_find_encoder(VIDEO_CODE);
     if (!VideoEncode::codec) {
         ALOGE("Codec '%s' not found\n", VideoEncode::codeName);
         return;
@@ -82,7 +82,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
         return;
     }
 
-    /* put sample parameters */
+    /* 比特率 指的是压缩程度  比特率越低 压缩的越厉害 */
     VideoEncode::c->bit_rate = 512 * 1000;
     /* resolution must be a multiple of two */
     VideoEncode::c->width = 640;
@@ -99,7 +99,7 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
      * will always be I frame irrespective to gop_size
      */
     VideoEncode::c->gop_size = 10;
-    VideoEncode::c->max_b_frames = 1;
+    VideoEncode::c->max_b_frames = VideoEncode::c->gop_size/2;
     VideoEncode::c->pix_fmt = AV_PIX_FMT_YUV420P;
 
     // 若是h264编码器，要设置一些参数

@@ -36,8 +36,8 @@ find_library(android-lib android)
 # can link multiple libraries, such as libraries you define in this
 # build script, prebuilt third-party libraries, or system libraries.
 
-
-
+#aux_source_directory(. MY_DIR_SRCS)
+#add_subdirectory(audio)
 add_library( # Sets the name of the library.
         native-lib
 
@@ -55,6 +55,7 @@ add_library( # Sets the name of the library.
         video/VideoDecode.cpp
         utils/ByteBuf.h
         utils/ByteBuf.cpp
+        common/CodecConfig.h
         )
 
 

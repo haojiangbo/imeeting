@@ -6,7 +6,7 @@
 #include "stdio.h"
 #include "JtoolUtils.h"
 #include "log/Hlog.h"
-
+#include "../common/CodecConfig.h"
 extern "C" {
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
@@ -35,7 +35,7 @@ JNIEXPORT void JNICALL
 Java_com_haojiangbo_ffmpeg_AudioDecode_initContext(JNIEnv *env, jobject thiz) {
 
     // 解码器
-    myDecode::codec = avcodec_find_decoder(AV_CODEC_ID_MP2);
+    myDecode::codec = avcodec_find_decoder(AUDIO_CODE);
     if (!myDecode::codec) {
         ALOGE("Codec not found\n");
         return;
