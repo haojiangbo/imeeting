@@ -36,7 +36,7 @@ flushall; 命令  使 当前路由表 立即生效
 
 ![](images/6c486a7c5bd0fcb33c3ae9947fd813f.png)
 ~~目前只支持 add list  get set del  flush exit 这几条命令~~
-add 二级域名 服务器端口 clientId 本地服务项目端口
+~~add 二级域名 服务器端口 clientId 本地服务项目端口
 ~~list 命令 查看 当前所有路由表~~
 ~~get 命令  get <clientId> 查看某一个clientId的路由表 例如   get abc~~
 ~~set 命令  set <clientId> <field> <value>  设置路由表中具体的属性 比如 set abc port  999 ~~
