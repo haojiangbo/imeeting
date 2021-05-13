@@ -84,9 +84,12 @@ public class UpdateStatementParser  extends CommonStatementParser
                 e.printStackTrace();
             }
         }
+        // 网络包发送
         BaseMysqlPacket packet =  RuntimeInstance.currentThreadPacket.get();
-        OkPackert okPackert = new OkPackert();
-        okPackert.write(packet,1,1000);
+        if(null != packet){
+            OkPackert okPackert = new OkPackert();
+            okPackert.write(packet,1,1000);
+        }
         return  true;
     }
 

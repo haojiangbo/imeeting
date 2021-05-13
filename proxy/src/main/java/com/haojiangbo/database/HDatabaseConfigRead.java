@@ -21,11 +21,11 @@ import java.util.UUID;
 public class HDatabaseConfigRead implements ConfigRead {
 
     private static final String GET_CONFIG = "select * from config";
-    private static final String CREATE_ROUTER_CONFIG = "create table config (domain varchar,port int,clientId varchar,clientUrl varchar)";
+    private static final String CREATE_ROUTER_CONFIG = "create table config (domain varchar,port int,clientId varchar,clientUrl varchar, rate int)";
 
     @Override
     public List<ConfigModel> readLine(String path) {
-        String  INSERT_VALUES = "insert into config values ('xxx',65534,'"+ UUID.randomUUID().toString().substring(0,5) +"','127.0.0.1:80')";
+        String  INSERT_VALUES = "insert into config values ('xxx',65534,'"+ UUID.randomUUID().toString().substring(0,5) +"','127.0.0.1:80',128)";
         SQLRouter.setDbPath(path);
         SQLRouter.router(CREATE_ROUTER_CONFIG);
         List<HDatabasseRowModel> result = (List<HDatabasseRowModel>) SQLRouter.router(GET_CONFIG);

@@ -83,6 +83,7 @@ public class ProxyServerHander extends ChannelInboundHandlerAdapter {
 
             //如果处在非代理模式下 则执行正常逻辑
             if(!ServerConfig.INSTAND.isProxyModel()){
+                // 这个host 指的是哨兵服务器的地址，可以是 本地 也可以是负载均衡
                 request.setHost(HOST);
                 request.setPort(domainProtMapping.get(domain));
             }

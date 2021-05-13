@@ -50,7 +50,7 @@ public class BridgeEngineContainner implements Container {
                         ch.pipeline().addLast(new BrigdeHander());
                     }
                 })
-                // 设置tcp缓冲区
+                // 连接队列
                 .option(ChannelOption.SO_BACKLOG, ConstantValue.SO_BACKLOG_VALUE)
                 //.option(ChannelOption.SO_REUSEADDR, true)
                 //.childOption(ChannelOption.SO_KEEPALIVE, true)

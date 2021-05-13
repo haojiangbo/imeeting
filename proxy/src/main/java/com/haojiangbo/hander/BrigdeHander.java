@@ -87,18 +87,23 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
 
     private void dataHander(ChannelHandlerContext ctx, CustomProtocol message) {
         Object tmp =   ctx.channel().config().getRecvByteBufAllocator();
+
         if(null != tmp && tmp instanceof  MyLimitByteBufAllocator){
+            long startTime = System.currentTimeMillis();
             String clientId =  SessionUtils.parserSessionId(message.getSessionId()).getClientId();
-            int baseLimit = ServerConfig.INSTAND.getLimitClientByteSize();
+            //int baseLimit = ServerConfig.INSTAND.getLimitClientByteSize();
             // 测试代码 针对某个client限速
-            if(clientId.equals("666")){
+            /*if(clientId.equals("666")){
                 baseLimit = LmitStreamEnmu.LIMIT_1024KB.getValue();
-            }
+            }*/
+            ConfigModel configModel =  ServerConfig.clientIdMapping.get(clientId);
             MyLimitByteBufAllocator myLimitByteBufAllocator = ((MyLimitByteBufAllocator)tmp);
             myLimitByteBufAllocator.getHandle().setChannel(ctx.channel());
             // 限速管理 可以自行修改此参数
-            myLimitByteBufAllocator.getHandle().setLimit(baseLimit);
+            myLimitByteBufAllocator.getHandle().setLimit(configModel.getRate() * 1024);
+            log.info("计算限速耗时 >>> {}",System.currentTimeMillis() - startTime);
         }
+
         Channel target = SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
         if (null == target || !target.isActive()) {
             SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());

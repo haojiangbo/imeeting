@@ -8,6 +8,8 @@ public class ConfigModel {
     private int port;
     private String clientId;
     private String clientUrl;
+    // 传输速率 单位为 KB   默认每秒 128 KB
+    private int rate;
 
     @Override
     public String toString() {

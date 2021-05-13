@@ -73,6 +73,12 @@ public class ServerConfig implements Container {
    private Map<String,Integer> domainProtMapping = new HashMap<>();
 
 
+    /**
+     * 客户端配置的MAP
+     */
+    public static final Map<String,ConfigModel> clientIdMapping = new HashMap<>();
+
+
     private List<ConfigModel> initConfigList(){
         // ConfigRead configRead =   new NioLocalFileConfigReadImp();
         ConfigRead configRead = new  HDatabaseConfigRead();
@@ -103,8 +109,8 @@ public class ServerConfig implements Container {
         }
         for (ConfigModel item : configList) {
             domainProtMapping.put(item.getDomain(), item.getPort());
+            clientIdMapping.put(item.getClientId(),item);
         }
-        // 禁止指令重排序
         INSTAND = this;
     }
 

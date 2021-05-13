@@ -25,7 +25,10 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
     private String clientId = null;
     private Bootstrap clientBootstrap = null;
     private String clientUrl = null;
-    public SentryServerHander(String clientId, Bootstrap bootstrap, String clientUrl){
+    public SentryServerHander(String clientId,
+                              Bootstrap bootstrap,
+                              String clientUrl
+    ){
         this.clientBootstrap =bootstrap;
         this.clientId = clientId;
         this.clientUrl = clientUrl;
@@ -40,6 +43,7 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                 .set(sessionId);
         SessionUtils.SessionModel model =  SessionUtils
                 .parserSessionId(ctx.channel().attr(NettyProxyMappingConstant.SESSION).get());
+
         createConnect(ctx,Unpooled.wrappedBuffer("CONCAT".getBytes()),model,ConstantValue.CONCAT);
         super.channelActive(ctx);
     }
@@ -58,6 +62,9 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
     }
 
     private void createConnect(ChannelHandlerContext ctx,ByteBuf byteBuf,SessionUtils.SessionModel model,int type) {
+        // 设置自动读取为关闭,什么时候打款自动读取呢？
+        // 当桥接端 响应握手包之后 由  SentryClientHander 打开 AUTO_READ
+
         ctx.channel().config().setOption(ChannelOption.AUTO_READ,false);
         clientBootstrap
                 .connect(ServerConfig.INSTAND.getBridgeHost(), ServerConfig.INSTAND.getBridgePort())
