@@ -60,6 +60,10 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
                 //处理本地哨兵数据的转发
                 dataHander(ctx, message);
                 break;
+            case ConstantValue.CONCAT_ERROR:
+                //处理本地哨兵数据的转发
+                dataHander(ctx, message);
+                break;
             default:
                 break;
         }
@@ -79,9 +83,7 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         SessionChannelMapping.SESSION_CHANNEL_MAPPING.put(message.getSessionId(), ctx.channel());
         flag = System.currentTimeMillis();
         //向客户端发送消息
-        target.writeAndFlush(message.setMeesgeType(type)).addListener((ChannelFutureListener) future -> {
-        });
-
+        target.writeAndFlush(message.setMeesgeType(type));
 
     }
 
@@ -91,11 +93,6 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         if(null != tmp && tmp instanceof  MyLimitByteBufAllocator){
             long startTime = System.currentTimeMillis();
             String clientId =  SessionUtils.parserSessionId(message.getSessionId()).getClientId();
-            //int baseLimit = ServerConfig.INSTAND.getLimitClientByteSize();
-            // 测试代码 针对某个client限速
-            /*if(clientId.equals("666")){
-                baseLimit = LmitStreamEnmu.LIMIT_1024KB.getValue();
-            }*/
             ConfigModel configModel =  ServerConfig.clientIdMapping.get(clientId);
             MyLimitByteBufAllocator myLimitByteBufAllocator = ((MyLimitByteBufAllocator)tmp);
             myLimitByteBufAllocator.getHandle().setChannel(ctx.channel());
@@ -107,15 +104,10 @@ public class BrigdeHander extends ChannelInboundHandlerAdapter {
         Channel target = SessionChannelMapping.SESSION_CHANNEL_MAPPING.get(message.getSessionId());
         if (null == target || !target.isActive()) {
             SessionChannelMapping.SESSION_CHANNEL_MAPPING.remove(message.getSessionId());
-            // 此处关闭的是 客户端 到 服务端的链接 是一个bug
-            // ctx.close();
             ReferenceCountUtil.release(message);
         } else {
             // 向哨兵客户端发送数据
-            target.writeAndFlush(message).addListener((ChannelFutureListener) channelFuture -> {
-                if(channelFuture.isSuccess()){
-                }
-            });
+            target.writeAndFlush(message);
         }
     }
 

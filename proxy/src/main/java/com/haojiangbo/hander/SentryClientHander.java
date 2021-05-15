@@ -11,51 +11,59 @@ import io.netty.util.ReferenceCountUtil;
 import lombok.extern.slf4j.Slf4j;
 
 /**
-  *
-  * 哨兵客户端
- 　　* @author 郝江波
- 　　* @date 2020/4/16 17:40
- 　　*/
- @Slf4j
+ * 哨兵客户端
+ * 　　* @author 郝江波
+ * 　　* @date 2020/4/16 17:40
+ *
+ */
+@Slf4j
 public class SentryClientHander extends ChannelInboundHandlerAdapter {
 
 
-     @Override
-     public void channelRead(ChannelHandlerContext ctx, Object msg) {
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
         CustomProtocol customProtocol = (CustomProtocol) msg;
-        Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-        boolean autoRead =  target.config().getOption(ChannelOption.AUTO_READ);
-        if(!autoRead){
-            target.config().setOption(ChannelOption.AUTO_READ,true);
+        Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+        boolean autoRead = target.config().getOption(ChannelOption.AUTO_READ);
+        if (!autoRead) {
+            target.config().setOption(ChannelOption.AUTO_READ, true);
         }
-        if(customProtocol.getMeesgeType() == ConstantValue.CONCAT_RPLAY){
+        if (customProtocol.getMeesgeType() == ConstantValue.CONCAT_RPLAY) {
             ReferenceCountUtil.release(customProtocol);
             return;
         }
-        boolean b = (null != target && target.isActive());
-        if(b){
+        if (customProtocol.getMeesgeType() == ConstantValue.CONCAT_ERROR) {
             target.writeAndFlush(customProtocol.getContent());
-        }else{
+            log.info("close channcel = {}",target);
+            ctx.close();
+            target.close();
+            return;
+        }
+
+        boolean b = (null != target && target.isActive());
+        if (b) {
+            target.writeAndFlush(customProtocol.getContent());
+        } else {
             ctx.close();
             ReferenceCountUtil.release(customProtocol);
         }
-     }
+    }
 
 
-     @Override
-     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-         Channel target =  ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
-         if(null != target){
-             target.close();
-         }
-         log.error("哨兵客户端-桥接-连接已关闭");
-         ctx.close();
-     }
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        Channel target = ctx.channel().attr(NettyProxyMappingConstant.MAPPING).get();
+        if (null != target) {
+            target.close();
+        }
+        log.error("哨兵客户端-桥接-连接已关闭");
+        ctx.close();
+    }
 
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         cause.printStackTrace();
-         super.exceptionCaught(ctx, cause);
+        super.exceptionCaught(ctx, cause);
     }
 }

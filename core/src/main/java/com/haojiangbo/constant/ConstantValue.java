@@ -33,13 +33,14 @@ public class ConstantValue {
      * 连接消息
      */
     public static final int CONCAT = 0X80;
-
-
-
     /**
-     * 连接消息
+     * 连接回复
      */
     public static final int CONCAT_RPLAY = 0X82;
+    /**
+     * 连接错误
+     */
+    public static final int CONCAT_ERROR = 0X83;
 
 
     /**

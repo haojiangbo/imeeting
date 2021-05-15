@@ -74,7 +74,6 @@ public class SentryServerHander extends ChannelInboundHandlerAdapter {
                                 .addListener((ChannelFutureListener) future1 -> {
                                     if(future1.isSuccess()){
                                         A2BUtils.addMapping(ctx.channel(),future.channel());
-                                        //ctx.channel().config().setOption(ChannelOption.AUTO_READ,true);
                                     }else{
                                         ctx.close();
                                     }
