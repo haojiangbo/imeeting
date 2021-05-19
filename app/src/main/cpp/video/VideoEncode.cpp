@@ -82,8 +82,8 @@ Java_com_haojiangbo_ffmpeg_VideoEncode_initContext(JNIEnv *env, jobject thiz) {
         return;
     }
 
-    /* 比特率 指的是压缩程度  比特率越低 压缩的越厉害 */
-    VideoEncode::c->bit_rate = 512 * 1000;
+    /* 比特率 指的是压缩程度  比特率越低 压缩的越厉害 512 * 1000 */
+    VideoEncode::c->bit_rate = 512;
     /* resolution must be a multiple of two */
     VideoEncode::c->width = 640;
     VideoEncode::c->height = 480;
