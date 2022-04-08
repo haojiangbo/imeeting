@@ -6,17 +6,17 @@
 
 ## 服务端代码
 -  https://gitee.com/haojiangbo/hummingbird.git server 分支
+ 
+## 使用教程
 
-##使用教程
+-  执行 server 端 UdpServerApp 的 main 方法 启动服务端
 
-执行 server 端 UdpServerApp 的 main 方法 启动服务端
+-  修改安卓项目中 NettyKeyConfig 中的 ip 地址为当前运行环境的ip地址
 
-修改安卓项目中 NettyKeyConfig 中的 ip 地址为当前运行环境的ip地址
-
-打开app 注册自己的号码
+-  打开app 注册自己的号码
 
 ![](./d6fa9b5061aed34ac68cdac1df871b6.png)
 
-输入对方号码呼叫
+-  输入对方号码呼叫
 
 
