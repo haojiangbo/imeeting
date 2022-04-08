@@ -200,7 +200,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
         uint8_t *data = (uint8_t *) tmpData;
         int ret = 0;
         while (data_size > 0) {
-            // 这个函数是直接解码，
+            // 把原始数据封装到 pkt 中
             ret = av_parser_parse2(VideoDecode::parser, VideoDecode::c, &VideoDecode::pkt->data,
                                    &VideoDecode::pkt->size,
                                    data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);

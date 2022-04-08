@@ -78,7 +78,7 @@ Java_com_haojiangbo_ffmpeg_AudioDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
         return NULL;
     }
 
-    // 把包数据发送到 codecContext
+    // 把原始数据包数据发送到 解码器中
     ret = avcodec_send_packet(myDecode::c, myDecode::pkt);
     if (ret < 0) {
         ALOGE("Error submitting the packet to the decoder\n");

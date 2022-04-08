@@ -95,7 +95,7 @@ Java_com_haojiangbo_ffmpeg_AudioEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
     int constSamplesLen = frame->nb_samples;
     int totalResultIndex = 0;
     char *resultBuff = (char *)malloc(jtoolUtils.charLen);
-    // 样本数转换 转换成实际的占用字节数
+    // 样本数转换 转换成实际的占用字节数 16位样本
     int tmpSamplesLen = frame->nb_samples * 2;
     while (totalSamples > 0){
         //frame->data[0]
