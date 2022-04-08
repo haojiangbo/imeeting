@@ -86,6 +86,7 @@ namespace VideoDecode {
 
     int decode(AVCodecContext *dec_ctx, AVFrame *frame, AVPacket *pkt) {
         int ret;
+        // 把原始pkt 读入到解码器中
         ret = avcodec_send_packet(dec_ctx, pkt);
         if (ret < 0) {
             fprintf(stderr, "Error sending a packet for decoding\n");
@@ -94,6 +95,7 @@ namespace VideoDecode {
         }
 
         while (ret >= 0) {
+            // 从解码器中读取一帧数据
             ret = avcodec_receive_frame(dec_ctx, frame);
             if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
                 return -1;
@@ -108,7 +110,7 @@ namespace VideoDecode {
                                                             VideoDecode::converFormat, SWS_BICUBIC,
                                                             NULL, NULL, NULL);
             }
-            // 转换数据
+            // 转换数据 转换为目标 pKt
             sws_scale(VideoDecode::imgConvertCtx, frame->data, frame->linesize,
                       0, dec_ctx->height,
                       VideoDecode::rgbaFrame->data, VideoDecode::rgbaFrame->linesize);
@@ -198,6 +200,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_decodeFrame(JNIEnv *env, jobject thiz, jb
         uint8_t *data = (uint8_t *) tmpData;
         int ret = 0;
         while (data_size > 0) {
+            // 这个函数是直接解码，
             ret = av_parser_parse2(VideoDecode::parser, VideoDecode::c, &VideoDecode::pkt->data,
                                    &VideoDecode::pkt->size,
                                    data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);
@@ -247,6 +250,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
         uint8_t *data = (uint8_t *) tmpData;
         int ret = 0;
         while (data_size > 0) {
+            // 解析数据包，其实就是封装 pkt
             ret = av_parser_parse2(VideoDecode::parser, VideoDecode::c, &VideoDecode::pkt->data,
                                    &VideoDecode::pkt->size,
                                    data, data_size, AV_NOPTS_VALUE, AV_NOPTS_VALUE, 0);

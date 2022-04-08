@@ -35,6 +35,7 @@ namespace VideoEncode {
 
 
 jbyteArray encode(JNIEnv *env) {
+    // 将原始视频数据放入到编码器中
     int ret = avcodec_send_frame(VideoEncode::c, VideoEncode::frame);
     if (ret < 0) {
         ALOGE( "Error sending a frame for encoding\n");
@@ -42,6 +43,7 @@ jbyteArray encode(JNIEnv *env) {
     }
 
     while (ret >= 0) {
+        // 从编码器中得到编码后的数据
         ret = avcodec_receive_packet(VideoEncode::c, VideoEncode::pkt);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
             return NULL;

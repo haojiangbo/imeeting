@@ -51,6 +51,14 @@ public class ImageUtil {
         int width = crop.width();
         int height = crop.height();
         Image.Plane[] planes = image.getPlanes();
+        /**
+         * 为什么是 width * height * ImageFormat.getBitsPerPixel(format) / 8
+         * 这是一个简化后的公式
+         * 换算下来就是下面这种计算方式 为什么 /4 因为 yuv 420 是 隔行采样  第一行 4个y 2个 u  第二行4个y 2 个 v  所以 u / y = 1/4
+         * 640 * 480 = 307200
+         * 640 * 480 / 4 = 153600
+         * 640 * 480 / 4 = 153600
+         */
         byte[] data = new byte[width * height * ImageFormat.getBitsPerPixel(format) / 8];
         byte[] rowData = new byte[planes[0].getRowStride()];
         if (VERBOSE) Log.w(TAG, "get data from " + planes.length + " planes");
@@ -119,6 +127,7 @@ public class ImageUtil {
     }
 
     /**
+     * Plane 模式 转为 package 模式
      * 我认为我的代码是最优的
      * @param image
      * @return
