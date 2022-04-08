@@ -110,7 +110,7 @@ namespace VideoDecode {
                                                             VideoDecode::converFormat, SWS_BICUBIC,
                                                             NULL, NULL, NULL);
             }
-            // 转换数据 转换为目标 pKt
+            // 转换数据 转换为目标 格式
             sws_scale(VideoDecode::imgConvertCtx, frame->data, frame->linesize,
                       0, dec_ctx->height,
                       VideoDecode::rgbaFrame->data, VideoDecode::rgbaFrame->linesize);
