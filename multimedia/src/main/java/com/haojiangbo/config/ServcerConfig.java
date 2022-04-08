@@ -13,7 +13,7 @@ public class ServcerConfig {
     /**
      * 监听端口号
      */
-    public static int LISTENER_PROT = 10086;
+    public static int LISTENER_PROT = 10087;
     /**
      * 工作线程数
      */
