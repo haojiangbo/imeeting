@@ -37,7 +37,7 @@ public class MediaDataProtocol {
     public static MediaDataProtocol byteBufToMediaDataProtocol(ByteBuf byteBuf){
         MediaDataProtocol protocol = new MediaDataProtocol();
         protocol.type = byteBuf.readByte();
-        byte [] number = new byte[6];
+        byte [] number = new byte[14];
         byteBuf.readBytes(number);
         protocol.number = number;
         // 此处要修改一下，
@@ -55,7 +55,7 @@ public class MediaDataProtocol {
 
 
     public static ByteBuf mediaDataProtocolToByteBuf(Channel channel, MediaDataProtocol mediaDataProtocol){
-        int totalLen = 11;
+        int totalLen = 19;
         totalLen += mediaDataProtocol.data.length;
         ByteBuf byteBuf =  channel.alloc().buffer(totalLen);
         byteBuf.writeByte(mediaDataProtocol.type);
