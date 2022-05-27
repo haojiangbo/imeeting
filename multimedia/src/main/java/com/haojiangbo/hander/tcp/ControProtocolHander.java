@@ -133,10 +133,20 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
             CallNumberAndChannelMapping.ROOM_MAPPING.remove(model.key);
         }
         // 删除tcp用户
-        Map tcpMap = CallNumberAndChannelMapping.ROOM_CHANNEL_MAPPING.get(model.key);
+        Map<String, Channel>  tcpMap = CallNumberAndChannelMapping.ROOM_CHANNEL_MAPPING.get(model.key);
         if (null != tcpMap) {
             tcpMap.remove(model.uid);
             log.info("tcp go back roomid = {}  uid = {} ", model.key, model.uid);
+
+            MessageAck ack =  MessageAck.ok("退出事件");
+            ack.setData(session);
+            // 挨个发送加入信息
+            tcpMap.keySet().stream().forEach(key -> {
+                Channel tmpChanael =   tcpMap.get(key);
+                if(null != tmpChanael && tmpChanael.isActive()){
+                    tmpChanael.writeAndFlush(new ControlProtocol(ControlProtocol.CLOSE, ack.toJson().getBytes()));
+                }
+            });
         }
         // 删除udp用户
         Map udpMap = CallNumberAndChannelMapping.UDP_ROOM_CHANNEL_MAPPING.get(model.key);
