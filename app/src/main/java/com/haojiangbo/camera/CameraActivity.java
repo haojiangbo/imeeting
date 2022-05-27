@@ -207,7 +207,7 @@ public class CameraActivity extends AppCompatActivity implements View.OnClickLis
             Log.e("编码前数据","编码前大小"+oldDataLen + "编码后数据大小"+converData.length);
             MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
             mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;
-            mediaDataProtocol.number = MainActivity.CALL_NUMBER.getBytes();
+            mediaDataProtocol.number = MainActivity.ROOM_NUMBER.getBytes();
             // 高位1字节 表示摄像头的正反
             int camareType = 1 << 24;
             // 服务端最大接受65535个字节 2 位足够表示了

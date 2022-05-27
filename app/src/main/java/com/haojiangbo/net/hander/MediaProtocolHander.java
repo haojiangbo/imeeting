@@ -23,7 +23,7 @@ public class MediaProtocolHander  extends ChannelInboundHandlerAdapter {
        /* StringBuilder stringBuffer = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(stringBuffer,datagramPacket.content());*/
         //Log.e("HJB",stringBuffer.toString());
-        Log.e("数据大小>>",datagramPacket.content().readableBytes() + ">>>>");
+        Log.i("数据大小>>",datagramPacket.content().readableBytes() + ">>>>");
         byte type = datagramPacket.content().readByte();
         switch (type){
             case MediaDataProtocol .AUDIO_DATA:

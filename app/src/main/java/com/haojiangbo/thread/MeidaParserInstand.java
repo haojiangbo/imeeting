@@ -4,7 +4,9 @@ import android.util.Log;
 
 import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.ffmpeg.AudioDecode;
+import com.haojiangbo.ndkdemo.MettingActivite;
 import com.haojiangbo.net.protocol.MediaDataProtocol;
+import com.haojiangbo.net.tcp.ControlProtocolManager;
 
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -26,19 +28,22 @@ public class MeidaParserInstand implements Runnable {
         AudioDecode decode = new AudioDecode();
         decode.initContext();
         int i = 1;
-        AudioTrackManager audioTrackManager = AudioTrackManager.getInstance();
         while (i == 1) {
             try {
                ByteBuf byteBuf =  MEDIA_DATA_QUEUE.take();
                if(byteBuf.readableBytes() > 0){
-                   byteBuf.readBytes(10);
+                   byte[] number = new byte[14];
+                   byteBuf.readBytes(number);
+                   String session = new String(number);
+                   byteBuf.readBytes(4);
                    byte [] bytes = new byte[byteBuf.readableBytes()];
                    byteBuf.readBytes(bytes);
                   /* // 转换协议
                    MediaDataProtocol protocol =   MediaDataProtocol.byteBufToMediaDataProtocol(byteBuf);*/
                    Log.e("负载大小>>",bytes.length + ">>>>");
                    byte [] converData =  decode.decodeFrame(bytes);
-                   if(converData != null){
+                   AudioTrackManager audioTrackManager = MettingActivite.audioManager.get(session);
+                   if(converData != null && null != audioTrackManager && !session.equals(ControlProtocolManager.getSessionId())){
                        Log.e("解析后的数据",">>>>>"+converData.length);
                        audioTrackManager.startPlay(converData);
                    }
@@ -49,7 +54,6 @@ public class MeidaParserInstand implements Runnable {
                 e.printStackTrace();
             }
         }
-        audioTrackManager.stopPlay();
         decode.freeContext();
     }
 }

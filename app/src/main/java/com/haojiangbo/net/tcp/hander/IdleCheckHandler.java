@@ -54,27 +54,30 @@ public class IdleCheckHandler extends IdleStateHandler {
 
     public static void sendPingMessage(Channel channel) {
         String messgae = "ping";
-        String sessionId =  UUID.randomUUID().toString();
-        if(!StringUtil.isNullOrEmpty(MainActivity.CALL_NUMBER)){
-            messgae = MainActivity.CALL_NUMBER;
+        // String sessionId =  UUID.randomUUID().toString();
+        if(StringUtil.isNullOrEmpty(MainActivity.ROOM_NUMBER)){
+            MainActivity.ROOM_NUMBER = "000000";
         }
+        messgae = MainActivity.ROOM_NUMBER;
         // 发送tcp心跳消息
         byte [] pingData = messgae.getBytes();
-        byte [] sessionData = sessionId.getBytes();
+        byte [] sessionData = (MainActivity.ROOM_NUMBER+channel.id().asShortText()).getBytes();
         channel.writeAndFlush(new ControlProtocol(ControlProtocol.PING,
                 (byte) (sessionData.length & 0xFF),sessionData,pingData.length,pingData));
 
         //UDP的心跳消息
-        MediaDataProtocol  mediaDataProtocol = new MediaDataProtocol();
-        mediaDataProtocol.type = MediaDataProtocol.PING;
-        mediaDataProtocol.number = MainActivity.CALL_NUMBER.getBytes();
-        mediaDataProtocol.dataSize = pingData.length;
-        mediaDataProtocol.data = pingData;
-        DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol
-                .mediaDataProtocolToByteBuf(MediaProtocolManager.CHANNEL,
-                        mediaDataProtocol),
-                new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
-        MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
+        if(!StringUtil.isNullOrEmpty(MainActivity.ROOM_NUMBER)){
+            MediaDataProtocol  mediaDataProtocol = new MediaDataProtocol();
+            mediaDataProtocol.type = MediaDataProtocol.PING;
+            mediaDataProtocol.number = sessionData;
+            mediaDataProtocol.dataSize = pingData.length;
+            mediaDataProtocol.data = pingData;
+            DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol
+                    .mediaDataProtocolToByteBuf(MediaProtocolManager.CHANNEL,
+                            mediaDataProtocol),
+                    new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
+            MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
+        }
         Log.e("net>>>" ,"ping>>"+messgae);
     }
 }

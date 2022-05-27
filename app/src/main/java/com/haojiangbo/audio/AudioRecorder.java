@@ -11,6 +11,7 @@ import com.haojiangbo.ndkdemo.MainActivity;
 import com.haojiangbo.net.MediaProtocolManager;
 import com.haojiangbo.net.config.NettyKeyConfig;
 import com.haojiangbo.net.protocol.MediaDataProtocol;
+import com.haojiangbo.net.tcp.ControlProtocolManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -124,7 +125,7 @@ public class AudioRecorder {
 
                    MediaDataProtocol mediaDataProtocol = new MediaDataProtocol();
                    mediaDataProtocol.type = MediaDataProtocol.AUDIO_DATA;
-                   mediaDataProtocol.number = MainActivity.TARGET_NUMBER.getBytes();
+                   mediaDataProtocol.number = ControlProtocolManager.getSessionId().getBytes();
                    mediaDataProtocol.dataSize = converData.length;
                    mediaDataProtocol.data = converData;
 

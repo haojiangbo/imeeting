@@ -1,6 +1,11 @@
 package com.haojiangbo.net.protocol;
 
+import com.haojiangbo.ndkdemo.MainActivity;
+import com.haojiangbo.net.tcp.ControlProtocolManager;
+
 import java.io.Serializable;
+import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 /**
  * 该协议使用TCP传输
@@ -16,14 +21,21 @@ import java.io.Serializable;
 
 public class ControlProtocol implements Serializable {
     //////////////// 控制位标记 ////////////////////////
-    // 呼叫
-    public static final byte CALL = 1;
-    // 呼叫回复
-    public static final byte CALL_REPLY = 2;
-    // 挂断
-    public static final byte HANG = 3;
+    // 创建房间
+    public static final byte CREATE = 1;
+    // 创建房间回复
+    public static final byte CREATE_REPLAY = 2;
+    // 创建房间
+    public static final byte JOIN = 3;
+    // 创建房间回复
+    public static final byte JOIN_REPLAY = 4;
+    // 关闭房间
+    public static final byte CLOSE = 5;
+    // 关闭房间回复
+    public static final byte CLOSE_REPLAY = 6;
     // 心跳消息
-    public static final byte PING = 5;
+    public static final byte PING = 7;
+
 
 
     public static final byte HEADER = 0XF;
@@ -48,4 +60,14 @@ public class ControlProtocol implements Serializable {
         this.dataSize = dataSize;
         this.data = data;
     }
+
+
+    public ControlProtocol(byte flag, byte[] data) {
+        this.flag = flag;
+        this.session = ControlProtocolManager.getSessionId().getBytes();
+        this.sessionSize = (byte) this.session.length;
+        this.dataSize = data.length;
+        this.data = data;
+    }
+
 }

@@ -2,9 +2,11 @@ package com.haojiangbo.net.tcp;
 
 import android.util.Log;
 
+import com.haojiangbo.ndkdemo.MainActivity;
 import com.haojiangbo.net.codec.tcp.MediaProtocolDecode;
 import com.haojiangbo.net.codec.tcp.MediaProtocolEncode;
 import com.haojiangbo.net.config.NettyKeyConfig;
+import com.haojiangbo.net.protocol.ControlProtocol;
 import com.haojiangbo.net.tcp.hander.ControProtocolHander;
 import com.haojiangbo.net.tcp.hander.IdleCheckHandler;
 
@@ -20,6 +22,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.internal.StringUtil;
 
 /**
  * 控制协议
@@ -62,7 +65,7 @@ public class ControlProtocolManager extends ChannelInboundHandlerAdapter {
                     if(future.isSuccess()){
                         Log.e("net>>>","连接成功...");
                         ACTIVITY_CHANNEL = future.channel();
-                        IdleCheckHandler.sendPingMessage(future.channel());
+                        // IdleCheckHandler.sendPingMessage(future.channel());
                     }else{
                         Log.e("net>>>","连接失败...");
                         ControlProtocolManager.this.restart();
@@ -100,5 +103,16 @@ public class ControlProtocolManager extends ChannelInboundHandlerAdapter {
         super.channelInactive(ctx);
         ControlProtocolManager.this.stop();
         ControlProtocolManager.this.restart();
+    }
+    public static String getSessionId(){
+        String roomNo = MainActivity.ROOM_NUMBER;
+        if(StringUtil.isNullOrEmpty(roomNo)){
+            roomNo = "000000";
+        }
+        String uid = "00000000";
+        if(null != ControlProtocolManager.ACTIVITY_CHANNEL){
+            uid = ControlProtocolManager.ACTIVITY_CHANNEL.id().asShortText();
+        }
+        return roomNo+uid;
     }
 }

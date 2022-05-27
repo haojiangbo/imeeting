@@ -119,6 +119,10 @@ public class AudioTrackManager {
         return mInstance;
     }
 
+    public static AudioTrackManager getInstance(String uid) {
+        return new AudioTrackManager();
+    }
+
     /**
      * 设置播放流模式
      */

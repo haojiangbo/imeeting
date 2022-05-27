@@ -19,41 +19,30 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 /**
  * 媒体控制协议处理
  */
-public class ControProtocolHander  extends ChannelInboundHandlerAdapter {
+public class ControProtocolHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ControlProtocol protocol = (ControlProtocol) msg;
         String data = new String(protocol.data);
-        switch (protocol.flag){
-            case ControlProtocol.CALL:
-                Log.e("net call",">>>>>>>"+data);
+        switch (protocol.flag) {
+            case ControlProtocol.CREATE_REPLAY:
                 // 回复接通的消息 通过eventBus 传输到 mainActivity
-                replyMessage(ctx, protocol, data);
+                replyMessage(ctx, protocol.flag, data);
                 break;
             // 接收到对方的回复消息
-            case ControlProtocol.CALL_REPLY:
-                EventBus.getDefault().post(new CallReplyModel(ControlProtocol.CALL_REPLY,protocol));
+            case ControlProtocol.JOIN_REPLAY:
+                replyMessage(ctx, protocol.flag, data);
                 break;
-            case ControlProtocol.HANG:
-                Log.e("net hang",">>>>>收到挂断消息");
-                EventBus.getDefault().post(new CallReplyModel(ControlProtocol.HANG,protocol));
+            case ControlProtocol.JOIN:
+                Log.e("net hang", ">>>>>收到挂断消息");
+                EventBus.getDefault().post(new CallReplyModel(ControlProtocol.CLOSE, protocol));
                 break;
         }
     }
 
-    private void replyMessage(ChannelHandlerContext ctx, ControlProtocol protocol, String data) {
-        Pod pod =  JSONObject.parseObject(data, Pod.class);
-        String tmpSrc = pod.getSrc();
-        pod.setSrc(pod.getDst());
-        pod.setDst(tmpSrc);
-        byte [] re = pod.toString().getBytes();
-        protocol.flag = ControlProtocol.CALL_REPLY;
-        protocol.dataSize = re.length;
-        protocol.data = re;
-        MainActivity.TARGET_NUMBER = tmpSrc;
-        EventBus.getDefault().post(new MessageModel(MessageModel.CALL,protocol,ctx.channel()));
+    private void replyMessage(ChannelHandlerContext ctx, byte type, String data) {
+        EventBus.getDefault().post(new MessageModel(type, data, ctx.channel()));
     }
-
 
 
 }

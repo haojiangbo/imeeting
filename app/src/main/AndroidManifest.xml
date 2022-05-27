@@ -2,35 +2,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.haojiangbo.ndkdemo">
 
-    <application
-        android:name="com.haojiangbo.application.MyApplication"
-        android:allowBackup="true"
-        android:hardwareAccelerated="false"
-        android:icon="@mipmap/ic_launcher_round"
-        android:label="@string/app_name"
-        android:networkSecurityConfig="@xml/network_security_config"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name="com.haojiangbo.screen.ScreenRecordActivity"></activity>
-        <activity android:name="com.haojiangbo.camera.CameraActivity" />
-        <activity android:name=".Call" />
-        <activity android:name=".RigisterNumber" />
-        <activity android:name=".MainActivity">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <service
-            android:name="com.haojiangbo.service.AudioPalyService"
-            android:enabled="true"
-            android:exported="true" />
-    </application>
-
     <uses-feature android:name="android.hardware.camera.autofocus" />
+
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -49,7 +22,37 @@
     <uses-permission android:name="android.permission.READ_SETTINGS" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
-
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
+    <application
+        android:name="com.haojiangbo.application.MyApplication"
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:icon="@mipmap/ic_launcher_round"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
+        <activity
+            android:name=".MettingActivite"
+            android:exported="true" />
+        <activity android:name="com.haojiangbo.screen.ScreenRecordActivity" />
+        <activity android:name="com.haojiangbo.camera.CameraActivity" />
+        <activity android:name=".Call" />
+        <activity android:name=".RigisterNumber" />
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <service
+            android:name="com.haojiangbo.service.AudioPalyService"
+            android:enabled="true"
+            android:exported="true" />
+    </application>
 
 </manifest>

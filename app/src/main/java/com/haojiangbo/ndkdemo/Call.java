@@ -188,17 +188,17 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void mssageEventBus(final CallReplyModel callReplyModel) {
         //ToastUtils.showToastShort("CallReply收到消息");
-        if (callReplyModel.type == ControlProtocol.CALL_REPLY) {
+        //if (callReplyModel.type == ControlProtocol.CALL_REPLY) {
             runloding = 0;
             mediaPlayer.stop();
             callStatusShow.setText("通话已连接");
             checkStream.setVisibility(View.VISIBLE);
             // 开始录音
             AudioRecorder.getInstance().startRecord();
-        } else if (callReplyModel.type == ControlProtocol.HANG) {
+        /*} else if (callReplyModel.type == ControlProtocol.HANG) {
             ToastUtils.showToastShort("通话已挂断");
             this.finish();
-        }
+        }*/
     }
 
 
@@ -265,7 +265,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         byte[] session = ControlProtocolManager.ACTIVITY_CHANNEL.attr(NettyKeyConfig.SESSION_KEY).get().getBytes();
         Pod pod = new Pod(src, dst, key);
         byte[] data = pod.toString().getBytes();
-        ControlProtocol protocol = new ControlProtocol(ControlProtocol.CALL,
+        ControlProtocol protocol = new ControlProtocol(ControlProtocol.CREATE,
                 (byte) session.length,
                 session,
                 data.length,
@@ -288,7 +288,7 @@ public class Call extends AppCompatActivity implements View.OnClickListener, Sen
         Pod pod = new Pod(src, dst, key);
         byte[] data = pod.toString().getBytes();
         ControlProtocol controlProtocol = new ControlProtocol();
-        controlProtocol.flag = ControlProtocol.HANG;
+        controlProtocol.flag = ControlProtocol.CLOSE;
         controlProtocol.sessionSize = (byte) sesbyteArray.length;
         controlProtocol.session = sesbyteArray;
         controlProtocol.dataSize = data.length;

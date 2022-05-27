@@ -6,7 +6,9 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.util.internal.StringUtil;
 
 import android.Manifest;
 import android.content.DialogInterface;
@@ -17,9 +19,12 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.haojiangbo.application.MyApplication;
 import com.haojiangbo.audio.AudioRecorder;
@@ -28,8 +33,11 @@ import com.haojiangbo.eventbus.MessageModel;
 import com.haojiangbo.ffmpeg.VideoEncode;
 import com.haojiangbo.net.MediaProtocolManager;
 import com.haojiangbo.net.protocol.ControlProtocol;
+import com.haojiangbo.net.protocol.MessageAck;
 import com.haojiangbo.net.protocol.Pod;
+import com.haojiangbo.net.protocol.RoomInfo;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
+import com.haojiangbo.net.tcp.hander.IdleCheckHandler;
 import com.haojiangbo.screen.ScreenRecordActivity;
 import com.haojiangbo.service.AudioPalyService;
 import com.haojiangbo.storage.NumberStorageManager;
@@ -52,16 +60,16 @@ import static android.content.pm.PackageManager.PERMISSION_GRANTED;
 /**
  *
  */
-public class MainActivity extends AppCompatActivity implements View.OnClickListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     // 自己的号码
-    public static String CALL_NUMBER = null;
+    public static String ROOM_NUMBER = null;
     // 对方的号码
     public static String TARGET_NUMBER = null;
-    ControlProtocolManager controlProtocolManager =  new ControlProtocolManager();
+    ControlProtocolManager controlProtocolManager = new ControlProtocolManager();
     MediaProtocolManager mediaProtocolManager = new MediaProtocolManager();
 
     // 案件缓存
-    private static List<String> KEY_WORD_CATCH =  new ArrayList<>(6);
+    private static List<String> KEY_WORD_CATCH = new ArrayList<>(6);
 
     // Used to load the 'native-lib' library on application startup.
     static {
@@ -70,25 +78,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         System.loadLibrary("native-lib");
     }
 
-    private TextView numberShow;
-    private TextView myCallNumber;
+    private Button create;
+    private Button join;
+    private EditText roomNum;
+    private EditText password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActionBar actionBar = getSupportActionBar();
-        if(null !=  actionBar){
+        if (null != actionBar) {
             actionBar.hide();
         }
-        StatusBarColorUtils.setBarColor(this,R.color.design_default_color_background);
+        StatusBarColorUtils.setBarColor(this, R.color.design_default_color_background);
         EventBus.getDefault().register(this);
-        numberShow = findViewById(R.id.number_show);
-        myCallNumber = findViewById(R.id.my_call_number);
+        create = findViewById(R.id.create);
+        join = findViewById(R.id.join);
+        roomNum = findViewById(R.id.roomnum);
+        password = findViewById(R.id.password);
         // 初始化权限
-        if(!initPermission()){
-           return;
+        if (!initPermission()) {
+            return;
         }
+        create.setOnClickListener(view ->
+                {
+                    String rr = roomNum.getText().toString();
+                    String ps = password.getText().toString();
+                    if (StringUtil.isNullOrEmpty(rr) || StringUtil.isNullOrEmpty(ps)) {
+                        ToastUtils.showToastShort("请输入房间号和密码");
+                        return;
+                    }
+                    MainActivity.ROOM_NUMBER = rr;
+                    RoomInfo roomInfo = new RoomInfo();
+                    roomInfo.setRoomnum(rr);
+                    roomInfo.setPassword(ps);
+                    ControlProtocolManager.ACTIVITY_CHANNEL
+                            .writeAndFlush(new ControlProtocol(ControlProtocol.CREATE, roomInfo.toJson().getBytes()));
+                }
+        );
+        join.setOnClickListener(view -> {
+            String rr = roomNum.getText().toString();
+            String ps = password.getText().toString();
+            if (StringUtil.isNullOrEmpty(rr) || StringUtil.isNullOrEmpty(ps)) {
+                ToastUtils.showToastShort("请输入房间号和密码");
+                return;
+            }
+            MainActivity.ROOM_NUMBER = rr;
+            RoomInfo roomInfo = new RoomInfo();
+            roomInfo.setRoomnum(rr);
+            roomInfo.setPassword(ps);
+            ControlProtocolManager.ACTIVITY_CHANNEL
+                    .writeAndFlush(new ControlProtocol(ControlProtocol.JOIN, roomInfo.toJson().getBytes()));
+        });
         // 初始化音频录制
         initAudioRecorder();
         // 开启媒体播放
@@ -100,11 +142,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     protected void onStart() {
         // 获取配置信息
-        initConfigInfo();
+        //initConfigInfo();
         super.onStart();
     }
 
-    private void initNetworkConfig(){
+    private void initNetworkConfig() {
         // tcp初始化
         controlProtocolManager.start();
 
@@ -113,59 +155,59 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    private void initConfigInfo(){
-        byte[] bytes = NumberStorageManager.build().getData("number.cnf");
-        if (null != bytes) {
-            String data = AesEncodeUtil.decode(new String(bytes));
-            myCallNumber.setText("我的号码："+data);
-            MainActivity.CALL_NUMBER = data;
-        }
-    }
     private void initAudioRecorder() {
         AudioRecorder.getInstance().createDefaultAudio();
     }
-    private void startMediaPlay(){
-        //Intent intent = new Intent(this,AudioPalyService.class);
-        //startService(intent);
+
+    private void startMediaPlay() {
         // 启动接受音频数据的队列
         new Thread(new MeidaParserInstand()).start();
         new Thread(new VideoMediaParserInstand()).start();
-       /* ParserMediaProtoThreadPool.exec();
-        ParserMediaProtoThreadPool.exec(new VideoMediaParserInstand());*/
     }
 
     /**
      * 收到呼叫消息之后，需要做一个接通的操作
+     *
      * @param message
      */
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void mssageEventBus(final MessageModel message)  {
-        //ToastUtils.showToastShort("收到呼叫消息");
-        ControlProtocol protocol = (ControlProtocol) message.payLoad;
-        Pod pod = JSONObject.parseObject(new String(protocol.data),Pod.class);
-        Intent call =  new Intent(this,Call.class);
-        call.putExtra("src",pod.getSrc());
-        call.putExtra("dst",pod.getDst());
-        call.putExtra("type",Call.accept);
-        Bundle bundle = new Bundle();
-        bundle.putSerializable("protocol",protocol);
-        call.putExtra("protocol",bundle);
-        startActivity(call);
+    public void mssageEventBus(final MessageModel message) {
+        String payLoad = (String) message.payLoad;
+        if (StringUtil.isNullOrEmpty(payLoad)) {
+            return;
+        }
+        MessageAck messageAck = JSONObject.parseObject(payLoad, MessageAck.class);
+        ToastUtils.showToastShort(messageAck.getMsg());
+        if (message.type == ControlProtocol.CREATE_REPLAY || message.type == ControlProtocol.JOIN_REPLAY) {
+            if (messageAck.getCode() != 0) {
+                return;
+            }
+            JSONArray data = (JSONArray) messageAck.getData();
+            MainActivity.ROOM_NUMBER = roomNum.getText().toString();
+            IdleCheckHandler.sendPingMessage(message.channel);
+            Intent intentv = new Intent(this, MettingActivite.class);
+            ArrayList arrayList = new ArrayList(data.size());
+            if (null != data && data.size() > 0) {
+                for (int i = 0; i < data.size(); i++) {
+                    arrayList.add(data.getString(i));
+                    Log.e("uid = ", data.getString(i));
+                }
+                intentv.putStringArrayListExtra("meetingUids", arrayList);
+            }
+            if(MettingActivite.getInstand() == null){
+                startActivity(intentv);
+            }else{
+                MettingActivite.getInstand().addVideoSurface(arrayList);
+            }
+
+        }
+
     }
-
-
-    public void printRet(int t){
-        Log.e("HJB>>>>>","call back"+t);
-    }
-
-    public native void startMp3(String url);
-
-
 
 
     @Override
     public void onClick(View v) {
-        switch (v.getId()){
+        switch (v.getId()) {
             case R.id.start_recorder:
                 AudioRecorder.getInstance().startRecord();
                 break;
@@ -173,11 +215,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 AudioRecorder.getInstance().stopRecord();
                 break;
             case R.id.register_number:
-                Intent intent = new Intent(this,RigisterNumber.class);
+                Intent intent = new Intent(this, RigisterNumber.class);
                 startActivity(intent);
                 break;
             case R.id.open_video_test:
-                Intent intentv = new Intent(this,CameraActivity.class);
+                Intent intentv = new Intent(this, CameraActivity.class);
                 startActivity(intentv);
                 break;
             case R.id.open_scrren_test:
@@ -189,49 +231,48 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private void viewHander(View view){
-        if(view instanceof  Button){
-            Button button  = (Button) view;
-            String keyWord =  button.getText().toString();
+    private void viewHander(View view) {
+        if (view instanceof Button) {
+            Button button = (Button) view;
+            String keyWord = button.getText().toString();
 
-            switch (keyWord){
+            switch (keyWord) {
                 case "CALL":
-                    String result =  list2str(KEY_WORD_CATCH);
-                    if(result.getBytes().length != 6){
-                        Toast.makeText(MyApplication.getContext(),"仅支持6位电话号码",Toast.LENGTH_SHORT).show();
+                    String result = list2str(KEY_WORD_CATCH);
+                    if (result.getBytes().length != 6) {
+                        Toast.makeText(MyApplication.getContext(), "仅支持6位电话号码", Toast.LENGTH_SHORT).show();
                         return;
                     }
-                    Intent call =  new Intent(this,Call.class);
-                    call.putExtra("src",MainActivity.CALL_NUMBER);
-                    call.putExtra("dst",result);
-                    call.putExtra("type",Call.attack);
+                    Intent call = new Intent(this, Call.class);
+                    call.putExtra("src", MainActivity.ROOM_NUMBER);
+                    call.putExtra("dst", result);
+                    call.putExtra("type", Call.attack);
                     startActivity(call);
                     break;
                 case "DEL":
-                    if(KEY_WORD_CATCH.size() > 0){
+                    if (KEY_WORD_CATCH.size() > 0) {
                         KEY_WORD_CATCH.remove(KEY_WORD_CATCH.size() - 1);
                     }
                     break;
                 default:
                     KEY_WORD_CATCH.add(keyWord);
             }
-            if(KEY_WORD_CATCH.size() > 6){
+            if (KEY_WORD_CATCH.size() > 6) {
                 KEY_WORD_CATCH.remove(KEY_WORD_CATCH.size() - 1);
-                Toast.makeText(MyApplication.getContext(),"最大支持6位电话号码",Toast.LENGTH_SHORT).show();
+                Toast.makeText(MyApplication.getContext(), "最大支持6位电话号码", Toast.LENGTH_SHORT).show();
             }
-            String result =  list2str(KEY_WORD_CATCH);
-            numberShow.setText(result);
+            String result = list2str(KEY_WORD_CATCH);
+
         }
     }
 
-    private <T> String list2str(List<T> list){
+    private <T> String list2str(List<T> list) {
         StringBuilder stringBuilder = new StringBuilder();
-        for(T item : list){
+        for (T item : list) {
             stringBuilder.append(item);
         }
         return stringBuilder.toString();
     }
-
 
 
     @Override
@@ -243,10 +284,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-
     //////////////////////////////////////动态申请权限模块///////////////////////////////////////
 
-    String [] quanxianList = {
+    String[] quanxianList = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.ACCESS_NETWORK_STATE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -258,14 +298,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      Manifest.permission.ACCESS_FINE_LOCATION,
      Manifest.permission. READ_PHONE_STATE,*/
     private final int mRequestCode = 100;//权限请求码
-    private boolean  initPermission() {
+
+    private boolean initPermission() {
         int sta = 0;
-        for(String s : quanxianList){
+        for (String s : quanxianList) {
             if (ContextCompat.checkSelfPermission(this, s) != PERMISSION_GRANTED) {
                 sta++;
             }
         }
-        if(sta > 0){
+        if (sta > 0) {
             ActivityCompat.requestPermissions(this, quanxianList, mRequestCode);
         }
         return sta > 0 ? false : true;
@@ -299,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     AlertDialog mPermissionDialog;
     private static final int NOT_NOTICE = 2;//如果勾选了不再询问
+
     private void showPermissionDialog() {
         if (mPermissionDialog == null) {
             mPermissionDialog = new AlertDialog.Builder(this)
@@ -307,7 +349,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                             cancelPermissionDialog();
-                            Uri packageURI = Uri.parse("package:" +  getPackageName());
+                            Uri packageURI = Uri.parse("package:" + getPackageName());
                             Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
                             startActivityForResult(intent, NOT_NOTICE);
                         }
@@ -324,6 +366,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         mPermissionDialog.show();
     }
+
     //关闭对话框
     private void cancelPermissionDialog() {
         mPermissionDialog.cancel();
