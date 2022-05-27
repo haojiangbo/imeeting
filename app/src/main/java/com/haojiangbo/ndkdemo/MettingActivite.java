@@ -83,7 +83,7 @@ public class MettingActivite extends AppCompatActivity {
             VideoSurface view = (VideoSurface) layoutInflater.inflate(R.layout.video_pod, null);
             current = view;
         }else {
-            addVideoSurface(uids);
+            addVideoSurface(uids,true);
         }
         initVideoEncode();
         initCamera();
@@ -105,13 +105,13 @@ public class MettingActivite extends AppCompatActivity {
     }
 
 
-    public void addVideoSurface(ArrayList<String> uids) {
+    public void addVideoSurface(ArrayList<String> uids,boolean isUseCurrentView) {
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         for (int i = 0; i < uids.size(); i++) {
             String sessionId = uids.get(i);
             VideoSurface view = (VideoSurface) layoutInflater.inflate(R.layout.video_pod, null);
             VideoSurface tmp =  videoSurfaces.get(sessionId);
-            if(ControlProtocolManager.getSessionId().equals(sessionId)){
+            if(ControlProtocolManager.getSessionId().equals(sessionId) && current == null){
                 current = view;
             }
             if(null != tmp){
@@ -121,7 +121,22 @@ public class MettingActivite extends AppCompatActivity {
             videoContainerLayout.addView(view, 300, 300);
             audioManager.put(sessionId,AudioTrackManager.getInstance(sessionId));
         }
+        Log.e("xxx","xx");
     }
+
+    public void removeVideoSurface(String uid) {
+        VideoSurface tmp =  videoSurfaces.get(uid);
+        videoSurfaces.remove(uid);
+        if(null != tmp){
+            videoContainerLayout.removeView(tmp);
+        }
+        AudioTrackManager trackManager  = audioManager.get(uid);
+        if(null != trackManager){
+            trackManager.stopPlay();
+        }
+        audioManager.remove(uid);
+    }
+
 
     void initVideoEncode() {
         // 视频解码器
@@ -218,7 +233,7 @@ public class MettingActivite extends AppCompatActivity {
             mediaDataProtocol.type = MediaDataProtocol.VIDEO_DATA;
             mediaDataProtocol.number = ControlProtocolManager.getSessionId().getBytes();
             // 高位1字节 表示摄像头的正反
-            int camareType = 0 << 24;
+            int camareType = Integer.parseInt(mCameraID) << 24;
             // 服务端最大接受65535个字节 2 位足够表示了
             int dataSizeBit = converData.length & 0xFFFF;
             mediaDataProtocol.dataSize = camareType | dataSizeBit;

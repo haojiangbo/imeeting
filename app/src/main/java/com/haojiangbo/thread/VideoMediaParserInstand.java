@@ -11,6 +11,7 @@ import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.camera.CameraActivity;
 import com.haojiangbo.ffmpeg.AudioDecode;
 import com.haojiangbo.ffmpeg.VideoDecode;
+import com.haojiangbo.ffmpeg.VideoDecodeObj;
 import com.haojiangbo.ndkdemo.Call;
 import com.haojiangbo.ndkdemo.MettingActivite;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
@@ -20,7 +21,10 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import io.netty.buffer.ByteBuf;
@@ -33,19 +37,28 @@ public class VideoMediaParserInstand implements Runnable {
      */
     public static final BlockingDeque<ByteBuf> MEDIA_DATA_QUEUE = new LinkedBlockingDeque<>();
 
+    public static final Map<String, VideoDecodeObj> ENCODE_MAPPING = new HashMap<>();
 
     @Override
     public void run() {
-        VideoDecode videoDecode = new VideoDecode();
-        videoDecode.initContext();
+        VideoDecodeObj videoDecode;
         int i = 1;
         while (i == 1) {
             try {
                 ByteBuf byteBuf = MEDIA_DATA_QUEUE.take();
+                if (MEDIA_DATA_QUEUE.size() > 1000) {
+                    continue;
+                }
                 if (byteBuf.readableBytes() > 0) {
                     byte[] number = new byte[14];
                     byteBuf.readBytes(number);
                     String session = new String(number);
+                    videoDecode = ENCODE_MAPPING.get(session);
+                    if (null == videoDecode) {
+                        videoDecode = new VideoDecodeObj();
+                        videoDecode.initContext();
+                        ENCODE_MAPPING.put(session, videoDecode);
+                    }
                     int cameraType = byteBuf.readByte();
                     byteBuf.readByte();
                     // 注意 & 0xFF 防止高位补1 导致数据不一致
@@ -58,6 +71,7 @@ public class VideoMediaParserInstand implements Runnable {
                     //byte [] b = videoDecode.decodeFrame(bytes);
                     VideoSurface videoSurface = MettingActivite.videoSurfaces.get(session);
                     if (null != videoSurface && !session.equals(ControlProtocolManager.getSessionId())) {
+                        Log.e("test", "msurfa.id = " + videoSurface.mSurface.toString() + "decode = " + videoDecode.toString() + "session" + session);
                         videoDecode.drawSurface(videoSurface.mSurface, bytes, cameraType);
                     }
                 }

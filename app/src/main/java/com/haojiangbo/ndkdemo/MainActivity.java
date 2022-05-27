@@ -178,6 +178,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         MessageAck messageAck = JSONObject.parseObject(payLoad, MessageAck.class);
         ToastUtils.showToastShort(messageAck.getMsg());
+        MettingActivite mettingActivite = MettingActivite.getInstand();
         if (message.type == ControlProtocol.CREATE_REPLAY || message.type == ControlProtocol.JOIN_REPLAY) {
             if (messageAck.getCode() != 0) {
                 return;
@@ -194,14 +195,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 intentv.putStringArrayListExtra("meetingUids", arrayList);
             }
-            if(MettingActivite.getInstand() == null){
+            if (MettingActivite.getInstand() == null) {
                 startActivity(intentv);
-            }else{
-                MettingActivite.getInstand().addVideoSurface(arrayList);
+            } else {
+                if (null != mettingActivite) {
+                    mettingActivite.addVideoSurface(arrayList,false);
+                }
             }
-
+        } else if (message.type == ControlProtocol.CLOSE) {
+            if (null != mettingActivite) {
+                mettingActivite.removeVideoSurface(messageAck.getData().toString());
+            }
         }
-
     }
 
 

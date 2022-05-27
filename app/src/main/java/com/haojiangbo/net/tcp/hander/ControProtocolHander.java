@@ -24,20 +24,19 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ControlProtocol protocol = (ControlProtocol) msg;
         String data = new String(protocol.data);
-        switch (protocol.flag) {
+        replyMessage(ctx, protocol.flag, data);
+       /* switch (protocol.flag) {
             case ControlProtocol.CREATE_REPLAY:
                 // 回复接通的消息 通过eventBus 传输到 mainActivity
                 replyMessage(ctx, protocol.flag, data);
                 break;
-            // 接收到对方的回复消息
             case ControlProtocol.JOIN_REPLAY:
                 replyMessage(ctx, protocol.flag, data);
                 break;
-            case ControlProtocol.JOIN:
-                Log.e("net hang", ">>>>>收到挂断消息");
-                EventBus.getDefault().post(new CallReplyModel(ControlProtocol.CLOSE, protocol));
+            case ControlProtocol.CLOSE:
+                replyMessage(ctx, protocol.flag, data);
                 break;
-        }
+        }*/
     }
 
     private void replyMessage(ChannelHandlerContext ctx, byte type, String data) {

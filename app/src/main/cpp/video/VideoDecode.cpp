@@ -242,7 +242,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecode_drawSurface(JNIEnv *env, jobject thiz, jo
     byteBufWrite(VideoDecode::byteBuf, ((char *) dataBuff), data_size);
     free(dataBuff);
     VideoDecode::totalCatch++;
-    if (VideoDecode::totalCatch > 5) {
+    if (VideoDecode::totalCatch > 3) {
         VideoDecode::totalCatch = 0;
         data_size = VideoDecode::byteBuf->writeIndex - VideoDecode::byteBuf->readIndex;
         uint8_t *tmpData = (uint8_t *) malloc(data_size);
