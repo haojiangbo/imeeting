@@ -118,7 +118,7 @@ public class MettingActivite extends AppCompatActivity {
                 continue;
             }
             videoSurfaces.put(sessionId,view);
-            videoContainerLayout.addView(view, 300, 300);
+            videoContainerLayout.addView(view, 400, 400);
             audioManager.put(sessionId,AudioTrackManager.getInstance(sessionId));
         }
         Log.e("xxx","xx");
