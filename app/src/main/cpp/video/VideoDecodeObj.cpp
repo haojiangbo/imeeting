@@ -196,7 +196,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_initContext(JNIEnv *env, jobject thiz)
 
     ALOGE("video decode init ok");
 
-
+    // https://www.jianshu.com/p/084fe9b91698
     jclass clazz = (jclass) env->GetObjectClass(thiz);
     jfieldID fid = (jfieldID) (*env).GetFieldID(clazz, "decodeContext", "J");
     env->SetLongField(thiz, fid, (jlong) montext);
