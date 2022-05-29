@@ -91,7 +91,7 @@ public class MettingActivite extends AppCompatActivity {
         instand = this;
 
         //AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
-        // AudioRecorder.getInstance().startRecord();
+        AudioRecorder.getInstance().startRecord();
     }
 
     @Override
