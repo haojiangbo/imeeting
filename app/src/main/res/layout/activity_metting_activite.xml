@@ -17,4 +17,12 @@
         >
     </androidx.appcompat.widget.LinearLayoutCompat>
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:layout_below="@id/video_container_layout"
+        android:id="@+id/video_container_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
 </RelativeLayout>

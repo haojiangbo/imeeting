@@ -5,6 +5,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.app.ActivityCompat;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.Manifest;
 import android.content.Context;
@@ -35,6 +39,8 @@ import com.haojiangbo.audio.AudioRecorder;
 import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.camera.CameraActivity;
 import com.haojiangbo.ffmpeg.VideoEncode;
+import com.haojiangbo.list.apder.UserInfoModel;
+import com.haojiangbo.list.apder.VideoItemListApader;
 import com.haojiangbo.net.MediaProtocolManager;
 import com.haojiangbo.net.config.NettyKeyConfig;
 import com.haojiangbo.net.protocol.MediaDataProtocol;
@@ -58,6 +64,7 @@ import io.netty.channel.socket.DatagramPacket;
 public class MettingActivite extends AppCompatActivity {
 
     LinearLayoutCompat videoContainerLayout = null;
+    RecyclerView       videoContainerList   = null;
     public  static  final Map<String,VideoSurface> videoSurfaces = new LinkedHashMap<>();
     public  static  final Map<String,AudioTrackManager> audioManager = new LinkedHashMap<>();
     VideoSurface current = null;
@@ -65,6 +72,7 @@ public class MettingActivite extends AppCompatActivity {
     VideoEncode videoEncode = null;
     SurfaceHolder mSurfaceHolder;
     private static MettingActivite instand  = null;
+    VideoItemListApader videoItemListApader                          = new VideoItemListApader();
 
 
     @Override
@@ -76,6 +84,7 @@ public class MettingActivite extends AppCompatActivity {
             actionBar.hide();
         }
         videoContainerLayout = findViewById(R.id.video_container_layout);
+        initVideoGroupView();
         Intent intent =  getIntent();
         ArrayList<String> uids =  intent.getStringArrayListExtra("meetingUids");
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
@@ -94,6 +103,19 @@ public class MettingActivite extends AppCompatActivity {
         AudioRecorder.getInstance().startRecord();
     }
 
+    void  initVideoGroupView(){
+        videoContainerList   = findViewById(R.id.video_container_list);
+        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+//        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);   //设置后瀑布流不显示了
+        videoContainerList.setLayoutManager(layoutManager);
+        videoContainerList.setItemAnimator(null);
+        DividerItemDecoration decoration = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
+        videoContainerList.addItemDecoration(decoration);
+
+
+        videoContainerList.setAdapter(videoItemListApader);
+    }
+
     @Override
     protected void onDestroy() {
         instand = null;
@@ -107,6 +129,7 @@ public class MettingActivite extends AppCompatActivity {
 
     public void addVideoSurface(ArrayList<String> uids,boolean isUseCurrentView) {
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        List<UserInfoModel> userInfoModels = new LinkedList<>();
         for (int i = 0; i < uids.size(); i++) {
             String sessionId = uids.get(i);
             VideoSurface view = (VideoSurface) layoutInflater.inflate(R.layout.video_pod, null);
@@ -120,8 +143,15 @@ public class MettingActivite extends AppCompatActivity {
             videoSurfaces.put(sessionId,view);
             videoContainerLayout.addView(view, 400, 400);
             audioManager.put(sessionId,AudioTrackManager.getInstance(sessionId));
+
+
+            UserInfoModel umodel = new UserInfoModel();
+            umodel.setUid(uids.get(i));
+            umodel.setName("用户"+umodel.getUid());
+            userInfoModels.add(umodel);
+            userInfoModels.add(umodel);
         }
-        Log.e("xxx","xx");
+        videoItemListApader.setRecords(userInfoModels);
     }
 
     public void removeVideoSurface(String uid) {

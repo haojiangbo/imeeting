@@ -113,6 +113,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     RoomInfo roomInfo = new RoomInfo();
                     roomInfo.setRoomnum(rr);
                     roomInfo.setPassword(ps);
+                    if(ControlProtocolManager.ACTIVITY_CHANNEL == null || !ControlProtocolManager.ACTIVITY_CHANNEL.isActive()){
+                        ToastUtils.showToastShort("服务不可用");
+                        return;
+                    }
                     ControlProtocolManager.ACTIVITY_CHANNEL
                             .writeAndFlush(new ControlProtocol(ControlProtocol.CREATE, roomInfo.toJson().getBytes()));
                 }
