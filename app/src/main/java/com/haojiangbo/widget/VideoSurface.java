@@ -5,10 +5,13 @@ import android.graphics.PixelFormat;
 import android.util.AttributeSet;
 import android.view.Surface;
 import android.view.SurfaceView;
+import android.view.View;
 
 public class VideoSurface extends SurfaceView {
 
     public Surface mSurface;
+
+    private View groupView;
 
     public VideoSurface(Context context) {
         super(context);
@@ -35,6 +38,11 @@ public class VideoSurface extends SurfaceView {
         mSurface = getHolder().getSurface();
     }
 
+    public View getGroupView() {
+        return groupView;
+    }
 
-
+    public void setGroupView(View groupView) {
+        this.groupView = groupView;
+    }
 }

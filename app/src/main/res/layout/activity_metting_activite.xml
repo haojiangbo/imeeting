@@ -8,19 +8,19 @@
     tools:context=".MettingActivite">
 
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <GridLayout
         android:id="@+id/video_container_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:dividerPadding="10dp"
+        android:columnCount="2"
         >
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    </GridLayout>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_below="@id/video_container_layout"
         android:id="@+id/video_container_list"
         android:layout_width="match_parent"
+        android:visibility="gone"
         android:layout_height="match_parent">
 
     </androidx.recyclerview.widget.RecyclerView>

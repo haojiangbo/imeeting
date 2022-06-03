@@ -15,6 +15,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
+import android.graphics.Rect;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -32,7 +33,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.haojiangbo.audio.AudioRecorder;
@@ -63,16 +67,15 @@ import io.netty.channel.socket.DatagramPacket;
 
 public class MettingActivite extends AppCompatActivity {
 
-    LinearLayoutCompat videoContainerLayout = null;
-    RecyclerView       videoContainerList   = null;
-    public  static  final Map<String,VideoSurface> videoSurfaces = new LinkedHashMap<>();
-    public  static  final Map<String,AudioTrackManager> audioManager = new LinkedHashMap<>();
-    VideoSurface current = null;
-    public  static  VideoSurface test = null;
+    GridLayout videoContainerLayout = null;
+    RecyclerView videoContainerList = null;
+    public static final Map<String, VideoSurface> videoSurfaces = new LinkedHashMap<>();
+    public static final Map<String, AudioTrackManager> audioManager = new LinkedHashMap<>();
+    public static volatile VideoSurface current = null;
     VideoEncode videoEncode = null;
     SurfaceHolder mSurfaceHolder;
-    private static MettingActivite instand  = null;
-    VideoItemListApader videoItemListApader                          = new VideoItemListApader();
+    private static MettingActivite instand = null;
+    VideoItemListApader videoItemListApader = new VideoItemListApader();
 
 
     @Override
@@ -85,15 +88,12 @@ public class MettingActivite extends AppCompatActivity {
         }
         videoContainerLayout = findViewById(R.id.video_container_layout);
         initVideoGroupView();
-        Intent intent =  getIntent();
-        ArrayList<String> uids =  intent.getStringArrayListExtra("meetingUids");
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        if(null == uids || uids.size() == 0){
-            VideoSurface view = (VideoSurface) layoutInflater.inflate(R.layout.video_pod, null);
-            current = view;
-        }else {
-            addVideoSurface(uids,true);
+        Intent intent = getIntent();
+        ArrayList<String> uids = intent.getStringArrayListExtra("meetingUids");
+        if (null == uids || uids.size() == 0) {
+            uids.add(ControlProtocolManager.getSessionId());
         }
+        addVideoSurface(uids, true);
         initVideoEncode();
         initCamera();
 
@@ -103,13 +103,13 @@ public class MettingActivite extends AppCompatActivity {
         AudioRecorder.getInstance().startRecord();
     }
 
-    void  initVideoGroupView(){
-        videoContainerList   = findViewById(R.id.video_container_list);
+    void initVideoGroupView() {
+        videoContainerList = findViewById(R.id.video_container_list);
         StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
 //        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);   //设置后瀑布流不显示了
         videoContainerList.setLayoutManager(layoutManager);
         videoContainerList.setItemAnimator(null);
-        DividerItemDecoration decoration = new DividerItemDecoration(this,DividerItemDecoration.VERTICAL);
+        DividerItemDecoration decoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         videoContainerList.addItemDecoration(decoration);
 
 
@@ -122,46 +122,73 @@ public class MettingActivite extends AppCompatActivity {
         super.onDestroy();
     }
 
-    public static MettingActivite getInstand(){
+    public static MettingActivite getInstand() {
         return instand;
     }
 
 
-    public void addVideoSurface(ArrayList<String> uids,boolean isUseCurrentView) {
-        LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+    public void addVideoSurface(ArrayList<String> uids, boolean isUseCurrentView) {
+       /* LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
         List<UserInfoModel> userInfoModels = new LinkedList<>();
         for (int i = 0; i < uids.size(); i++) {
             String sessionId = uids.get(i);
-            VideoSurface view = (VideoSurface) layoutInflater.inflate(R.layout.video_pod, null);
-            VideoSurface tmp =  videoSurfaces.get(sessionId);
-            if(ControlProtocolManager.getSessionId().equals(sessionId) && current == null){
-                current = view;
-            }
-            if(null != tmp){
-                continue;
-            }
-            videoSurfaces.put(sessionId,view);
-            videoContainerLayout.addView(view, 400, 400);
-            audioManager.put(sessionId,AudioTrackManager.getInstance(sessionId));
-
-
             UserInfoModel umodel = new UserInfoModel();
             umodel.setUid(uids.get(i));
-            umodel.setName("用户"+umodel.getUid());
-            userInfoModels.add(umodel);
+            umodel.setName("用户" + umodel.getUid());
+            if (ControlProtocolManager.getSessionId().equals(sessionId)) {
+                umodel.setCurrent(true);
+            } else {
+                umodel.setCurrent(false);
+            }
             userInfoModels.add(umodel);
         }
         videoItemListApader.setRecords(userInfoModels);
+        videoItemListApader.notifyDataSetChanged();*/
+
+        List<UserInfoModel> userInfoModels = new LinkedList<>();
+        for (int i = 0; i < uids.size(); i++) {
+            LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(videoContainerLayout.getContext()).inflate(R.layout.video_item, videoContainerLayout, false);
+            VideoSurface view = linearLayout.findViewById(R.id.item_video_surface);
+            TextView uname = linearLayout.findViewById(R.id.item_video_uname);
+            view.setGroupView(linearLayout);
+
+            String sessionId = uids.get(i);
+            UserInfoModel umodel = new UserInfoModel();
+            umodel.setUid(uids.get(i));
+            umodel.setName("用户" + umodel.getUid());
+            uname.setText(umodel.getName());
+            if (ControlProtocolManager.getSessionId().equals(sessionId)) {
+                umodel.setCurrent(true);
+            } else {
+                umodel.setCurrent(false);
+            }
+            if (umodel.isCurrent() && null == current && isUseCurrentView) {
+                current = view;
+            }
+            userInfoModels.add(umodel);
+            VideoSurface tmp = videoSurfaces.get(sessionId);
+            if (null != tmp) {
+                continue;
+            }
+            videoSurfaces.put(sessionId, view);
+
+            videoContainerLayout.addView(linearLayout);
+            audioManager.put(sessionId, AudioTrackManager.getInstance(sessionId));
+        }
+        videoItemListApader.setRecords(userInfoModels);
+        videoItemListApader.notifyDataSetChanged();
+
+
     }
 
     public void removeVideoSurface(String uid) {
-        VideoSurface tmp =  videoSurfaces.get(uid);
+        VideoSurface tmp = videoSurfaces.get(uid);
         videoSurfaces.remove(uid);
-        if(null != tmp){
-            videoContainerLayout.removeView(tmp);
+        if (null != tmp) {
+            videoContainerLayout.removeView(tmp.getGroupView());
         }
-        AudioTrackManager trackManager  = audioManager.get(uid);
-        if(null != trackManager){
+        AudioTrackManager trackManager = audioManager.get(uid);
+        if (null != trackManager) {
             trackManager.stopPlay();
         }
         audioManager.remove(uid);
@@ -174,7 +201,7 @@ public class MettingActivite extends AppCompatActivity {
         videoEncode.initContext();
     }
 
-    void initCamera() {
+    public void initCamera() {
         mSurfaceHolder = current.getHolder();
         mSurfaceHolder.setKeepScreenOn(true);
         // mSurfaceView添加回调
@@ -207,6 +234,7 @@ public class MettingActivite extends AppCompatActivity {
     private ImageReader mImageReader;
     private CameraManager mCameraManager;//摄像头管理器
     private CameraCaptureSession mCameraCaptureSession;
+
     /**
      * 初始化Camera2
      */
@@ -218,21 +246,21 @@ public class MettingActivite extends AppCompatActivity {
         mainHandler = new Handler(getMainLooper());
         //后摄像头
         mCameraID = "" + CameraCharacteristics.LENS_FACING_BACK;
-        mImageReader = ImageReader.newInstance(640,480 , ImageFormat.YUV_420_888,10);
+        mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 10);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
             @Override
             public void onImageAvailable(ImageReader reader) {
                 Image image = reader.acquireNextImage();
                 // Log.e("img",">>>>>"+image.getWidth()+">>>>"+image.getHeight());
-                /* Rect crop = new Rect(10,10,650,970);*/
-                //image.setCropRect(crop);
+                Rect crop = new Rect(0, 0, 640, 480);
+                image.setCropRect(crop);
                 long nowTime = System.currentTimeMillis();
-                byte [] data =  ImageUtil.getDataFromImage(image,ImageUtil.COLOR_FormatI420);
+                byte[] data = ImageUtil.getDataFromImage(image, ImageUtil.COLOR_FormatI420);
                 int oldDataLen = data.length;
-                byte [] converData =  videoEncode.encodeFrame(data);
+                byte[] converData = videoEncode.encodeFrame(data);
                 // 发送数据
                 sendPacketMessage(oldDataLen, converData);
-                Log.i("use_time",System.currentTimeMillis() - nowTime+">");
+                Log.i("use_time", System.currentTimeMillis() - nowTime + ">");
                 image.close();
             }
         }, childHandler);
@@ -252,7 +280,7 @@ public class MettingActivite extends AppCompatActivity {
     }
 
     private void sendPacketMessage(int oldDataLen, byte[] converData) {
-        if(null != converData){
+        if (null != converData) {
             /*try {
                 outputStream.write(converData);
             } catch (IOException e) {
@@ -272,10 +300,10 @@ public class MettingActivite extends AppCompatActivity {
             //发送视频数据
             DatagramPacket datagramPacket = new DatagramPacket(MediaDataProtocol
                     .mediaDataProtocolToByteBuf(MediaProtocolManager.CHANNEL,
-                            mediaDataProtocol),new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
-            if(!MediaProtocolManager.CHANNEL.isActive()){
-                Log.e("错误","连接已关闭");
-            }else {
+                            mediaDataProtocol), new InetSocketAddress(NettyKeyConfig.getHOST(), NettyKeyConfig.getPORT()));
+            if (!MediaProtocolManager.CHANNEL.isActive()) {
+                Log.e("错误", "连接已关闭");
+            } else {
                 MediaProtocolManager.CHANNEL.writeAndFlush(datagramPacket);
             }
         }
