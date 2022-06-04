@@ -4,25 +4,88 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/baise"
+    android:background="@color/heise"
     tools:context=".MettingActivite">
 
+    <TextView
+        android:id="@+id/video_room_name"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_alignParentTop="true"
+        android:gravity="center"
+        android:text="视频会议"
+        android:textColor="@color/baise">
+
+    </TextView>
 
     <GridLayout
         android:id="@+id/video_container_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:columnCount="2"
-        >
-    </GridLayout>
+        android:layout_below="@id/video_room_name"
+        android:columnCount="3"></GridLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_below="@id/video_container_layout"
         android:id="@+id/video_container_list"
         android:layout_width="match_parent"
-        android:visibility="gone"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:layout_below="@id/video_container_layout"
+        android:visibility="gone"></androidx.recyclerview.widget.RecyclerView>
 
-    </androidx.recyclerview.widget.RecyclerView>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/audit_type_but"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:onClick="onClick"
+                android:src="@drawable/volume"></ImageView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="免提"
+                android:textColor="@color/baise"></TextView>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/video_type_but"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:onClick="onClick"
+                android:src="@drawable/choose_camera"></ImageView>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="前置摄像头"
+                android:textColor="@color/baise"></TextView>
+        </LinearLayout>
+
+    </LinearLayout>
 
 </RelativeLayout>

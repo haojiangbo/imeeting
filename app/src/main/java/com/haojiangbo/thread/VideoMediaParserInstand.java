@@ -12,6 +12,7 @@ import com.haojiangbo.camera.CameraActivity;
 import com.haojiangbo.ffmpeg.AudioDecode;
 import com.haojiangbo.ffmpeg.VideoDecode;
 import com.haojiangbo.ffmpeg.VideoDecodeObj;
+import com.haojiangbo.list.apder.UserInfoModel;
 import com.haojiangbo.ndkdemo.Call;
 import com.haojiangbo.ndkdemo.MettingActivite;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
@@ -69,10 +70,10 @@ public class VideoMediaParserInstand implements Runnable {
                     byteBuf.readBytes(bytes);
                     Log.i("video_负载大小>>", bytes.length + ">>>> n >>" + totalDataSize);
                     //byte [] b = videoDecode.decodeFrame(bytes);
-                    VideoSurface videoSurface = MettingActivite.videoSurfaces.get(session);
-                    if (null != videoSurface && !session.equals(ControlProtocolManager.getSessionId())) {
-                        Log.e("test", "msurfa.id = " + videoSurface.mSurface.toString() + "decode = " + videoDecode.toString() + "session" + session);
-                        videoDecode.drawSurface(videoSurface.mSurface, bytes, cameraType);
+                    UserInfoModel model = MettingActivite.VIDEO_CACHE.get(session);
+                    if (null != model && !session.equals(ControlProtocolManager.getSessionId())) {
+                        /*Log.e("test", "msurfa.id = " + videoSurface.mSurface.toString() + "decode = " + videoDecode.toString() + "session" + session);*/
+                        videoDecode.drawSurface(model.getVideoSurface().mSurface, bytes, cameraType);
                     }
                 }
                 ReferenceCountUtil.release(byteBuf);

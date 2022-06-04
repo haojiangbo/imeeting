@@ -36,7 +36,7 @@ public class VideoItemListApader extends RecyclerView.Adapter<VideoItemListApade
 
     @Override
     public void onBindViewHolder(ViewHoder holder, final int position) {
-        UserInfoModel model = records.get(position);
+       /* UserInfoModel model = records.get(position);
         holder.uname.setText(model.getName());
         if(MettingActivite.videoSurfaces.get(model.getUid()) != null){
             return;
@@ -50,17 +50,8 @@ public class VideoItemListApader extends RecyclerView.Adapter<VideoItemListApade
         if(MettingActivite.videoSurfaces.get(model.getUid()) == null){
             MettingActivite.videoSurfaces.put(model.getUid(), holder.video);
             MettingActivite.audioManager.put(model.getUid(), AudioTrackManager.getInstance(model.getUid()));
-        }
+        }*/
 
-        /*holder.binding.setVariable(BR.company, records.get(position));
-        holder.binding.executePendingBindings();
-        holder.edit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EventBus.getDefault().post(new AseUseCompanyMessage(records.get(position),AseUseCompanyMessage.EDIT));
-            }
-        });
-*/
     }
 
 

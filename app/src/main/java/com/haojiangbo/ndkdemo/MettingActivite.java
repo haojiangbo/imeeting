@@ -1,5 +1,6 @@
 package com.haojiangbo.ndkdemo;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -29,12 +30,15 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.GridLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +55,9 @@ import com.haojiangbo.net.protocol.MediaDataProtocol;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
 import com.haojiangbo.net.tcp.hander.IdleCheckHandler;
 import com.haojiangbo.utils.ImageUtil;
+import com.haojiangbo.utils.SessionUtils;
+import com.haojiangbo.utils.ToastUtils;
+import com.haojiangbo.utils.android.StatusBarColorUtils;
 import com.haojiangbo.widget.VideoSurface;
 
 import java.net.InetSocketAddress;
@@ -65,39 +72,47 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.socket.DatagramPacket;
 
-public class MettingActivite extends AppCompatActivity {
+public class MettingActivite extends AppCompatActivity implements View.OnClickListener {
 
     GridLayout videoContainerLayout = null;
     RecyclerView videoContainerList = null;
-    public static final Map<String, VideoSurface> videoSurfaces = new LinkedHashMap<>();
-    public static final Map<String, AudioTrackManager> audioManager = new LinkedHashMap<>();
+    public static final Map<String, UserInfoModel> VIDEO_CACHE = new LinkedHashMap<>();
     public static volatile VideoSurface current = null;
     VideoEncode videoEncode = null;
     SurfaceHolder mSurfaceHolder;
-    private static MettingActivite instand = null;
+    private static MettingActivite INSTAND = null;
     VideoItemListApader videoItemListApader = new VideoItemListApader();
-
+    TextView videoRoomName;
+    ImageView videoTypeBut,audioTypeBut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metting_activite);
         ActionBar actionBar = getSupportActionBar();
+        StatusBarColorUtils.setBarColor(this, R.color.heise);
         if (null != actionBar) {
             actionBar.hide();
         }
         videoContainerLayout = findViewById(R.id.video_container_layout);
+        videoRoomName        = findViewById(R.id.video_room_name);
+        videoTypeBut         = findViewById(R.id.video_type_but);
+        audioTypeBut         = findViewById(R.id.audit_type_but);
+        audioTypeBut.setOnClickListener(this);
+        videoTypeBut.setOnClickListener(this);
         initVideoGroupView();
         Intent intent = getIntent();
         ArrayList<String> uids = intent.getStringArrayListExtra("meetingUids");
         if (null == uids || uids.size() == 0) {
             uids.add(ControlProtocolManager.getSessionId());
         }
+        SessionUtils.Model model = SessionUtils.splitSession(uids.get(0));
+        videoRoomName.setText("房间号："+model.key);
         addVideoSurface(uids, true);
         initVideoEncode();
         initCamera();
 
-        instand = this;
+        INSTAND = this;
 
         //AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
         AudioRecorder.getInstance().startRecord();
@@ -118,62 +133,39 @@ public class MettingActivite extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        instand = null;
+        INSTAND = null;
         super.onDestroy();
     }
 
     public static MettingActivite getInstand() {
-        return instand;
+        return INSTAND;
     }
 
 
     public void addVideoSurface(ArrayList<String> uids, boolean isUseCurrentView) {
-       /* LayoutInflater layoutInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
-        List<UserInfoModel> userInfoModels = new LinkedList<>();
-        for (int i = 0; i < uids.size(); i++) {
-            String sessionId = uids.get(i);
-            UserInfoModel umodel = new UserInfoModel();
-            umodel.setUid(uids.get(i));
-            umodel.setName("用户" + umodel.getUid());
-            if (ControlProtocolManager.getSessionId().equals(sessionId)) {
-                umodel.setCurrent(true);
-            } else {
-                umodel.setCurrent(false);
-            }
-            userInfoModels.add(umodel);
-        }
-        videoItemListApader.setRecords(userInfoModels);
-        videoItemListApader.notifyDataSetChanged();*/
-
         List<UserInfoModel> userInfoModels = new LinkedList<>();
         for (int i = 0; i < uids.size(); i++) {
             LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(videoContainerLayout.getContext()).inflate(R.layout.video_item, videoContainerLayout, false);
             VideoSurface view = linearLayout.findViewById(R.id.item_video_surface);
             TextView uname = linearLayout.findViewById(R.id.item_video_uname);
+
+            ViewGroup.LayoutParams layoutParams = linearLayout.getLayoutParams();
+            // 设置视频宽度
+            setViewWidth(linearLayout, layoutParams);
+
             view.setGroupView(linearLayout);
+            view.setSurfaceviewCorner(30);
 
             String sessionId = uids.get(i);
-            UserInfoModel umodel = new UserInfoModel();
-            umodel.setUid(uids.get(i));
-            umodel.setName("用户" + umodel.getUid());
-            uname.setText(umodel.getName());
-            if (ControlProtocolManager.getSessionId().equals(sessionId)) {
-                umodel.setCurrent(true);
-            } else {
-                umodel.setCurrent(false);
-            }
-            if (umodel.isCurrent() && null == current && isUseCurrentView) {
-                current = view;
-            }
-            userInfoModels.add(umodel);
-            VideoSurface tmp = videoSurfaces.get(sessionId);
+            // 生成用户对象
+            UserInfoModel umodel = getUserInfoModel(isUseCurrentView, userInfoModels,  view, uname, sessionId);
+
+            UserInfoModel tmp = VIDEO_CACHE.get(sessionId);
             if (null != tmp) {
                 continue;
             }
-            videoSurfaces.put(sessionId, view);
-
+            VIDEO_CACHE.put(sessionId, umodel);
             videoContainerLayout.addView(linearLayout);
-            audioManager.put(sessionId, AudioTrackManager.getInstance(sessionId));
         }
         videoItemListApader.setRecords(userInfoModels);
         videoItemListApader.notifyDataSetChanged();
@@ -181,17 +173,45 @@ public class MettingActivite extends AppCompatActivity {
 
     }
 
+    @NonNull
+    private UserInfoModel getUserInfoModel( boolean isUseCurrentView, List<UserInfoModel> userInfoModels, VideoSurface view, TextView uname, String sessionId) {
+        UserInfoModel umodel = new UserInfoModel();
+        umodel.setUid(sessionId);
+        umodel.setName(umodel.getUid());
+        uname.setText(umodel.getName());
+        if (ControlProtocolManager.getSessionId().equals(sessionId)) {
+            umodel.setCurrent(true);
+        } else {
+            umodel.setCurrent(false);
+        }
+        if (umodel.isCurrent() && null == current && isUseCurrentView) {
+            current = view;
+        }
+        umodel.setVideoSurface(view);
+        umodel.setAudioTrackManager(AudioTrackManager.getInstance(sessionId));
+        userInfoModels.add(umodel);
+        return umodel;
+    }
+
+    private void setViewWidth(LinearLayout linearLayout, ViewGroup.LayoutParams layoutParams) {
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int screenWidth = dm.widthPixels;
+        int screenHeight = dm.heightPixels;
+        // 计算宽高比 调整为合适的 宽高
+        Log.i("width ", "old = " + screenWidth / 3 + "width = " + screenWidth + "heigth = " + screenHeight);
+        layoutParams.width = screenWidth / 3;
+        layoutParams.height = (int) (layoutParams.width * 1.5);
+        linearLayout.setLayoutParams(layoutParams);
+    }
+
     public void removeVideoSurface(String uid) {
-        VideoSurface tmp = videoSurfaces.get(uid);
-        videoSurfaces.remove(uid);
+        UserInfoModel tmp = VIDEO_CACHE.get(uid);
+        VIDEO_CACHE.remove(uid);
         if (null != tmp) {
-            videoContainerLayout.removeView(tmp.getGroupView());
+            videoContainerLayout.removeView(tmp.getVideoSurface().getGroupView());
+            tmp.getAudioTrackManager().stopPlay();
         }
-        AudioTrackManager trackManager = audioManager.get(uid);
-        if (null != trackManager) {
-            trackManager.stopPlay();
-        }
-        audioManager.remove(uid);
     }
 
 
@@ -210,7 +230,7 @@ public class MettingActivite extends AppCompatActivity {
             public void surfaceCreated(SurfaceHolder holder) {
                 //SurfaceView创建
                 // 初始化Camera
-                initCamera2();
+                initCamera2( CameraCharacteristics.LENS_FACING_BACK+"");
             }
 
             @Override
@@ -239,13 +259,13 @@ public class MettingActivite extends AppCompatActivity {
      * 初始化Camera2
      */
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    private void initCamera2() {
+    private void initCamera2(String camerId) {
         HandlerThread handlerThread = new HandlerThread("Camera2");
         handlerThread.start();
         childHandler = new Handler(handlerThread.getLooper());
         mainHandler = new Handler(getMainLooper());
         //后摄像头
-        mCameraID = "" + CameraCharacteristics.LENS_FACING_BACK;
+        mCameraID = camerId;
         mImageReader = ImageReader.newInstance(640, 480, ImageFormat.YUV_420_888, 10);
         mImageReader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener() { //可以在这里处理拍照得到的临时照片 例如，写入本地
             @Override
@@ -377,6 +397,38 @@ public class MettingActivite extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+    private void closeCamera() {
+        if (null != mImageReader) {
+            mImageReader.close();
+        }
+        if (null != mCameraDevice) {
+            mCameraDevice.close();
+        }
+        if (null != mCameraCaptureSession) {
+            mCameraCaptureSession.close();
+        }
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()){
+            case R.id.video_type_but:
+                closeCamera();
+                if(mCameraID.equals("1")){
+                    mCameraID = "0";
+                }else {
+                    mCameraID = "1";
+                }
+                ToastUtils.showToastShort("点击了视频切换按钮");
+                initCamera2(mCameraID);
+                break;
+            case R.id.audit_type_but:
+                break;
+        }
+    }
+
+
 
 
 }

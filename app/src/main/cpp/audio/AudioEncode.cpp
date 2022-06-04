@@ -138,7 +138,7 @@ Java_com_haojiangbo_ffmpeg_AudioEncode_encodeFrame(JNIEnv *env, jobject thiz, jb
     jbyteArray  r = jtoolUtils.charpoint2jarray(env,resultBuff);
     free(freeDataPoint);
     free(resultBuff);
-    ALOGE("原始长度 = %d , 压缩后的长度 %d",srcLen,totalResultIndex);
+    ALOGI("原始长度 = %d , 压缩后的长度 %d",srcLen,totalResultIndex);
     return r;
 }
 

@@ -5,6 +5,7 @@ import android.util.Log;
 import com.haojiangbo.audio.AudioTrackManager;
 import com.haojiangbo.ffmpeg.AudioDecode;
 import com.haojiangbo.ffmpeg.AudioDecodeObj;
+import com.haojiangbo.list.apder.UserInfoModel;
 import com.haojiangbo.ndkdemo.MettingActivite;
 import com.haojiangbo.net.protocol.MediaDataProtocol;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
@@ -49,12 +50,12 @@ public class MeidaParserInstand implements Runnable {
                     }
                   /* // 转换协议
                    MediaDataProtocol protocol =   MediaDataProtocol.byteBufToMediaDataProtocol(byteBuf);*/
-                    Log.e("负载大小>>", bytes.length + ">>>>");
+                    Log.i("负载大小>>", bytes.length + ">>>>");
                     byte[] converData = decode.decodeFrame(bytes);
-                    AudioTrackManager audioTrackManager = MettingActivite.audioManager.get(session);
-                    if (converData != null && null != audioTrackManager && !session.equals(ControlProtocolManager.getSessionId())) {
-                        Log.e("解析后的数据", ">>>>>" + converData.length);
-                        audioTrackManager.startPlay(converData);
+                    UserInfoModel model = MettingActivite.VIDEO_CACHE.get(session);
+                    if (converData != null && null != model && !session.equals(ControlProtocolManager.getSessionId())) {
+                        Log.i("解析后的数据", ">>>>>" + converData.length);
+                        model.getAudioTrackManager().startPlay(converData);
                     }
                     ReferenceCountUtil.release(byteBuf);
                 }

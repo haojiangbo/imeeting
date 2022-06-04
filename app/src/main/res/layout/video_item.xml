@@ -1,24 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="200dp"
-    android:layout_height="250dp"
+    android:layout_height="200dp"
     android:layout_columnSpan="1"
-    android:padding="1dp"
-    android:orientation="vertical">
+    android:maxWidth="200dp"
+    android:orientation="vertical"
+    android:padding="2dp">
 
     <com.haojiangbo.widget.VideoSurface
         android:id="@+id/item_video_surface"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2">
+        android:layout_weight="2"></com.haojiangbo.widget.VideoSurface>
 
-    </com.haojiangbo.widget.VideoSurface>
 
-    <TextView
-        android:id="@+id/item_video_uname"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="50dp"
-        android:gravity="center"
-        >
-    </TextView>
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:src="@drawable/user"
+            android:layout_gravity="center"
+            android:layout_height="20dp"></ImageView>
+
+        <TextView
+            android:id="@+id/item_video_uname"
+            android:layout_width="0dp"
+            android:layout_height="20dp"
+            android:layout_marginLeft="5dp"
+            android:layout_weight="1"
+            android:gravity="bottom"
+            android:layout_gravity="center"
+            android:textColor="@color/baise"
+            android:textSize="10dp"></TextView>
+    </LinearLayout>
+
+
 </LinearLayout>
