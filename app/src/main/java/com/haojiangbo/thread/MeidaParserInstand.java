@@ -12,6 +12,7 @@ import com.haojiangbo.net.tcp.ControlProtocolManager;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -28,11 +29,11 @@ public class MeidaParserInstand implements Runnable {
     public static final Map<String, AudioDecodeObj> AUDIO_DECODE_OBJ_MAP = new HashMap<>();
 
 
+    public static volatile int THREAD_STATE = 1;
+
     @Override
     public void run() {
-
-        int i = 1;
-        while (i == 1) {
+        while (THREAD_STATE == 1) {
             try {
                 ByteBuf byteBuf = MEDIA_DATA_QUEUE.take();
                 if (byteBuf.readableBytes() > 0) {
@@ -46,24 +47,33 @@ public class MeidaParserInstand implements Runnable {
                     if (null == decode) {
                         decode = new AudioDecodeObj();
                         decode.initContext();
-                        AUDIO_DECODE_OBJ_MAP.put(session,decode);
+                        AUDIO_DECODE_OBJ_MAP.put(session, decode);
                     }
                   /* // 转换协议
                    MediaDataProtocol protocol =   MediaDataProtocol.byteBufToMediaDataProtocol(byteBuf);*/
                     Log.i("负载大小>>", bytes.length + ">>>>");
                     byte[] converData = decode.decodeFrame(bytes);
                     UserInfoModel model = MettingActivite.VIDEO_CACHE.get(session);
-                    if (converData != null && null != model && !session.equals(ControlProtocolManager.getSessionId())) {
+                    if (converData != null && null != model && !session.equals(ControlProtocolManager.getSessionId()) && THREAD_STATE == 1) {
                         Log.i("解析后的数据", ">>>>>" + converData.length);
                         model.getAudioTrackManager().startPlay(converData);
                     }
                     ReferenceCountUtil.release(byteBuf);
                 }
-            } catch (InterruptedException e) {
-                i = 0;
+            } catch (Exception e) {
+                THREAD_STATE = 0;
                 e.printStackTrace();
             }
         }
-        // decode.freeContext();
+    }
+
+    public static void freeContext() {
+        MEDIA_DATA_QUEUE.clear();
+        Set<String> stringSet = AUDIO_DECODE_OBJ_MAP.keySet();
+        for (String key : stringSet) {
+            AUDIO_DECODE_OBJ_MAP.get(key).freeContext();
+        }
+        AUDIO_DECODE_OBJ_MAP.clear();
+        THREAD_STATE = 0;
     }
 }

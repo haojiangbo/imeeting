@@ -14,7 +14,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.socket.DatagramPacket;
 
-public class MediaProtocolHander  extends ChannelInboundHandlerAdapter {
+public class MediaProtocolHander extends ChannelInboundHandlerAdapter {
 
 
     @Override
@@ -23,10 +23,13 @@ public class MediaProtocolHander  extends ChannelInboundHandlerAdapter {
        /* StringBuilder stringBuffer = new StringBuilder();
         ByteBufUtil.appendPrettyHexDump(stringBuffer,datagramPacket.content());*/
         //Log.e("HJB",stringBuffer.toString());
-        Log.i("数据大小>>",datagramPacket.content().readableBytes() + ">>>>");
+        Log.i("数据大小>>", datagramPacket.content().readableBytes() + ">>>>");
         byte type = datagramPacket.content().readByte();
-        switch (type){
-            case MediaDataProtocol .AUDIO_DATA:
+        if (VideoMediaParserInstand.THREAD_STATE != 1) {
+            return;
+        }
+        switch (type) {
+            case MediaDataProtocol.AUDIO_DATA:
                 MeidaParserInstand.MEDIA_DATA_QUEUE.put(datagramPacket.content());
                 break;
             case MediaDataProtocol.VIDEO_DATA:

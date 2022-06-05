@@ -234,6 +234,9 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
     jlong p = (jlong) env->GetLongField(thiz, fid);
     struct DecodeContxt *contxt = (DecodeContxt *) p;
 
+    if(contxt->c == NULL){
+        return ;
+    }
 
 
     char *dataBuff = contxt->jtoolUtils.jarray2charponit(env, bytes);

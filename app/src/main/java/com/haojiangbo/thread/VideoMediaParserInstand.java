@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -40,11 +41,12 @@ public class VideoMediaParserInstand implements Runnable {
 
     public static final Map<String, VideoDecodeObj> ENCODE_MAPPING = new HashMap<>();
 
+    public static volatile int THREAD_STATE =  1;
+
     @Override
     public void run() {
         VideoDecodeObj videoDecode;
-        int i = 1;
-        while (i == 1) {
+        while (THREAD_STATE == 1) {
             try {
                 ByteBuf byteBuf = MEDIA_DATA_QUEUE.take();
                 if (MEDIA_DATA_QUEUE.size() > 1000) {
@@ -71,17 +73,27 @@ public class VideoMediaParserInstand implements Runnable {
                     Log.i("video_负载大小>>", bytes.length + ">>>> n >>" + totalDataSize);
                     //byte [] b = videoDecode.decodeFrame(bytes);
                     UserInfoModel model = MettingActivite.VIDEO_CACHE.get(session);
-                    if (null != model && !session.equals(ControlProtocolManager.getSessionId())) {
+                    if (null != model && !session.equals(ControlProtocolManager.getSessionId()) && THREAD_STATE == 1) {
                         /*Log.e("test", "msurfa.id = " + videoSurface.mSurface.toString() + "decode = " + videoDecode.toString() + "session" + session);*/
                         videoDecode.drawSurface(model.getVideoSurface().mSurface, bytes, cameraType);
                     }
                 }
                 ReferenceCountUtil.release(byteBuf);
-            } catch (InterruptedException e) {
-                i = 0;
+            } catch (Exception e) {
+                THREAD_STATE = 0;
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void  freeContext(){
+        MEDIA_DATA_QUEUE.clear();
+        Set<String> stringSet =  ENCODE_MAPPING.keySet();
+        for(String key : stringSet){
+            ENCODE_MAPPING.get(key).freeContext();
+        }
+        ENCODE_MAPPING.clear();
+        THREAD_STATE = 0;
     }
 
     public static Bitmap byteToBitmap(byte[] imgByte) {

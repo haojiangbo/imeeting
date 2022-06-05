@@ -137,8 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
         // 初始化音频录制
         initAudioRecorder();
-        // 开启媒体播放
-        startMediaPlay();
         // 初始化网络配置
         initNetworkConfig();
     }
@@ -163,11 +161,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AudioRecorder.getInstance().createDefaultAudio();
     }
 
-    private void startMediaPlay() {
-        // 启动接受音频数据的队列
-        new Thread(new MeidaParserInstand()).start();
-        new Thread(new VideoMediaParserInstand()).start();
-    }
+
 
     /**
      * 收到呼叫消息之后，需要做一个接通的操作

@@ -79,6 +79,10 @@ Java_com_haojiangbo_ffmpeg_AudioDecodeObj_decodeFrame(JNIEnv *env, jobject thiz,
     jlong p = (jlong) env->GetLongField(thiz, fid);
     struct AudioContext *contxt = (AudioContext *) p;
 
+    if(contxt->c == NULL){
+        return NULL;
+    }
+
 
     char *dataBuff = contxt->jtoolUtils.jarray2charponit(env, bytes);
     // 把数据包解析到packet里

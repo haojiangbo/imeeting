@@ -54,6 +54,8 @@ import com.haojiangbo.net.config.NettyKeyConfig;
 import com.haojiangbo.net.protocol.MediaDataProtocol;
 import com.haojiangbo.net.tcp.ControlProtocolManager;
 import com.haojiangbo.net.tcp.hander.IdleCheckHandler;
+import com.haojiangbo.thread.MeidaParserInstand;
+import com.haojiangbo.thread.VideoMediaParserInstand;
 import com.haojiangbo.utils.ImageUtil;
 import com.haojiangbo.utils.SessionUtils;
 import com.haojiangbo.utils.ToastUtils;
@@ -67,6 +69,8 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -76,14 +80,14 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
 
     GridLayout videoContainerLayout = null;
     RecyclerView videoContainerList = null;
-    public static final Map<String, UserInfoModel> VIDEO_CACHE = new LinkedHashMap<>();
+    public static final Map<String, UserInfoModel> VIDEO_CACHE = new ConcurrentHashMap<>();
     public static volatile VideoSurface current = null;
     VideoEncode videoEncode = null;
     SurfaceHolder mSurfaceHolder;
     private static MettingActivite INSTAND = null;
     VideoItemListApader videoItemListApader = new VideoItemListApader();
-    TextView videoRoomName;
-    ImageView videoTypeBut,audioTypeBut;
+    TextView videoRoomName, roomAudioType;
+    ImageView videoTypeBut, audioTypeBut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,10 +98,12 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         if (null != actionBar) {
             actionBar.hide();
         }
+        INSTAND = this;
         videoContainerLayout = findViewById(R.id.video_container_layout);
-        videoRoomName        = findViewById(R.id.video_room_name);
-        videoTypeBut         = findViewById(R.id.video_type_but);
-        audioTypeBut         = findViewById(R.id.audit_type_but);
+        videoRoomName = findViewById(R.id.video_room_name);
+        videoTypeBut = findViewById(R.id.video_type_but);
+        audioTypeBut = findViewById(R.id.audit_type_but);
+        roomAudioType = findViewById(R.id.room_audio_type);
         audioTypeBut.setOnClickListener(this);
         videoTypeBut.setOnClickListener(this);
         initVideoGroupView();
@@ -107,15 +113,20 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
             uids.add(ControlProtocolManager.getSessionId());
         }
         SessionUtils.Model model = SessionUtils.splitSession(uids.get(0));
-        videoRoomName.setText("房间号："+model.key);
+        videoRoomName.setText("房间号：" + model.key);
         addVideoSurface(uids, true);
         initVideoEncode();
         initCamera();
+        // AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_MUSIC);
+    }
 
-        INSTAND = this;
 
-        //AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
-        AudioRecorder.getInstance().startRecord();
+    private void startMediaPlay() {
+        // 启动接受音频数据的队列
+        VideoMediaParserInstand.THREAD_STATE = 1;
+        MeidaParserInstand.THREAD_STATE = 1;
+        new Thread(new MeidaParserInstand()).start();
+        new Thread(new VideoMediaParserInstand()).start();
     }
 
     void initVideoGroupView() {
@@ -131,11 +142,52 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         videoContainerList.setAdapter(videoItemListApader);
     }
 
+
+    @Override
+    protected void onResume() {
+        startMediaPlay();
+        // 开始音频录制
+        AudioRecorder.getInstance().startRecord();
+        super.onResume();
+    }
+
+
+    @Override
+    public void onBackPressed() {
+        Log.e("event", "1");
+        VideoMediaParserInstand.freeContext();
+        MeidaParserInstand.freeContext();
+        AudioRecorder.getInstance().stopRecord();
+        super.onBackPressed();
+    }
+
+
+    @Override
+    protected void onPause() {
+        Log.e("event", "2");
+
+
+        INSTAND = null;
+        current = null;
+        Set<String> stringSet = VIDEO_CACHE.keySet();
+        for (String key : stringSet) {
+            UserInfoModel model = VIDEO_CACHE.get(key);
+            if (null != model) {
+                model.getAudioTrackManager().stopPlay();
+                videoContainerLayout.removeView(model.getVideoSurface().getGroupView());
+            }
+        }
+        VIDEO_CACHE.clear();
+        super.onPause();
+    }
+
     @Override
     protected void onDestroy() {
-        INSTAND = null;
+        closeCamera();
+        videoEncode.freeContext();
         super.onDestroy();
     }
+
 
     public static MettingActivite getInstand() {
         return INSTAND;
@@ -158,23 +210,24 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
 
             String sessionId = uids.get(i);
             // 生成用户对象
-            UserInfoModel umodel = getUserInfoModel(isUseCurrentView, userInfoModels,  view, uname, sessionId);
+            UserInfoModel umodel = getUserInfoModel(isUseCurrentView, userInfoModels, view, uname, sessionId);
 
             UserInfoModel tmp = VIDEO_CACHE.get(sessionId);
             if (null != tmp) {
                 continue;
             }
             VIDEO_CACHE.put(sessionId, umodel);
+            Log.e("video cache ", sessionId);
             videoContainerLayout.addView(linearLayout);
         }
-        videoItemListApader.setRecords(userInfoModels);
-        videoItemListApader.notifyDataSetChanged();
+        /*videoItemListApader.setRecords(userInfoModels);
+        videoItemListApader.notifyDataSetChanged();*/
 
 
     }
 
     @NonNull
-    private UserInfoModel getUserInfoModel( boolean isUseCurrentView, List<UserInfoModel> userInfoModels, VideoSurface view, TextView uname, String sessionId) {
+    private UserInfoModel getUserInfoModel(boolean isUseCurrentView, List<UserInfoModel> userInfoModels, VideoSurface view, TextView uname, String sessionId) {
         UserInfoModel umodel = new UserInfoModel();
         umodel.setUid(sessionId);
         umodel.setName(umodel.getUid());
@@ -189,6 +242,7 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         }
         umodel.setVideoSurface(view);
         umodel.setAudioTrackManager(AudioTrackManager.getInstance(sessionId));
+        umodel.getAudioTrackManager().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
         userInfoModels.add(umodel);
         return umodel;
     }
@@ -230,7 +284,7 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
             public void surfaceCreated(SurfaceHolder holder) {
                 //SurfaceView创建
                 // 初始化Camera
-                initCamera2( CameraCharacteristics.LENS_FACING_BACK+"");
+                initCamera2(CameraCharacteristics.LENS_FACING_BACK + "");
             }
 
             @Override
@@ -272,8 +326,8 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
             public void onImageAvailable(ImageReader reader) {
                 Image image = reader.acquireNextImage();
                 // Log.e("img",">>>>>"+image.getWidth()+">>>>"+image.getHeight());
-                Rect crop = new Rect(0, 0, 640, 480);
-                image.setCropRect(crop);
+                /*Rect crop = new Rect(0, 0, 640, 480);
+                image.setCropRect(crop);*/
                 long nowTime = System.currentTimeMillis();
                 byte[] data = ImageUtil.getDataFromImage(image, ImageUtil.COLOR_FormatI420);
                 int oldDataLen = data.length;
@@ -412,23 +466,33 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()){
+        switch (view.getId()) {
             case R.id.video_type_but:
                 closeCamera();
-                if(mCameraID.equals("1")){
+                if (mCameraID.equals("1")) {
                     mCameraID = "0";
-                }else {
+                } else {
                     mCameraID = "1";
                 }
-                ToastUtils.showToastShort("点击了视频切换按钮");
                 initCamera2(mCameraID);
                 break;
             case R.id.audit_type_but:
+                if (roomAudioType.getText().toString().equals("听筒")) {
+                    roomAudioType.setText("扬声器");
+                    Set<String> stringSet = VIDEO_CACHE.keySet();
+                    for (String key : stringSet) {
+                        VIDEO_CACHE.get(key).getAudioTrackManager().setPlayStaeam(AudioManager.STREAM_MUSIC);
+                    }
+                } else {
+                    roomAudioType.setText("听筒");
+                    Set<String> stringSet = VIDEO_CACHE.keySet();
+                    for (String key : stringSet) {
+                        VIDEO_CACHE.get(key).getAudioTrackManager().setPlayStaeam(AudioManager.STREAM_VOICE_CALL);
+                    }
+                }
                 break;
         }
     }
-
-
 
 
 }
