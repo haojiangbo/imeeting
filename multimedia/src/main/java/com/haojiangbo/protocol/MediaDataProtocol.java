@@ -34,10 +34,10 @@ public class MediaDataProtocol {
     public byte[] data;
 
 
-    public static MediaDataProtocol byteBufToMediaDataProtocol(ByteBuf byteBuf){
+    public static MediaDataProtocol byteBufToMediaDataProtocol(ByteBuf byteBuf) {
         MediaDataProtocol protocol = new MediaDataProtocol();
         protocol.type = byteBuf.readByte();
-        byte [] number = new byte[14];
+        byte[] number = new byte[14];
         byteBuf.readBytes(number);
         protocol.number = number;
         // 此处要修改一下，
@@ -45,24 +45,24 @@ public class MediaDataProtocol {
         // 取出 int 2 个 低字节 得到数据总大小
         int dataSize =
                 ((protocol.dataSize & 0xffff) >>> 8) << 8
-                  |
-                (protocol.dataSize & 0xff);
+                        |
+                        (protocol.dataSize & 0xff);
         byte data[] = new byte[dataSize];
         byteBuf.readBytes(data);
         protocol.data = data;
-        return  protocol;
+        return protocol;
     }
 
 
-    public static ByteBuf mediaDataProtocolToByteBuf(Channel channel, MediaDataProtocol mediaDataProtocol){
+    public static ByteBuf mediaDataProtocolToByteBuf(Channel channel, MediaDataProtocol mediaDataProtocol) {
         int totalLen = 19;
         totalLen += mediaDataProtocol.data.length;
-        ByteBuf byteBuf =  channel.alloc().buffer(totalLen);
+        ByteBuf byteBuf = channel.alloc().buffer(totalLen);
         byteBuf.writeByte(mediaDataProtocol.type);
         byteBuf.writeBytes(mediaDataProtocol.number);
         byteBuf.writeInt(mediaDataProtocol.dataSize);
         byteBuf.writeBytes(mediaDataProtocol.data);
-        return  byteBuf;
+        return byteBuf;
     }
 
 }
