@@ -214,6 +214,10 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_freeContext(JNIEnv *env, jobject thiz)
     jlong p = (jlong) env->GetLongField(thiz, fid);
     struct DecodeContxt *contxt = (DecodeContxt *) p;
 
+    if(contxt == NULL){
+        return;
+    }
+
     if (contxt->imgConvertCtx != NULL) {
         sws_freeContext(contxt->imgConvertCtx);
     }
@@ -224,6 +228,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_freeContext(JNIEnv *env, jobject thiz)
     av_frame_free(&(contxt->frame));
     av_frame_free(&contxt->rgbaFrame);
     av_packet_free(&contxt->pkt);
+    contxt->c = NULL;
 }
 extern "C"
 JNIEXPORT void JNICALL
@@ -252,6 +257,10 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
         uint8_t *data = (uint8_t *) tmpData;
         int ret = 0;
         while (data_size > 0) {
+            ALOGE("run 1");
+            if(contxt->c == NULL){
+                return;
+            }
             // 解析数据包，其实就是封装 pkt
             ret = av_parser_parse2(contxt->parser, contxt->c, &(contxt->pkt->data),
                                    &(contxt->pkt->size),
@@ -265,6 +274,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
 
             if (contxt->pkt->size) {
                 int z =decode(contxt->c, contxt->frame, contxt->pkt,contxt);
+                ALOGE("decode %d",z);
                 if (z == 1) {
                     ANativeWindow *nativeWindow = ANativeWindow_fromSurface(env, m_surface);
                     ANativeWindow_Buffer windowBuffer;
@@ -278,11 +288,15 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
                         videoHeight = contxt->c->width;
                     }
 
-
+                    ALOGE("draw window 1");
                     // 设置native window的buffer大小,可自动拉伸
-                    ALOGI("set native window");
+                    ALOGE("set native window %d  null addr %d",nativeWindow,NULL);
+                    if(nativeWindow == NULL){
+                        return;
+                    }
                     ANativeWindow_setBuffersGeometry(nativeWindow, videoWidth, videoHeight,
                                                      WINDOW_FORMAT_RGBA_8888);
+                    ALOGE("draw window 00");
                     // lock native window buffer
                     // 锁定窗口缓存
                     ANativeWindow_lock(nativeWindow, &windowBuffer, NULL);
@@ -294,12 +308,14 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
                     if(is90 == 1){
                         //uint8_t  *tmpRotate =  (uint8_t *)VideoDecode::rotate90Clockwise(VideoDecode::defalutWidth,VideoDecode::defaultHeight);
                         // 逆时针
+                        ALOGE("draw window 01 rgbaddr %d contxtaddr %d",contxt->rgbaFrame->data,contxt);
                         uint8_t  *tmpRotate = NULL;
                         if(camera == 0){
                             tmpRotate =  (uint8_t *)rotate90Clockwise(contxt->defalutWidth,contxt->defaultHeight,contxt);
                         }else{
                             tmpRotate =  (uint8_t *)rotate90Anticlockwise(contxt->defalutWidth,contxt->defaultHeight,contxt);
                         }
+                        ALOGE("draw window 11");
                         src = tmpRotate;
                         int dstStride = windowBuffer.stride * 4;
                         // 步幅由 480 * 4 转成 640 * 4;
@@ -309,6 +325,7 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
                             memcpy(dst + i * dstStride, src + i * srcStride, srcStride);
                         }
                         free(tmpRotate);
+                        ALOGE("draw window 2");
                     }else{
                         src = contxt->rgbaFrame->data[0];
                         int dstStride = windowBuffer.stride * 4;
@@ -321,12 +338,17 @@ Java_com_haojiangbo_ffmpeg_VideoDecodeObj_drawSurface(JNIEnv *env, jobject thiz,
 
                     ANativeWindow_unlockAndPost(nativeWindow);
                     ANativeWindow_release(nativeWindow);
+                    ALOGE("draw window close ");
                     continue;
                 }
             }
         }
-        free(tmpData);
-        clearByteBuf(contxt->byteBuf);
+        if(tmpData != NULL){
+            free(tmpData);
+        }
+        if(NULL != contxt && contxt->byteBuf != NULL){
+            clearByteBuf(contxt->byteBuf);
+        }
     }
     return;
 

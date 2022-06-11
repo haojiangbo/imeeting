@@ -6,13 +6,13 @@ package com.haojiangbo.ffmpeg;
 public class AudioDecodeObj implements Codec{
     public long decodeContext;
     @Override
-    public native void initContext();
+    public synchronized native void initContext();
     @Override
-    public  byte[] encodeFrame(byte[] bytes) {
+    public synchronized  byte[] encodeFrame(byte[] bytes) {
         throw  new UnsupportedOperationException("不支持该操作");
     }
     @Override
-    public native byte[] decodeFrame(byte[] bytes);
+    public synchronized native byte[] decodeFrame(byte[] bytes);
     @Override
-    public native void freeContext();
+    public synchronized native void freeContext();
 }

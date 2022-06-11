@@ -106,6 +106,9 @@ Java_com_haojiangbo_ffmpeg_AudioDecodeObj_decodeFrame(JNIEnv *env, jobject thiz,
 //    int totalBuffLen = 1024 * 3;
 //    char * resultBuff = (char *) malloc(totalBuffLen);
     while (ret >= 0) {
+        if(NULL == contxt->c){
+            return NULL;
+        }
         ret = avcodec_receive_frame(contxt->c, contxt->decoded_frame);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
             break;
@@ -138,4 +141,5 @@ Java_com_haojiangbo_ffmpeg_AudioDecodeObj_freeContext(JNIEnv *env, jobject thiz)
     av_parser_close(contxt->parser);
     av_frame_free(&contxt->decoded_frame);
     av_packet_free(&contxt->pkt);
+    contxt->c = NULL;
 }

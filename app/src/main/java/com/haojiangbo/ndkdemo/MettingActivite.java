@@ -118,6 +118,12 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         initVideoEncode();
         initCamera();
         // AudioTrackManager.getInstance().setPlayStaeam(AudioManager.STREAM_MUSIC);
+
+
+        startMediaPlay();
+        // 开始音频录制
+        AudioRecorder.getInstance().startRecord();
+
     }
 
 
@@ -145,19 +151,12 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
 
     @Override
     protected void onResume() {
-        startMediaPlay();
-        // 开始音频录制
-        AudioRecorder.getInstance().startRecord();
         super.onResume();
     }
 
 
     @Override
     public void onBackPressed() {
-        Log.e("event", "1");
-        VideoMediaParserInstand.freeContext();
-        MeidaParserInstand.freeContext();
-        AudioRecorder.getInstance().stopRecord();
         super.onBackPressed();
     }
 
@@ -165,6 +164,15 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
     @Override
     protected void onPause() {
         Log.e("event", "2");
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+
+        VideoMediaParserInstand.freeContext();
+        MeidaParserInstand.freeContext();
+        AudioRecorder.getInstance().stopRecord();
 
 
         INSTAND = null;
@@ -178,11 +186,8 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
             }
         }
         VIDEO_CACHE.clear();
-        super.onPause();
-    }
 
-    @Override
-    protected void onDestroy() {
+
         closeCamera();
         videoEncode.freeContext();
         super.onDestroy();

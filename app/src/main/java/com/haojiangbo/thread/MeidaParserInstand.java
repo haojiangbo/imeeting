@@ -54,7 +54,7 @@ public class MeidaParserInstand implements Runnable {
                     Log.i("负载大小>>", bytes.length + ">>>>");
                     byte[] converData = decode.decodeFrame(bytes);
                     UserInfoModel model = MettingActivite.VIDEO_CACHE.get(session);
-                    if (converData != null && null != model && !session.equals(ControlProtocolManager.getSessionId()) && THREAD_STATE == 1) {
+                    if (converData != null && converData.length > 0 && null != model && !session.equals(ControlProtocolManager.getSessionId()) && THREAD_STATE == 1) {
                         Log.i("解析后的数据", ">>>>>" + converData.length);
                         model.getAudioTrackManager().startPlay(converData);
                     }
