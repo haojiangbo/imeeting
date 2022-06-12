@@ -81,6 +81,7 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
     GridLayout videoContainerLayout = null;
     RecyclerView videoContainerList = null;
     public static final Map<String, UserInfoModel> VIDEO_CACHE = new ConcurrentHashMap<>();
+    public static final Map<String, UserInfoModel> CURRENT_VIDEO_VIEW = new ConcurrentHashMap<>();
     public static volatile VideoSurface current = null;
     VideoEncode videoEncode = null;
     SurfaceHolder mSurfaceHolder;
@@ -88,13 +89,14 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
     VideoItemListApader videoItemListApader = new VideoItemListApader();
     TextView videoRoomName, roomAudioType;
     ImageView videoTypeBut, audioTypeBut;
+    VideoSurface showViewDetail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_metting_activite);
         ActionBar actionBar = getSupportActionBar();
-        StatusBarColorUtils.setBarColor(this, R.color.heise);
+        StatusBarColorUtils.setBarColor(this, R.color.heise,false);
         if (null != actionBar) {
             actionBar.hide();
         }
@@ -104,6 +106,7 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         videoTypeBut = findViewById(R.id.video_type_but);
         audioTypeBut = findViewById(R.id.audit_type_but);
         roomAudioType = findViewById(R.id.room_audio_type);
+        showViewDetail = findViewById(R.id.show_detail_view);
         audioTypeBut.setOnClickListener(this);
         videoTypeBut.setOnClickListener(this);
         initVideoGroupView();
@@ -204,11 +207,49 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         for (int i = 0; i < uids.size(); i++) {
             LinearLayout linearLayout = (LinearLayout) LayoutInflater.from(videoContainerLayout.getContext()).inflate(R.layout.video_item, videoContainerLayout, false);
             VideoSurface view = linearLayout.findViewById(R.id.item_video_surface);
+            view.setUid(uids.get(i));
             TextView uname = linearLayout.findViewById(R.id.item_video_uname);
 
             ViewGroup.LayoutParams layoutParams = linearLayout.getLayoutParams();
             // 设置视频宽度
-            setViewWidth(linearLayout, layoutParams);
+            setViewWidth(layoutParams);
+            linearLayout.setLayoutParams(layoutParams);
+
+            view.setOnClickListener(view1 -> {
+                VideoSurface tmp = (VideoSurface) view1;
+                if(CURRENT_VIDEO_VIEW.containsKey(tmp.getUid())){
+                    CURRENT_VIDEO_VIEW.get(tmp.getUid()).getVideoSurface().setVisibility(View.GONE);
+                    CURRENT_VIDEO_VIEW.remove(tmp.getUid());
+                }else {
+                    UserInfoModel umodel = new UserInfoModel();
+                    umodel.setUid(tmp.getUid());
+                    umodel.setVideoSurface(showViewDetail);
+                    showViewDetail.setUid(umodel.getUid());
+                    showViewDetail.setVisibility(View.VISIBLE);
+                    showViewDetail.setOnClickListener(view2 -> {
+                        CURRENT_VIDEO_VIEW.get(tmp.getUid()).getVideoSurface().setVisibility(View.GONE);
+                        CURRENT_VIDEO_VIEW.remove(tmp.getUid());
+                    });
+                    CURRENT_VIDEO_VIEW.put(umodel.getUid(),umodel);
+                }
+            });
+
+            /*linearLayout.setOnClickListener(linerTmpView -> {
+                GridLayout.LayoutParams tmpParams = (GridLayout.LayoutParams) linerTmpView.getLayoutParams();
+                DisplayMetrics dm = new DisplayMetrics();
+                getWindowManager().getDefaultDisplay().getMetrics(dm);
+                int screenWidth = dm.widthPixels;
+                if(tmpParams.width == screenWidth){
+                    setViewWidth(tmpParams);
+                    tmpParams.columnSpec = GridLayout.spec(1, 1);
+                }else {
+                    tmpParams.width = screenWidth;
+                    tmpParams.height = (int) (tmpParams.width * 1.1);
+                    tmpParams.columnSpec = GridLayout.spec(0, 3);
+                }
+                linerTmpView.setLayoutParams(tmpParams);
+            });*/
+
 
             view.setGroupView(linearLayout);
             view.setSurfaceviewCorner(30);
@@ -252,17 +293,22 @@ public class MettingActivite extends AppCompatActivity implements View.OnClickLi
         return umodel;
     }
 
-    private void setViewWidth(LinearLayout linearLayout, ViewGroup.LayoutParams layoutParams) {
+    private void setViewWidth(ViewGroup.LayoutParams layoutParams) {
+        setViewWidth(layoutParams,3);
+    }
+
+
+    private void setViewWidth(ViewGroup.LayoutParams layoutParams, int split) {
         DisplayMetrics dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         int screenWidth = dm.widthPixels;
         int screenHeight = dm.heightPixels;
         // 计算宽高比 调整为合适的 宽高
         Log.i("width ", "old = " + screenWidth / 3 + "width = " + screenWidth + "heigth = " + screenHeight);
-        layoutParams.width = screenWidth / 3;
+        layoutParams.width = screenWidth / split;
         layoutParams.height = (int) (layoutParams.width * 1.5);
-        linearLayout.setLayoutParams(layoutParams);
     }
+
 
     public void removeVideoSurface(String uid) {
         UserInfoModel tmp = VIDEO_CACHE.get(uid);

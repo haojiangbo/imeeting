@@ -16,6 +16,8 @@ public class VideoSurface extends SurfaceView {
 
     private View groupView;
 
+    private String uid;
+
     public VideoSurface(Context context) {
         super(context);
         init();
@@ -64,5 +66,13 @@ public class VideoSurface extends SurfaceView {
 
     public void setGroupView(View groupView) {
         this.groupView = groupView;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
     }
 }

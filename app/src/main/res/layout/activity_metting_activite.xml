@@ -33,6 +33,16 @@
         android:visibility="gone"></androidx.recyclerview.widget.RecyclerView>
 
 
+    <com.haojiangbo.widget.VideoSurface
+        android:id="@+id/show_detail_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:visibility="gone"
+        >
+    </com.haojiangbo.widget.VideoSurface>
+
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

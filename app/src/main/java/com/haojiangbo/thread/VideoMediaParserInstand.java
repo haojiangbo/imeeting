@@ -43,9 +43,12 @@ public class VideoMediaParserInstand implements Runnable {
 
     public static volatile int THREAD_STATE =  1;
 
+    public static VideoDecodeObj currentVideoDecode = new VideoDecodeObj();
+
     @Override
     public void run() {
         VideoDecodeObj videoDecode;
+        currentVideoDecode.initContext();
         while (THREAD_STATE == 1) {
             try {
                 ByteBuf byteBuf = MEDIA_DATA_QUEUE.take();
@@ -77,6 +80,12 @@ public class VideoMediaParserInstand implements Runnable {
                         /*Log.e("test", "msurfa.id = " + videoSurface.mSurface.toString() + "decode = " + videoDecode.toString() + "session" + session);*/
                         videoDecode.drawSurface(model.getVideoSurface().mSurface, bytes, cameraType);
                     }
+
+                    // 是否绘制detailVideo
+                    UserInfoModel currentModel =   MettingActivite.CURRENT_VIDEO_VIEW.get(session);
+                    if (null != currentModel && THREAD_STATE == 1) {
+                        currentVideoDecode.drawSurface(currentModel.getVideoSurface().mSurface, bytes, cameraType);
+                    }
                 }
                 ReferenceCountUtil.release(byteBuf);
             } catch (Exception e) {
@@ -92,6 +101,7 @@ public class VideoMediaParserInstand implements Runnable {
         for(String key : stringSet){
             ENCODE_MAPPING.get(key).freeContext();
         }
+        currentVideoDecode.freeContext();
         ENCODE_MAPPING.clear();
         THREAD_STATE = 0;
     }
