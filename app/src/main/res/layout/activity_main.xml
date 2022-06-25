@@ -8,19 +8,41 @@
     tools:context=".MainActivity">
 
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="100dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="iMeeting"
+        android:textSize="30dp"
+        android:gravity="center"
+        >
+
+    </TextView>
+
+
+
     <EditText
         android:id="@+id/roomnum"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="100dp"
+        android:layout_marginTop="200dp"
+        android:background="@drawable/top_radio"
         android:text="123456"></EditText>
 
     <EditText
         android:id="@+id/password"
         android:layout_width="match_parent"
         android:layout_height="50dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
         android:layout_below="@id/roomnum"
+        android:inputType="textPassword"
+        android:background="@drawable/top_radio"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="10dp"></EditText>
 
@@ -29,20 +51,27 @@
         android:layout_below="@id/password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="10dp"
+        android:orientation="vertical">
 
         <Button
             android:id="@+id/create"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:textColor="@color/baise"
+            android:background="@drawable/keyword_color"
             android:text="创建"></Button>
 
         <Button
             android:id="@+id/join"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:layout_height="45dp"
+            android:textColor="@color/baise"
             android:layout_weight="1"
+            android:layout_marginTop="10dp"
+            android:background="@drawable/keyword_color_blue"
             android:text="加入"></Button>
     </androidx.appcompat.widget.LinearLayoutCompat>
 

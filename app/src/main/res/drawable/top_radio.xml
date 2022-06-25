@@ -5,14 +5,14 @@
     <!-- 连框颜色值 -->
     <item>
         <shape>
-            <corners android:radius="35dp"></corners>
-            <solid android:color="#10000000"></solid>
+            <corners android:radius="3dp"></corners>
+            <solid android:color="@color/lanse"></solid>
         </shape>
     </item>
     <!-- 主体背景颜色值 -->
-    <item android:top="1dp">
+    <item android:bottom="1dp">
         <shape>
-            <corners android:radius="35dp"></corners>
+            <corners android:radius="3dp"></corners>
             <solid android:color="@color/baise"></solid>
         </shape>
     </item>

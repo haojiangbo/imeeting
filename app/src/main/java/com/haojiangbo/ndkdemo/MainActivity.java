@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (null != actionBar) {
             actionBar.hide();
         }
+        //StatusBarColorUtils.setBarColor(this, R.color.heise,false);
         StatusBarColorUtils.setBarColor(this, R.color.design_default_color_background);
         EventBus.getDefault().register(this);
         create = findViewById(R.id.create);

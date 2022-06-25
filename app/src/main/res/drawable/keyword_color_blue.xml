@@ -22,7 +22,7 @@
             <item android:top="0.5dp" android:left="0.5dp" android:right="0.5dp" android:bottom="0.5dp"> <!--设置只有右边有边框 -->
                 <shape >
                     <corners android:radius="5dp"></corners>
-                    <solid android:color="@color/yingkou"></solid>
+                    <solid android:color="@color/zise"></solid>
                 </shape>
             </item>
         </layer-list>
@@ -40,7 +40,7 @@
             <item android:top="0.5dp" android:left="0.5dp" android:right="0.5dp" android:bottom="0.5dp"> <!--设置只有右边有边框 -->
                 <shape >
                     <corners android:radius="5dp"></corners>
-                    <solid android:color="@color/yingkou"></solid>
+                    <solid android:color="@color/zise"></solid>
                 </shape>
             </item>
         </layer-list>
