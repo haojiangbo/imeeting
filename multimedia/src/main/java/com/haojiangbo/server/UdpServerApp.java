@@ -2,6 +2,7 @@ package com.haojiangbo.server;
 
 import com.haojiangbo.config.ServcerConfig;
 import com.haojiangbo.hander.udp.UdpServerMessageReadHander;
+import com.haojiangbo.thread.CheckChannelIsOnline;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -19,6 +20,8 @@ public class UdpServerApp {
 
 
     public static void main(String[] ages) {
+        CheckChannelIsOnline checkChannelIsOnline = new CheckChannelIsOnline();
+
         TcpServerApp tcpServerApp = new TcpServerApp();
         tcpServerApp.start(ServcerConfig.LISTENER_PROT);
 

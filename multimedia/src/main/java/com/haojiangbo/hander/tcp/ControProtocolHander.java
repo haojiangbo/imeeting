@@ -44,6 +44,8 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
                 if(!CallNumberAndChannelMapping.SESSION_CHANNEL_MAPPING.containsKey(session)){
                     return;
                 }
+                // 活跃用户
+                CallNumberAndChannelMapping.CHECK_IS_ONLINE_MAPPING.put(ctx,System.currentTimeMillis());
                 addActiviteChannel(ctx, session, model);
                 break;
             case ControlProtocol.CREATE: {
@@ -120,7 +122,15 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
     @Override
     public void channelInactive(ChannelHandlerContext ctx) throws Exception {
         super.channelInactive(ctx);
+        // 删除离线channel
+        removeDeadLineChannel(ctx);
+    }
 
+    /**
+     * 删除离线channel
+     * @param ctx
+     */
+    public static void removeDeadLineChannel(ChannelHandlerContext ctx) {
         String session = CallNumberAndChannelMapping.CHANNEL_SESSION_MAPPING.get(ctx.channel());
         if (StringUtils.isEmpty(session)) {
             return;
@@ -154,5 +164,7 @@ public class ControProtocolHander extends ChannelInboundHandlerAdapter {
             udpMap.remove(model.uid);
             log.info("udp go back roomid = {}  uid = {} ", model.key, model.uid);
         }
+        CallNumberAndChannelMapping.CHECK_IS_ONLINE_MAPPING.remove(ctx);
+        ctx.channel().close();
     }
 }
